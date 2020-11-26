@@ -10,14 +10,14 @@ public interface ItemView {
     /**
      * Return the number of slots in the inventory.
      */
-    int getSlotCount();
+    int getItemSlotCount();
 
     /**
      * Return the stack in some slot. Note that the stack may have an arbitrary count. It is possible that the returned stack may change
      *
      * <p><b>THIS IS AN ITEM VIEW. DO NOT EVER MODIFY THE RETURNED STACK.
-     * @param slot The slot id, must be between 0 and {@link ItemView#getSlotCount()}.
-     * @throws IndexOutOfBoundsException if the slot is not in the range [0, {@link ItemView#getSlotCount()}).
+     * @param slot The slot id, must be between 0 and {@link ItemView#getItemSlotCount()}.
+     * @throws IndexOutOfBoundsException if the slot is not in the range [0, {@link ItemView#getItemSlotCount()}).
      */
     ItemStack getStack(int slot);
 

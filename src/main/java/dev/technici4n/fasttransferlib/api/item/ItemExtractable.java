@@ -11,13 +11,13 @@ public interface ItemExtractable extends ItemView {
      * Extract some items from this extractable, with the same semantics as {@link ItemExtractable#extract(ItemStack, Simulation) the slotless variant}.
      * The slot parameter, as long as it is in range, can be anything.
      * It is however expected that calling this in a loop will be faster for callers that need to move a lot of items, with the following snippet for example:
-     * <pre>
+     * <pre>{@code
      * for(int i = 0; i < extractable.getSlotCount(); i++) {
      *     ItemStack extractedStack = extractable.extract(i, extractable.getStack(i), Simulation.ACT);
      *     // use the extracted slot
      * }
-     * </pre>
-     * @param slot The slot id, must be between 0 and {@link ItemView#getSlotCount()}.
+     * }</pre>
+     * @param slot The slot id, must be between 0 and {@link ItemView#getItemSlotCount()}.
      * @param stack The filter for the stack to extract, and the number of items to extract at most.
      * @param simulation If {@link Simulation#SIMULATE}, do not mutate the insertable
      * @return The extracted stack
@@ -32,10 +32,11 @@ public interface ItemExtractable extends ItemView {
      * <p><b>It is possible that the passed stack is one of the stacks of the inventory. This should be taken into account by the implementation.
      * @param stack The filter for the stack to extract, and the number of items to extract at most.
      * @param simulation If {@link Simulation#SIMULATE}, do not mutate the insertable
+     * @implNote Implementations are encouraged to override this method with a more performant implementation.
      * @return The extracted stack
      */
     default ItemStack extract(ItemStack stack, Simulation simulation) {
-        for(int i = 0; i < getSlotCount(); ++i) {
+        for(int i = 0; i < getItemSlotCount(); ++i) {
             ItemStack extracted = extract(i, stack, simulation);
             if (!extracted.isEmpty()) {
                 return extracted;
