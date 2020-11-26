@@ -1,34 +1,31 @@
 {
   "schemaVersion": 1,
-  "id": "modid",
+  "id": "fasttransferlib",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "Fast Transfer Lib",
+  "description": "A fast item and fluid api based on fabric-provider-api-v1",
   "authors": [
-    "Me!"
+    "Technici4n"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "homepage": "https://github.com/Technici4n/FastTransferLib",
+    "sources": "https://github.com/Technici4n/FastTransferLib"
   },
 
   "license": "CC0-1.0",
-  "icon": "assets/modid/icon.png",
+  "icon": "assets/fasttransferlib/icon.png",
 
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.example.ExampleMod"
+      "dev.technici4n.fasttransferlib.FastTransferLib"
     ]
   },
-  "mixins": [
-    "modid.mixins.json"
-  ],
 
   "depends": {
     "fabricloader": ">=0.7.4",
-    "fabric": "*",
+    "fabric-api-provider": "*",
     "minecraft": "1.16.x"
   },
   "suggests": {
