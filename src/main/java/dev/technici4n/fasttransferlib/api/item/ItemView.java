@@ -22,7 +22,7 @@ public interface ItemView {
     ItemStack getStack(int slot);
 
     /**
-     * Return the version of this inventory. f this number is the same for two calls, it is expected
+     * Return the version of this inventory. If this number is the same for two calls, it is expected
      * that the underlying inventory hasn't changed. There is however no guarantee that the inventory has changed if this number has changed.
      */
     default int getVersion() {
