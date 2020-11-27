@@ -5,6 +5,8 @@ import net.minecraft.item.ItemStack;
 
 /**
  * An item inventory that supports extracting items.
+ *
+ * @see ItemInsertable
  */
 public interface ItemExtractable extends ItemView {
     /**
@@ -21,6 +23,7 @@ public interface ItemExtractable extends ItemView {
      * @param stack The filter for the stack to extract, and the number of items to extract at most.
      * @param simulation If {@link Simulation#SIMULATE}, do not mutate the insertable
      * @return The extracted stack
+     * @implSpec The passed stack must never be stored or mutated by this function.
      */
     ItemStack extract(int slot, ItemStack stack, Simulation simulation);
 
@@ -32,8 +35,9 @@ public interface ItemExtractable extends ItemView {
      * <p><b>It is possible that the passed stack is one of the stacks of the inventory. This should be taken into account by the implementation.
      * @param stack The filter for the stack to extract, and the number of items to extract at most.
      * @param simulation If {@link Simulation#SIMULATE}, do not mutate the insertable
-     * @implNote Implementations are encouraged to override this method with a more performant implementation.
      * @return The extracted stack
+     * @implNote Implementations are encouraged to override this method with a more performant implementation.
+     * @implSpec The passed stack must never be stored or mutated by this function.
      */
     default ItemStack extract(ItemStack stack, Simulation simulation) {
         for(int i = 0; i < getItemSlotCount(); ++i) {

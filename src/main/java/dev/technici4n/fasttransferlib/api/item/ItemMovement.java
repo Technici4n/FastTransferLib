@@ -3,13 +3,20 @@ package dev.technici4n.fasttransferlib.api.item;
 import dev.technici4n.fasttransferlib.api.Simulation;
 import net.minecraft.item.ItemStack;
 
-public class ItemUtils {
+/**
+ * Utilities related to moving items from an {@link ItemExtractable} to another {@link ItemInsertable}.
+ */
+public final class ItemMovement {
     /**
      * Move some items from some slots of an {@link ItemExtractable} to an {@link ItemInsertable}.
+     *
+     * @param from the extractable to move items from
+     * @param to the insertable to move the items to
      * @param maxCount The maximum number of items to move.
      * @param startSlot The first slot of the range to move, inclusive.
      * @param endSlot The last slot of the range to move, exclusive.
      * @return The number of items that were moved.
+     * @throws IndexOutOfBoundsException if the start or end slot is out of bounds of the {@link ItemExtractable}'s slot count.
      */
     public static int moveRange(ItemExtractable from, ItemInsertable to, int maxCount, int startSlot, int endSlot) {
         int totalMoved = 0;
@@ -44,10 +51,16 @@ public class ItemUtils {
 
     /**
      * Move some items from an {@link ItemExtractable} to an {@link ItemInsertable}.
+     *
+     * @param from the extractable to move items from
+     * @param to the insertable to move the items to
      * @param maxCount The maximum number of items to move.
      * @return The number of items that were moved.
      */
     public static int moveMultiple(ItemExtractable from, ItemInsertable to, int maxCount) {
         return moveRange(from, to, maxCount, 0, from.getItemSlotCount());
+    }
+
+    private ItemMovement() {
     }
 }
