@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "fasttransferlib-testmod",
+  "version": "${version}",
+
+  "name": "Fast Transfer Lib Testmod",
+  "description": "A testmod for the fast item and fluid api based on fabric-provider-api-v1",
+  "authors": [
+    "Technici4n"
+  ],
+  "contact": {
+    "homepage": "https://github.com/Technici4n/FastTransferLib",
+    "sources": "https://github.com/Technici4n/FastTransferLib"
+  },
+
+  "license": "CC0-1.0",
+
+  "depends": {
+    "fabricloader": ">=0.7.4",
+    "fabric-api-provider": "*",
+    "minecraft": "1.16.x"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

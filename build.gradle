@@ -1,3 +1,5 @@
+import net.fabricmc.loom.task.AbstractRunTask
+
 plugins {
 	id 'fabric-loom' version '0.5-SNAPSHOT'
 	id 'maven-publish'
@@ -20,6 +22,13 @@ repositories {
 	}
 }
 
+sourceSets {
+	testmod {
+		compileClasspath += main.compileClasspath
+		runtimeClasspath += main.runtimeClasspath
+	}
+}
+
 dependencies {
 	// To change the versions see the gradle.properties file
 	minecraft "com.mojang:minecraft:${project.minecraft_version}"
@@ -28,6 +37,10 @@ dependencies {
 
 	modApi "net.fabricmc.fabric-api:fabric-provider-api-v1:${project.api_provider_version}"
 	include "net.fabricmc.fabric-api:fabric-provider-api-v1:${project.api_provider_version}"
+
+	afterEvaluate {
+		testmodImplementation sourceSets.main.output
+	}
 }
 
 processResources {
@@ -87,3 +100,12 @@ publishing {
 		// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	}
 }
+
+// TODO: Fix this below
+// Comment out block below to enable to disable testmods when running the game
+/*
+tasks.withType(AbstractRunTask) {
+    classpath += sourceSets.testmod.runtimeClasspath
+    classpath += sourceSets.testmod.output
+}
+//*/
