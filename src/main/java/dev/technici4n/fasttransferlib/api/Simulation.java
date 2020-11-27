@@ -4,11 +4,11 @@ public enum Simulation {
     SIMULATE,
     ACT;
 
-    public boolean isSimulate() {
+    public boolean isSimulating() {
         return this == SIMULATE;
     }
 
-    public boolean isAct() {
+    public boolean isActing() {
         return this == ACT;
     }
 }

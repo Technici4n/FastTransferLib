@@ -18,10 +18,11 @@ public interface ItemInteractionContext {
     boolean setStack(ItemStack stack, Simulation simulation);
 
     /**
-     * Set the extract stack if possible and return whether the modification was successful.
-     * @param stack The new stack
+     * Add extra stacks if possible and return whether the modification was successful.
+     * @param stacks The extra stacks
      * @param simulation If {@link Simulation#SIMULATE}, do not mutate anything
      * @return whether the modification was successful
+     * @apiNote If a simulation succeeds twice, it is not guaranteed that the action will succeed twice, so it is recommended to only call this function once.
      */
-    boolean setExtraStack(ItemStack stack, Simulation simulation);
+    boolean addExtraStacks(ItemStack stacks, Simulation simulation);
 }
