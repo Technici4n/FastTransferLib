@@ -18,7 +18,7 @@ public interface ItemInsertable extends ItemView {
      *
      * @param insertedStack The inserted stack, given to the insertable forever
      * @param simulation If {@link Simulation#SIMULATE}, do not mutate the insertable
-     * @return the leftover stack that could not be inserted
+     * @return the leftover of the stack that could not be inserted
      */
     ItemStack insert(ItemStack insertedStack, Simulation simulation);
 }
