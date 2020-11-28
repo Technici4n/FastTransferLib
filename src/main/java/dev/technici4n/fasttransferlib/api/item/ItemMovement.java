@@ -6,6 +6,7 @@ import net.minecraft.item.ItemStack;
 /**
  * Utilities related to moving items from an {@link ItemExtractable} to another {@link ItemInsertable}.
  */
+// TODO: add a Predicate<ItemKey> parameter
 public final class ItemMovement {
     /**
      * Move some items from some slots of an {@link ItemExtractable} to an {@link ItemInsertable}.
@@ -21,27 +22,25 @@ public final class ItemMovement {
     public static int moveRange(ItemExtractable from, ItemInsertable to, int maxCount, int startSlot, int endSlot) {
         int totalMoved = 0;
         for (int i = startSlot; i < endSlot && maxCount > 0; ++i) {
-            // Try to extract once
-            ItemStack filter = from.extract(i, from.getStack(i), Simulation.SIMULATE);
-            if (filter.isEmpty()) continue;
-
-            // Try to insert
-            filter = filter.copy();
-            filter.setCount(Math.min(filter.getCount(), maxCount));
-            ItemStack leftover = to.insert(filter.copy(), Simulation.SIMULATE);
-            int moved = filter.getCount() - leftover.getCount();
+            // Try to extract the maximum count
+            ItemKey key = from.getItemKey(i);
+            int moved = from.extract(i, key, maxCount, Simulation.SIMULATE);
             if (moved <= 0) continue;
-            filter.setCount(moved);
 
-            // Try to extract again with the new count
-            ItemStack extracted = from.extract(i, filter, Simulation.SIMULATE);
-            if (extracted.getCount() != moved) continue;
+            // Try to insert the maximum count that can be extracted
+            moved -= to.insert(key, moved, Simulation.SIMULATE);
+            if (moved <= 0) continue;
+
+            // Try to extract again with the maximum count for the insertable, and return if that doesn't match
+            if (from.extract(i, key, moved, Simulation.SIMULATE) != moved) continue;
 
             // Move the items at last
-            extracted = from.extract(i, filter, Simulation.ACT);
-            // TODO: if extracted.getCount() != moved, throw
-            leftover = to.insert(extracted, Simulation.ACT);
-            // TODO: if !leftover.isEmpty(), throw
+            if (from.extract(i, key, moved, Simulation.ACT) != moved) {
+                // TODO: throw
+            }
+            if (to.insert(key, moved, Simulation.ACT) != 0) {
+                // TODO: throw
+            }
 
             totalMoved += moved;
             maxCount -= moved;

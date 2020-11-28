@@ -10,7 +10,7 @@ import net.minecraft.item.ItemStack;
  */
 public interface ItemExtractable extends ItemView {
     /**
-     * Extract some items from this extractable, with the same semantics as {@link ItemExtractable#extract(ItemStack, Simulation) the slotless variant}.
+     * Extract some items from this extractable, with the same semantics as {@link ItemExtractable#extract(ItemKey, int, Simulation) the slotless variant}.
      * The slot parameter, as long as it is in range, can be anything.
      * It is however expected that calling this in a loop will be faster for callers that need to move a lot of items, with the following snippet for example:
      * <pre>{@code
@@ -20,32 +20,29 @@ public interface ItemExtractable extends ItemView {
      * }
      * }</pre>
      * @param slot The slot id, must be between 0 and {@link ItemView#getItemSlotCount()}.
-     * @param stack The filter for the stack to extract, and the number of items to extract at most.
+     * @param key The filter for the items to extract
+     * @param maxCount the number of items to extract at most.
      * @param simulation If {@link Simulation#SIMULATE}, do not mutate the insertable
      * @return The extracted stack
-     * @implSpec The passed stack must never be stored or mutated by this function.
      */
-    ItemStack extract(int slot, ItemStack stack, Simulation simulation);
+    int extract(int slot, ItemKey key, int maxCount, Simulation simulation);
 
     /**
-     * Extract some items from this extractable, matching the passed stack ignoring the count, and at most the count of the stack.
+     * Extract some items from this extractable, matching the passed item key.
      * <p>If simulation is {@link Simulation#SIMULATE}, the result of the operation must be returned, but the underlying state of the item extractable must not change.
-     * <p>The passed stack must never be stored or mutated by this function.
-     * The returned stack is given to the caller in the sense that it will not be used by the item extractable.
-     * <p><b>It is possible that the passed stack is one of the stacks of the inventory. This should be taken into account by the implementation.
-     * @param stack The filter for the stack to extract, and the number of items to extract at most.
+     * @param key The filter for the items to extract
+     * @param maxCount the number of items to extract at most.
      * @param simulation If {@link Simulation#SIMULATE}, do not mutate the insertable
      * @return The extracted stack
      * @implNote Implementations are encouraged to override this method with a more performant implementation.
-     * @implSpec The passed stack must never be stored or mutated by this function.
      */
-    default ItemStack extract(ItemStack stack, Simulation simulation) {
+    default int extract(ItemKey key, int maxCount, Simulation simulation) {
         for(int i = 0; i < getItemSlotCount(); ++i) {
-            ItemStack extracted = extract(i, stack, simulation);
-            if (!extracted.isEmpty()) {
+            int extracted = extract(i, key, maxCount, simulation);
+            if (extracted > 0) {
                 return extracted;
             }
         }
-        return ItemStack.EMPTY;
+        return 0;
     }
 }
