@@ -1,4 +1,4 @@
-import net.fabricmc.loom.task.AbstractRunTask
+//import net.fabricmc.loom.task.AbstractRunTask
 
 plugins {
 	id 'fabric-loom' version '0.5-SNAPSHOT'
@@ -20,6 +20,13 @@ repositories {
 			includeGroup "net.fabricmc.fabric-api"
 		}
 	}
+	maven {
+		name = "BuildCraft"
+		url = "https://mod-buildcraft.com/maven"
+		content {
+			includeGroup "alexiil.mc.lib"
+		}
+	}
 }
 
 sourceSets {
@@ -35,8 +42,10 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
+	// TODO: add fabric api
 	modApi "net.fabricmc.fabric-api:fabric-provider-api-v1:${project.api_provider_version}"
 	include "net.fabricmc.fabric-api:fabric-provider-api-v1:${project.api_provider_version}"
+	modCompileOnly "alexiil.mc.lib:libblockattributes-all:${project.lba_version}"
 
 	afterEvaluate {
 		testmodImplementation sourceSets.main.output

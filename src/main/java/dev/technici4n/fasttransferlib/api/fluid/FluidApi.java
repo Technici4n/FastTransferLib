@@ -1,6 +1,7 @@
 package dev.technici4n.fasttransferlib.api.fluid;
 
 import dev.technici4n.fasttransferlib.api.ItemInteractionContext;
+import dev.technici4n.fasttransferlib.impl.fluid.compat.lba.LbaCompat;
 import net.fabricmc.fabric.api.provider.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.provider.v1.block.BlockApiLookupRegistry;
 import net.fabricmc.fabric.api.provider.v1.item.ItemApiLookup;
@@ -18,6 +19,7 @@ public class FluidApi {
             ItemApiLookupRegistry.getLookup(new Identifier("fasttransferlib:fluid_view"), FluidView.class, ItemInteractionContext.class);
 
     static {
-        // TODO: Vanilla and LBA compat for guaranteed epicness
+        // TODO: Vanilla and full LBA compat for guaranteed epicness
+        LbaCompat.init();
     }
 }
