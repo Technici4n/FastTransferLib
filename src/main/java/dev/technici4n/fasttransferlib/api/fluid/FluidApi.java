@@ -1,6 +1,7 @@
 package dev.technici4n.fasttransferlib.api.fluid;
 
 import dev.technici4n.fasttransferlib.api.ItemInteractionContext;
+import dev.technici4n.fasttransferlib.impl.fluid.FluidImpl;
 import dev.technici4n.fasttransferlib.impl.fluid.compat.lba.LbaCompat;
 import net.fabricmc.fabric.api.provider.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.provider.v1.block.BlockApiLookupRegistry;
@@ -20,6 +21,6 @@ public class FluidApi {
 
     static {
         // TODO: Vanilla and full LBA compat for guaranteed epicness
-        LbaCompat.init();
+        FluidImpl.loadLbaCompat();
     }
 }
