@@ -42,7 +42,8 @@ dependencies {
 	mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
 	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-	// TODO: add fabric api
+	modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+
 	modApi "net.fabricmc.fabric-api:fabric-provider-api-v1:${project.api_provider_version}"
 	include "net.fabricmc.fabric-api:fabric-provider-api-v1:${project.api_provider_version}"
 	modCompileOnly "alexiil.mc.lib:libblockattributes-all:${project.lba_version}"
@@ -110,11 +111,7 @@ publishing {
 	}
 }
 
-// TODO: Fix this below
-// Comment out block below to enable to disable testmods when running the game
-/*
-tasks.withType(AbstractRunTask) {
-    classpath += sourceSets.testmod.runtimeClasspath
-    classpath += sourceSets.testmod.output
+tasks.withType(net.fabricmc.loom.task.AbstractRunTask) {
+	classpath += sourceSets.testmod.runtimeClasspath
+	classpath += sourceSets.testmod.output
 }
-//*/

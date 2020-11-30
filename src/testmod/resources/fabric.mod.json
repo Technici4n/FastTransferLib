@@ -15,12 +15,17 @@
 
   "license": "CC0-1.0",
 
+  "entrypoints": {
+    "main": [
+        "dev.technic4n.fasttransferlib.example.fluid.FluidExample"
+    ]
+  },
+
+"environment": "*",
+
   "depends": {
     "fabricloader": ">=0.7.4",
     "fabric-provider-api-v1": "*",
     "minecraft": "1.16.x"
-  },
-  "suggests": {
-    "another-mod": "*"
   }
 }
