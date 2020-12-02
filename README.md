@@ -6,7 +6,7 @@ Hopefully it will be merged in fabric api, but more testing has to be done befor
 ## Goals of the project
 * The first goal of the project is testing the `fabric-provider-api-v1` in a production environment for correctness and performance.
 * The second goal of the project is trying to design a simple yet very efficient design for an item and fluid transfer api for potential inclusion in Fabric API in the future.
-  In particular, that includes experimenting with a fixed-denominator base 81000 fluid api.
+  In particular, that includes experimenting with per-container denominators for the fluid api.
 * For this api to be a drop-in replacement in the current 1.16 ecosystem, it will be bundled with `Inventory`/`SidedInventory` and LBA interop, but that may be removed in the future if it is not necessary anymore.
   
 ## Users of the API
@@ -17,15 +17,54 @@ Hopefully it will be merged in fabric api, but more testing has to be done befor
 When the API is a bit more fleshed out, builds will be available on https://github.com/Technici4n/Technici4n-maven.
 
 ## Usage
-TODO
+Item transfer is handled by three interfaces: `ItemView`, `ItemInsertable` and `ItemExtractable`.
+* `ItemView` is a read-only view of an inventory.
+* `ItemInsertable` is an `ItemView` that also supports inserting items.
+* `ItemExtractable` is an `ItemView` that supports extracting items.
 
-## Why this API (api-provider)
-TODO
+Note that `ItemStack`s are never transferred directly with this API. Instead, immutable count-less `ItemStack`s called `ItemKey`s are used, and the
+counts must be passed separately. This prevents unneeded allocation, and can make comparison between stacks a lot faster.
 
-## Why this API (Items)
-TODO
+Querying an instance of the API is dead simple:
+```java
+ItemView view = ItemApi.SIDED_VIEW.get(world, blockPos, direction);
+if (view != null) {
+    // use the view
+}
+if (view instanceof ItemInsertable) {
+    // cast to ItemInsertable and use
+}
+if (view instanceof ItemExtractable) {
+    // cast to ItemExtractable and use
+}
+```
 
-## Prior art
+Registering your block to use the API is also very simple:
+```java
+ItemApi.SIDED_VIEW.registerForBlocks((world, pos, blockState, direction) -> {
+    // return an ItemView for your block, or null if there is none
+}, BLOCK_INSTANCE, ANOTHER_BLOCK_INSTANCE); // register as many blocks as you want
+```
+
+If your block is a BlockEntity, it is much more efficient to use `registerForBlockEntities` instead. Ideally, you also want to
+store the API in a field of your block entity, as there can be a lot of queries per tick.
+```java
+ItemApi.SIDED_VIEW.registerForBlockEntities((blockEntity, direction) -> {
+    if (blockEntity instanceof YourBlockEntity) {
+        // return your ItemView, ideally a field in the block entity, or null if there is none.
+    }
+}, BLOCK_ENTITY_TYPE_1, BLOCK_ENTITY_TYPE_2);
+```
+
+TODO: item-provided APIS
+
+TODO: fluid API
+
+## Why use fabric-provider-api-v1
+`fabric-provider-api-v1` is much more flexible than `InventoryProvider` or block entity `instanceof` checks as it also allows registering compatibility layers.
+It also comes with a caching system to massively improve performance for blocks that need to do queries every tick.
+
+## Item API prior art
 ### Vanilla Inventory/SidedInventory
 The standard Minecraft interfaces for handling items.
 They require a lot of boilerplate for the implementor and for the user, but they are very simple to understand.
@@ -47,18 +86,39 @@ The standard Forge capability for handling items. It is clearly an improvement o
   Some way to listen to inventory changes or at least have a way to skip unchanged inventories would be nice.
 
 ### LibBlockAttributes (LBA)
-TODO
-The author is very familiar with LBA, and has designed FTL as an alternative to LBA specifically. Notable differences:
-* FTL has a much smaller API surface;
-* FTL uses millidroplets for its fluid api, LBA uses fractions;
-* FTL has a single `ItemView`/`FluidView` interface that can be cast to `Insertable`/`Extractable` if necessary.
+LBA is an item and fluid transfer library written for use in BuildCraft. It has a ton of API surface and default implementations.
+For example, the main classes for item transfer are `ItemInsertable`, `ItemExtractable`, `FixedItemInvView`, `FixItemInv`, `GroupedItemInvView` and `GroupedItemInv`.
+These classes have a lot of default methods, some inherit others, and sometimes you get one by querying another, which can be surprising.
+The author feels that it should be possible to remove 80% of the code of LBA while still retaining the most important functionality.
+
+Another concern is that `ItemExtractable`s in particular work with a completely opaque `ItemStack extract(int maxCount, ItemFilter filter)`,
+where `ItemFilter` is basically a count-independent `Predicate<ItemStack>`.
+One of the issues with that approach is that it's very hard to optimize the extraction, unless the `ItemFilter` implements `ReadableItemFilter` and one of
+`ConstantItemFilter`, `ExactItemFilter`, `ExactItemSetFilter`, `ExactItemStackFilter`, `ItemClassFilter`, `AggregateItemFilter`, `ResolvableItemFilter`.
+The author feels that this is a lot of complexity for little benefit.
+
+Also, moving a lot of items between an `ItemExtractable` and an `ItemInsertable`, each with `N` slots, is in `O(N^3)` for a naive implementation,
+whereas it is only `O(N^2)` with the vanilla interfaces or the Forge capabilities.
+
+Finally, without defensive copies, it is still possible to modify `ItemStack`s directly.
+
+In spite of that, `ItemExtractable` and `ItemInsertable` are great abstractions to work with, and LBA is clearly a big improvement over the vanilla interfaces.
 
 ### Fluidity
-TODO
-The author is not familiar with Fluidity, and has no clue how its item and fluid interfaces work.
-Note however that `fabric-provider-api-v1` is derived from a subset of Fluidity. Notable differences:
-* FTL uses simulations, Fluidity uses transactions;
-* FTL uses millidroplets for its fluid api, LBA uses fractions.
+The author is not very familiar with Fluidity, but a few observations can be made:
+* `fabric-provider-api-v1` is derived from the component and device subsystem of Fluidity.
+* Fluidity always distinguishes between a resource and its amount. `ItemStack`s are split into a count and an immutable `Article`.
+  In fact, an `Article` in Fluidity can be an item with nbt, a fluid, or even something else. Fluidity uses the same functions for handling all
+  types of `Article`s, which makes it very generic and powerful. However, it is the author's opinion that this increases the cognitive load for the user.
+* Like LBA, Fluidity has a lot of API surface, which can make it hard to understand.
+* On top of simulations, Fluidity provides a transaction system, allowing arbitrarily complex transfer operations to be simulated and reverted if necessary.
+  This allows some patterns that are simply not possible with APIs that only allow simulating one operation at the time like IItemHandler and LBA.
+
+A lot of other things can probably be said about Fluidity. The author hasn't studied it very closely, but he strongly recommends giving it a try if the
+reader is looking for a batteries-included generic resource management library.
+
+## Item API design
+TODO explain which of the above problems FTL addresses.
 
 ## License
 This library is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
