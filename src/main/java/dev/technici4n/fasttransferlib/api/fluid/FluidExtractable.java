@@ -23,7 +23,7 @@ public interface FluidExtractable extends FluidView {
     long extract(int slot, Fluid fluid, long maxAmount, Simulation simulation);
 
     /**
-     * Extract some fluid from this extractable, matching the passed fluid.
+     * Extract some fluid from this extractable, matching the passed fluid. The unit for the amount is given by {@link FluidView#getFluidUnit}.
      * <p>If simulation is {@link Simulation#SIMULATE}, the result of the operation must be returned, but the underlying state of the fluid extractable must not change.
      * @param fluid The filter for the fluid to extract
      * @param maxAmount The amount of fluid to extract at most

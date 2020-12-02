@@ -24,9 +24,10 @@ public class YeetStick extends Item {
             FluidExtractable extractable = (FluidExtractable) fluidIO;
             if (extractable.getFluidSlotCount() > 0) {
                 Fluid fluid = extractable.getFluid(0);
-                long extractedAmmount = extractable.extract(fluid, FluidConstants.BOTTLE * 2, Simulation.ACT);
-                if (extractedAmmount > 0) {
-                    System.out.printf("Extracted %d %s%n", extractedAmmount, Registry.FLUID.getId(fluid).toString());
+                long toExtract = 2 * extractable.getFluidUnit() / 3;
+                long extractedAmount = extractable.extract(fluid, toExtract, Simulation.ACT);
+                if (extractedAmount > 0) {
+                    System.out.printf("Extracted %d / %d %s%n", extractedAmount, extractable.getFluidUnit(), Registry.FLUID.getId(fluid).toString());
                 }
                 return ActionResult.SUCCESS;
             }

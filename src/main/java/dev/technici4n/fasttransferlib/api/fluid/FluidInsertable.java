@@ -10,7 +10,7 @@ import net.minecraft.fluid.Fluid;
  */
 public interface FluidInsertable extends FluidView {
     /**
-     * Insert fluid into this inventory, and return the amount of leftover fluid.
+     * Insert fluid into this inventory, and return the amount of leftover fluid. The unit for the amount is given by {@link FluidView#getFluidUnit}.
      * Distribution is left entirely to the implementor.
      * <p>If simulation is {@link Simulation#SIMULATE}, the result of the operation must be returned, but the underlying state of the fluid insertable must not change.
      *
