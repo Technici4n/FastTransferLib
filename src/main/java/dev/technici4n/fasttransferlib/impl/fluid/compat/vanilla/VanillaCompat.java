@@ -9,7 +9,7 @@ public class VanillaCompat {
     }
 
     static {
-        FluidApi.SIDED_VIEW.registerForBlocks((world, pos, direction) -> new CauldronWrapper(world, pos), Blocks.CAULDRON);
-        FluidApi.UNSIDED_VIEW.registerForBlocks((world, pos, direction) -> new CauldronWrapper(world, pos), Blocks.CAULDRON);
+        FluidApi.SIDED_VIEW.registerForBlocks((world, pos, state, direction) -> new CauldronWrapper(world, pos), Blocks.CAULDRON);
+        FluidApi.UNSIDED_VIEW.registerForBlocks((world, pos, state, direction) -> new CauldronWrapper(world, pos), Blocks.CAULDRON);
     }
 }

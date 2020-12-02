@@ -23,7 +23,7 @@ public class LbaCompat {
     }
 
     private static void registerLbaInFtl() {
-        FluidApi.SIDED_VIEW.registerBlockFallback((world, pos, direction) -> {
+        FluidApi.SIDED_VIEW.registerBlockFallback((world, pos, state, direction) -> {
             if (inCompat) return null;
             inCompat = true;
             AttributeList<FixedFluidInv> to = FluidAttributes.FIXED_INV.getAll(world, pos, SearchOptions.inDirection(direction.getOpposite()));
