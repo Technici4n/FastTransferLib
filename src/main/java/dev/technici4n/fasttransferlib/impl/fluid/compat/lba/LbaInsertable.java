@@ -4,6 +4,7 @@ import alexiil.mc.lib.attributes.Simulation;
 import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
 import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
 import dev.technici4n.fasttransferlib.api.fluid.FluidInsertable;
+import dev.technici4n.fasttransferlib.impl.compat.LbaUtil;
 import net.minecraft.fluid.Fluid;
 
 import java.math.RoundingMode;
@@ -25,7 +26,7 @@ class LbaInsertable implements alexiil.mc.lib.attributes.fluid.FluidInsertable {
             return fluidVolume;
         }
         long inserted = fluidVolume.getAmount_F().asLong(81000, RoundingMode.DOWN);
-        inserted -= insertable.insert(fluid, inserted, simulation.isAction() ? ACT : SIMULATE);
+        inserted -= insertable.insert(fluid, inserted, LbaUtil.getSimulation(simulation));
         return fluidVolume.getFluidKey().withAmount(fluidVolume.getAmount_F().sub(FluidAmount.of(inserted, 81000)));
     }
 }

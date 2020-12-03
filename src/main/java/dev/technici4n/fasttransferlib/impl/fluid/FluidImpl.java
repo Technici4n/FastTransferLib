@@ -14,7 +14,7 @@ public class FluidImpl {
                 Method init = clazz.getMethod("init");
                 init.invoke(null);
             } catch (Exception ex) {
-                throw new RuntimeException("LBA was detected, but compat loading failed", ex);
+                throw new RuntimeException("LBA was detected, but fluid compat loading failed", ex);
             }
         }
     }

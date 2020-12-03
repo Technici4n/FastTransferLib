@@ -1,6 +1,8 @@
 package dev.technici4n.fasttransferlib.api.item;
 
 import dev.technici4n.fasttransferlib.api.ItemInteractionContext;
+import dev.technici4n.fasttransferlib.impl.item.ItemImpl;
+import dev.technici4n.fasttransferlib.impl.item.compat.vanilla.VanillaCompat;
 import net.fabricmc.fabric.api.provider.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.provider.v1.block.BlockApiLookupRegistry;
 import net.fabricmc.fabric.api.provider.v1.item.ItemApiLookup;
@@ -18,6 +20,7 @@ public class ItemApi {
             ItemApiLookupRegistry.getLookup(new Identifier("fasttransferlib:item_view"), ItemView.class, ItemInteractionContext.class);
 
     static {
-        // TODO: Vanilla and LBA compat for guaranteed epicness
+        VanillaCompat.init();
+        ItemImpl.loadLbaCompat();
     }
 }

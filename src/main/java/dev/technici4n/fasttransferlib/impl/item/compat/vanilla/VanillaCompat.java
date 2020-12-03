@@ -12,7 +12,7 @@ import net.minecraft.util.math.Direction;
 import org.jetbrains.annotations.NotNull;
 
 public class VanillaCompat {
-    public void init() {
+    public static void init() {
         // initialize static
     }
 

@@ -8,6 +8,7 @@ import alexiil.mc.lib.attributes.fluid.volume.FluidKey;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
 import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
 import dev.technici4n.fasttransferlib.api.fluid.FluidExtractable;
+import dev.technici4n.fasttransferlib.impl.compat.LbaUtil;
 import net.minecraft.fluid.Fluid;
 
 import java.math.RoundingMode;
@@ -28,7 +29,7 @@ class LbaExtractable implements alexiil.mc.lib.attributes.fluid.FluidExtractable
             Fluid fluid = extractable.getFluid(i);
             FluidKey key = FluidKeys.get(fluid);
             if (!filter.matches(key)) continue;
-            long extracted = extractable.extract(i, fluid, maxAmount.asLong(81000, RoundingMode.DOWN), simulation.isAction() ? ACT : SIMULATE);
+            long extracted = extractable.extract(i, fluid, maxAmount.asLong(81000, RoundingMode.DOWN), LbaUtil.getSimulation(simulation));
             if (extracted > 0) {
                 return key.withAmount(FluidAmount.of(extracted, 81000));
             }
