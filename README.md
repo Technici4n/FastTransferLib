@@ -132,5 +132,8 @@ reader is looking for a batteries-included generic resource management library.
 ## Item API design
 TODO explain which of the above problems FTL addresses.
 
+## Fluid API design
+TODO
+
 ## License
 This library is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
