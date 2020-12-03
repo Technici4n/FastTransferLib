@@ -1,14 +1,14 @@
 package dev.technici4n.fasttransferlib.api;
 
 public enum Simulation {
-    SIMULATE,
-    ACT;
+	SIMULATE,
+	ACT;
 
-    public boolean isSimulating() {
-        return this == SIMULATE;
-    }
+	public boolean isSimulating() {
+		return this == SIMULATE;
+	}
 
-    public boolean isActing() {
-        return this == ACT;
-    }
+	public boolean isActing() {
+		return this == ACT;
+	}
 }

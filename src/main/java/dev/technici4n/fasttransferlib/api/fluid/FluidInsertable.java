@@ -1,6 +1,7 @@
 package dev.technici4n.fasttransferlib.api.fluid;
 
 import dev.technici4n.fasttransferlib.api.Simulation;
+
 import net.minecraft.fluid.Fluid;
 
 /**
@@ -9,15 +10,16 @@ import net.minecraft.fluid.Fluid;
  * @see FluidExtractable
  */
 public interface FluidInsertable extends FluidView {
-    /**
-     * Insert fluid into this inventory, and return the amount of leftover fluid. The unit for the amount is given by {@link FluidView#getFluidUnit}.
-     * Distribution is left entirely to the implementor.
-     * <p>If simulation is {@link Simulation#SIMULATE}, the result of the operation must be returned, but the underlying state of the fluid insertable must not change.
-     *
-     * @param fluid The fluid to insert
-     * @param amount The amount of fluid to insert
-     * @param simulation If {@link Simulation#SIMULATE}, do not mutate the insertable
-     * @return the amount of fluid that could not be inserted
-     */
-    long insert(Fluid fluid, long amount, Simulation simulation);
+	/**
+	 * Insert fluid into this inventory, and return the amount of leftover fluid. The unit for the amount is given by {@link FluidView#getFluidUnit}.
+	 * Distribution is left entirely to the implementor.
+	 *
+	 * <p>If simulation is {@link Simulation#SIMULATE}, the result of the operation must be returned, but the underlying state of the fluid insertable must not change.
+	 *
+	 * @param fluid      The fluid to insert
+	 * @param amount     The amount of fluid to insert
+	 * @param simulation If {@link Simulation#SIMULATE}, do not mutate the insertable
+	 * @return the amount of fluid that could not be inserted
+	 */
+	long insert(Fluid fluid, long amount, Simulation simulation);
 }
