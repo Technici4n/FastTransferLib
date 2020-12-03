@@ -17,10 +17,12 @@ Hopefully it will be merged in fabric api, but more testing has to be done befor
 When the API is a bit more fleshed out, builds will be available on https://github.com/Technici4n/Technici4n-maven.
 
 ## Usage
+### Item API
 Item transfer is handled by three interfaces: `ItemView`, `ItemInsertable` and `ItemExtractable`.
 * `ItemView` is a read-only view of an inventory.
 * `ItemInsertable` is an `ItemView` that also supports inserting items.
 * `ItemExtractable` is an `ItemView` that supports extracting items.
+* Note that `ItemMovement` provides useful functions for moving items between an `ItemExtractable` and an `ItemInsertable`.
 
 Note that `ItemStack`s are never transferred directly with this API. Instead, immutable count-less `ItemStack`s called `ItemKey`s are used, and the
 counts must be passed separately. This prevents unneeded allocation, and can make comparison between stacks a lot faster.
@@ -53,15 +55,25 @@ ItemApi.SIDED_VIEW.registerForBlockEntities((blockEntity, direction) -> {
     if (blockEntity instanceof YourBlockEntity) {
         // return your ItemView, ideally a field in the block entity, or null if there is none.
     }
+    return null;
 }, BLOCK_ENTITY_TYPE_1, BLOCK_ENTITY_TYPE_2);
 ```
 
-TODO: item-provided APIS
+### Fluid API
+The fluid transfer API is basically the same as the item api, with the following differences:
+* Fluids are identified by a `Fluid` parameter instead of an `ItemKey` parameter. `FluidKey`s may be considered in the future, but they don't seem
+  very useful for now.
+* The amounts are specified in `long`s instead of `int`s.
+* `FluidView#getFluidUnit()` specifies the unit to use for all interactions with a given `FluidView`.
 
-TODO: fluid API
+### Unsided APIs
+TODO
+
+### Item-provided APIs
+TODO
 
 ## Why use fabric-provider-api-v1
-`fabric-provider-api-v1` is much more flexible than `InventoryProvider` or block entity `instanceof` checks as it also allows registering compatibility layers.
+`fabric-provider-api-v1` is much more flexible than `InventoryProvider` or block entity `instanceof` checks as it allows registering compatibility layers.
 It also comes with a caching system to massively improve performance for blocks that need to do queries every tick.
 
 ## Item API prior art

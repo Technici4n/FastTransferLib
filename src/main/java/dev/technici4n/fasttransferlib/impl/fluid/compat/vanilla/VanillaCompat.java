@@ -5,7 +5,7 @@ import net.minecraft.block.Blocks;
 
 public class VanillaCompat {
     public static void load() {
-        // initialize static fields
+        // initialize static
     }
 
     static {

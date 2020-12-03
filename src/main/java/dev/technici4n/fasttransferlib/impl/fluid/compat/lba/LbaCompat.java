@@ -17,9 +17,12 @@ public class LbaCompat {
     private static boolean inCompat = false;
 
     public static void init() {
+        // initialize static
+    }
+
+    static {
         registerLbaInFtl();
         registerFtlInLba();
-        // TODO: item compat
     }
 
     private static void registerLbaInFtl() {
