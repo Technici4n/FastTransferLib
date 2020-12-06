@@ -212,5 +212,8 @@ Ultimately, the author believes that forcing transaction support for every inven
 If this assumption is wrong, it will be possible to deprecate the previous simulation-based API and replace it with transactions in the future,
 but that should not stop simulation from being used _now_.
 
+## Fluid API design
+TODO explain differences with the item api
+
 ## License
 This library is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
