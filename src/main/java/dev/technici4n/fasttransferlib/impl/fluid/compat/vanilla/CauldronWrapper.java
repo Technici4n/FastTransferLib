@@ -1,7 +1,6 @@
 package dev.technici4n.fasttransferlib.impl.fluid.compat.vanilla;
 
 import dev.technici4n.fasttransferlib.api.Simulation;
-import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
 import dev.technici4n.fasttransferlib.api.fluid.FluidExtractable;
 import dev.technici4n.fasttransferlib.api.fluid.FluidInsertable;
 
