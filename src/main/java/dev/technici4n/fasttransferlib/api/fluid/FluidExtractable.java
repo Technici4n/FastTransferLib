@@ -17,19 +17,19 @@ public interface FluidExtractable extends FluidView {
 	 *
 	 * @param slot       The slot id, must be between 0 and {@link FluidView#getFluidSlotCount()}.
 	 * @param fluid      The filter for the fluid to extract
-	 * @param maxAmount  The amount of fluid to extract at most
+	 * @param maxAmount  The amount of fluid to extract at most, in millidroplets
 	 * @param simulation If {@link Simulation#SIMULATE}, do not mutate the insertable
 	 * @return The amount of fluid extracted
 	 */
 	long extract(int slot, Fluid fluid, long maxAmount, Simulation simulation);
 
 	/**
-	 * Extract some fluid from this extractable, matching the passed fluid. The unit for the amount is given by {@link FluidView#getFluidUnit}.
+	 * Extract some fluid from this extractable, matching the passed fluid. The amounts are given in millidroplets (1/81000 of a bucket).
 	 *
 	 * <p>If simulation is {@link Simulation#SIMULATE}, the result of the operation must be returned, but the underlying state of the fluid extractable must not change.
 	 *
 	 * @param fluid      The filter for the fluid to extract
-	 * @param maxAmount  The amount of fluid to extract at most
+	 * @param maxAmount  The amount of fluid to extract at most, in millidroplets
 	 * @param simulation If {@link Simulation#SIMULATE}, do not mutate the insertable
 	 * @return The amount of fluid extracted
 	 * @implNote Implementations are encouraged to override this method with a more performant implementation.

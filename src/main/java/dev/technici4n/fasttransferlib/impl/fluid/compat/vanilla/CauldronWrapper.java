@@ -1,6 +1,7 @@
 package dev.technici4n.fasttransferlib.impl.fluid.compat.vanilla;
 
 import dev.technici4n.fasttransferlib.api.Simulation;
+import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
 import dev.technici4n.fasttransferlib.api.fluid.FluidExtractable;
 import dev.technici4n.fasttransferlib.api.fluid.FluidInsertable;
 
@@ -29,13 +30,13 @@ class CauldronWrapper implements FluidInsertable, FluidExtractable {
 
 		if (state.isOf(Blocks.CAULDRON)) {
 			int level = state.get(CauldronBlock.LEVEL);
-			long extracted = Math.min(level, maxAmount);
+			long extracted = Math.min(level, maxAmount / 27000);
 
 			if (simulation.isActing()) {
 				world.setBlockState(pos, state.with(CauldronBlock.LEVEL, (int) (level - extracted)));
 			}
 
-			return extracted;
+			return extracted * 27000;
 		}
 
 		return 0;
@@ -49,13 +50,13 @@ class CauldronWrapper implements FluidInsertable, FluidExtractable {
 
 		if (state.isOf(Blocks.CAULDRON)) {
 			int level = state.get(CauldronBlock.LEVEL);
-			long inserted = Math.min(amount, 3 - level);
+			long inserted = Math.min(amount / 27000, 3 - level);
 
 			if (simulation.isActing()) {
 				world.setBlockState(pos, state.with(CauldronBlock.LEVEL, (int) (level + inserted)));
 			}
 
-			return amount - inserted;
+			return amount - inserted * 27000;
 		}
 
 		return amount;
@@ -74,11 +75,6 @@ class CauldronWrapper implements FluidInsertable, FluidExtractable {
 	@Override
 	public long getFluidAmount(int slot) {
 		Integer level = world.getBlockState(pos).get(CauldronBlock.LEVEL);
-		return level == null ? 0 : level;
-	}
-
-	@Override
-	public long getFluidUnit() {
-		return 3;
+		return level == null ? 0 : level * 27000;
 	}
 }

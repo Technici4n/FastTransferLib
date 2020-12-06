@@ -65,9 +65,4 @@ class LbaWrappedFixedInv implements FluidInsertable, FluidExtractable {
 	public long getFluidAmount(int slot) {
 		return wrapped.getTank(slot).get().amount().asLong(81000, RoundingMode.DOWN);
 	}
-
-	@Override
-	public long getFluidUnit() {
-		return 81000;
-	}
 }

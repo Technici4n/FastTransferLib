@@ -14,40 +14,34 @@ public final class FluidMovement {
 	 *
 	 * @param from          the extractable to move fluid from
 	 * @param to            the insertable to move fluid to
-	 * @param maxAmount     The maximum amount of fluid to move.
-	 * @param maxAmountUnit The unit of the maximum amount of fluid to move.
+	 * @param maxAmount     The maximum amount of fluid to move, in millidroplets.
 	 * @param startSlot     The first slot of the range to move, inclusive.
 	 * @param endSlot       The last slot of the range to move, exclusive.
 	 * @return The amount of fluid that was moved.
 	 * @throws IndexOutOfBoundsException if the start or end slot is out of bounds of the {@link FluidExtractable}'s slot count.
 	 */
-	public static long moveRange(FluidExtractable from, FluidInsertable to, long maxAmount, long maxAmountUnit, int startSlot, int endSlot) {
-		long fromDenom = from.getFluidUnit();
-		long toDenom = to.getFluidUnit();
-		long d = gcd(gcd(fromDenom, toDenom), maxAmountUnit);
-		long fromFactor = fromDenom / d;
-		long toFactor = toDenom / d;
-		long maxFactor = maxAmountUnit / d;
-		maxAmount /= maxFactor;
-
+	public static long moveRange(FluidExtractable from, FluidInsertable to, long maxAmount, int startSlot, int endSlot) {
 		long totalMoved = 0;
 
 		for (int i = startSlot; i < endSlot && maxAmount > 0; ++i) {
 			// Try to extract the maximum amount
 			Fluid fluid = from.getFluid(i);
-			long moved = from.extract(i, fluid, maxAmount * fromDenom, Simulation.SIMULATE) / fromDenom;
+			long moved = from.extract(i, fluid, maxAmount, Simulation.SIMULATE);
 			if (moved <= 0) continue;
 
 			// Try to insert the maximum amount that can be extracted
-			moved -= (to.insert(fluid, moved * toDenom, Simulation.SIMULATE) + toDenom - 1) / toDenom;
+			moved -= to.insert(fluid, moved, Simulation.SIMULATE);
 			if (moved <= 0) continue;
 
+			// Try to extract that amount to make sure it can be extracted
+			if (from.extract(i, fluid, maxAmount, Simulation.SIMULATE) != moved) continue;
+
 			// Move the fluid
-			if (from.extract(i, fluid, moved * fromDenom, Simulation.ACT) != moved * fromDenom) {
+			if (from.extract(i, fluid, moved, Simulation.ACT) != moved) {
 				// TODO: throw
 			}
 
-			if (to.insert(fluid, moved * toDenom, Simulation.ACT) != 0) {
+			if (to.insert(fluid, moved, Simulation.ACT) != 0) {
 				// TODO: throw
 			}
 
@@ -57,7 +51,7 @@ public final class FluidMovement {
 			--i; // multiple attempts may be necessary
 		}
 
-		return totalMoved * maxFactor;
+		return totalMoved;
 	}
 
 	/**
@@ -66,11 +60,10 @@ public final class FluidMovement {
 	 * @param from          the extractable to move fluid from
 	 * @param to            the insertable to move fluid to
 	 * @param maxAmount     The maximum amount of fluid to move.
-	 * @param maxAmountUnit The unit of the maximum amount of fluid to move.
 	 * @return The amount of fluid that was moved.
 	 */
-	public static long moveRange(FluidExtractable from, FluidInsertable to, long maxAmount, long maxAmountUnit) {
-		return moveRange(from, to, maxAmount, maxAmountUnit, 0, from.getFluidSlotCount());
+	public static long moveRange(FluidExtractable from, FluidInsertable to, long maxAmount) {
+		return moveRange(from, to, maxAmount, 0, from.getFluidSlotCount());
 	}
 
 	/**

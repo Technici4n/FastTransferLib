@@ -6,7 +6,7 @@ Hopefully it will be merged in fabric api, but more testing has to be done befor
 ## Goals of the project
 * The first goal of the project is testing the `fabric-provider-api-v1` in a production environment for correctness and performance.
 * The second goal of the project is trying to design a simple yet very efficient design for an item and fluid transfer api for potential inclusion in Fabric API in the future.
-  In particular, that includes experimenting with per-container denominators for the fluid api.
+  In particular, that includes experimenting with fixed base 81000 denominators for the fluid api.
 * For this api to be a drop-in replacement in the current 1.16 ecosystem, it will be bundled with `Inventory`/`SidedInventory` and LBA interop, but that may be removed in the future if it is not necessary anymore.
   
 ## Users of the API
@@ -64,7 +64,7 @@ The fluid transfer API is basically the same as the item api, with the following
 * Fluids are identified by a `Fluid` parameter instead of an `ItemKey` parameter. `FluidKey`s may be considered in the future, but they don't seem
   very useful for now.
 * The amounts are specified in `long`s instead of `int`s.
-* `FluidView#getFluidUnit()` specifies the unit to use for all interactions with a given `FluidView`.
+* All fluid operations are done in _millidroplets_, 1/81000th of a bucket.
 
 ### Unsided APIs
 TODO
@@ -130,7 +130,87 @@ A lot of other things can probably be said about Fluidity. The author hasn't stu
 reader is looking for a batteries-included generic resource management library.
 
 ## Item API design
-TODO explain which of the above problems FTL addresses.
+### ItemKey
+`ItemKey`s solve the problem of `ItemStack` mutation and allocation. Not only do they prevent users from modifying stacks through a read-only view,
+but they also ensure that we don't have to worry about which stacks are safe or not safe to pass to insert/extract functions.
+
+### The API
+This is the entire item api. An `ItemView` is queried, and it must be manually cast to `ItemInsertable` or `ItemExtractable` if possible. 
+```java
+public interface ItemView { // read-only view
+	int getItemSlotCount(); // number of slots
+	ItemKey getItemKey(int slot); // ItemKey in slot
+	int getItemCount(int slot); // count in slot
+	int getVersion(); // inventory version, must change if the inventory changes
+}
+public interface ItemInsertable extends ItemView { // view that can accept items
+	int insert(ItemKey key, int count, Simulation simulation); // insert, and return leftover
+}
+public interface ItemExtractable extends ItemView { // view that can provide items
+	int extract(int slot, ItemKey key, int maxCount, Simulation simulation); // extract
+	default int extract(ItemKey key, int maxCount, Simulation simulation) { /* ... */ } // slotless variant, with default impl
+}
+```
+
+### `ItemView`
+The first three functions of `ItemView` are as straightforward as one can get, they allow reading the content of an inventory,
+but without the same restriction as a vanilla `Inventory` regarding the slots. In particular, there is no max stack size, and
+the slots in the inventory need not match physical slots. A barrel would have a single slot, and a large chest would be free
+to merge stacks with the same content if it wants. Note also that it is not possible to modify the inventory in any way.
+
+The `getVersion` is an optional function provided by the API. The _version_ of an inventory **must** change when the inventory
+changes, but the value may also change even if the inventory itself hasn't changed. The idea is that pipes that maintain a cache
+of the contents of an inventory can skip rescanning an inventory whose version hasn't changed. This is very important for AE2,
+which must rescan all the Storage Busses every time an item enters or exits the network as it may have been moved to another storage bus.
+This feature is trivial to support for most implementations, yet it can make a huge performance difference for large bases.
+
+### `ItemInsertable`
+A few important points regarding this interface:
+* It is optional, which means it's trivial to tell if an inventory supports insertion or not. This is very useful for pipe connections.
+* It's very easy to implement: just one function!
+* It leaves distribution entirely to the implementor.
+* The implementor can easily optimize the insertion if they want to.
+
+### `ItemExtractable`
+* Again, it's optional.
+* For most simple inventories, the slot-based function is enough.
+* Inventories are able to optimize extraction through the slotless function if the `ItemKey` to be extracted is known in advance.
+
+But why have a slot-based function when the slotless function gives more freedom to the implementor? The point is that if you are
+iterating a big inventory using `getItemSlotCount` and `getItemKey` to find out which items can be extracted, you know in which
+slot the item is already, so you can prevent a lot of work by telling the `ItemExtractable` where to extract from.
+
+### Final words
+The API provides a few functions to move items between an `ItemInsertable` and an `ItemExtractable` because it is a frequent operation, and it
+can be a bit tricky to get right. The API also provides (or will provide) implementations for simple inventories that could be used
+for chests and similar "simple" containers.
+
+Overall, the author feels that this API hits a sweet spot between flexibility and performance, solving most issues with vanilla `(Sided)Inventory`,
+`IItemHandler` and LBA while keeping the API surface minimal.
+
+## Fluid API design
+The design of the fluid api is almost identical to that of the item api, with a few differences.
+
+It uses `Fluid` instances instead of `FluidKey` because fluids look sufficient for now.
+If for some reason you need `FluidKey`s, please open an issue so it can be discussed. For now, the author hasn't found a convincing use case for it.
+
+Items are discrete: most players don't expect their diamond to be splittable into two "half-diamonds". Players however expect fluids to be transferable
+in small amounts. Forge has been using millibuckets for the smallest amount of fluid that can be transferred, and just uses integers to store the number
+of millibuckets. Millibuckets have the advantage of being very easy to read for the player, but a bucket (1000 units) can't be divided into bottles, ingots or nuggets.
+To solve this, FTL uses millidroplets (1/81000 of a bucket). Buckets can be divided into bottles, ingots or nuggets with no issues, and the fluid amounts
+can still be displayed in a player-friendly fashion as `x + y/81 mb`, or just `x mb` if the amount is a multiple of `81`.
+
+The fluid API uses `long`s instead of `int`s because `int`s could be too small when transferring large amounts of buckets, although this probably
+wouldn't matter for most mods anyway.
+
+## Why not support transactions?
+FTL only allows simulating a single operation, which prevents some patterns from existing. A way to solve this would be to introduce transactions,
+which would allow simulating and then rolling back arbitrary transfer operations. Unfortunately, this requires every inventory to support transactions,
+which is non-trivial to do efficiently for even a big chest, and most existing mods don't have a use for it anyway.
+
+Ultimately, the author believes that forcing transaction support for every inventory is not reasonable, for both FTL and Fabric API.
+If this assumption is wrong, it will be possible to deprecate the previous simulation-based API and replace it with transactions in the future,
+but that should not stop simulation from being used _now_.
 
 ## License
 This library is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.

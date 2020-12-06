@@ -2,6 +2,7 @@ package dev.technic4n.fasttransferlib.example.fluid;
 
 import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.api.fluid.FluidApi;
+import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
 import dev.technici4n.fasttransferlib.api.fluid.FluidExtractable;
 import dev.technici4n.fasttransferlib.api.fluid.FluidView;
 
@@ -25,11 +26,10 @@ public class YeetStick extends Item {
 
 			if (extractable.getFluidSlotCount() > 0) {
 				Fluid fluid = extractable.getFluid(0);
-				long toExtract = 2 * extractable.getFluidUnit() / 3;
-				long extractedAmount = extractable.extract(fluid, toExtract, Simulation.ACT);
+				long extractedAmount = extractable.extract(fluid, 2 * FluidConstants.BOTTLE, Simulation.ACT);
 
 				if (extractedAmount > 0) {
-					System.out.printf("Extracted %d / %d %s%n", extractedAmount, extractable.getFluidUnit(), Registry.FLUID.getId(fluid).toString());
+					System.out.printf("Extracted %d + %d/81 millibuckets %s%n", extractedAmount / 81, extractedAmount % 81, Registry.FLUID.getId(fluid).toString());
 				}
 
 				return ActionResult.SUCCESS;

@@ -27,7 +27,7 @@ public interface FluidView {
 	Fluid getFluid(int slot);
 
 	/**
-	 * Return the amount of fluid stored in a slot, or 0 if there is no fluid. The unit for the amount is given by {@link FluidView#getFluidUnit}.
+	 * Return the amount of fluid stored in a slot, or 0 if there is no fluid. The amount is given in millidroplets (1/81000 of a bucket).
 	 *
 	 * @param slot The slot id, must be between 0 and {@link FluidView#getFluidSlotCount()}.
 	 * @return the amount of fluid stored in the slot, or 0 if there is no fluid.
@@ -42,12 +42,4 @@ public interface FluidView {
 	default int getVersion() {
 		return FluidImpl.version++;
 	}
-
-	/**
-	 * Return the fluid unit to use for all operations with this view. For example, returning 1 will cause all amounts to be
-	 * treated as buckets.
-	 *
-	 * @return a positive integer, the denominator to use for all operations with this view.
-	 */
-	long getFluidUnit();
 }
