@@ -1,6 +1,10 @@
 package dev.technici4n.fasttransferlib.api;
 
+import dev.technici4n.fasttransferlib.impl.fluid.compat.vanilla.PlayerEntityItemInteractionContext;
+
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
 
 /**
  * A context for interaction with item-provided item and fluid apis, that allows modifying the stack and passing a new stack.
@@ -28,4 +32,9 @@ public interface ItemInteractionContext {
 	 * @apiNote If a simulation succeeds twice, it is not guaranteed that the action will succeed twice, so it is recommended to only call this function once.
 	 */
 	boolean addExtraStacks(ItemStack stacks, Simulation simulation);
+
+	// TODO Cache object on the player with a mixin?
+	static ItemInteractionContext of(PlayerEntity player, Hand hand) {
+		return new PlayerEntityItemInteractionContext(player, hand);
+	}
 }
