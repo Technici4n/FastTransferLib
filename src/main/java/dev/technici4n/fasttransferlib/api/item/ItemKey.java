@@ -16,7 +16,7 @@ import net.minecraft.network.PacketByteBuf;
  * The immutable combination of an item and additional NBT data. Compare using {@link ItemKey#equals}.
  */
 public interface ItemKey {
-	ItemKey EMPTY = of(ItemStack.EMPTY);
+	ItemKey EMPTY = ItemKeyImpl.of(Items.AIR, null);
 
 	default boolean isEmpty() {
 		return this == EMPTY;
