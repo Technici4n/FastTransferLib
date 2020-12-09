@@ -1,13 +1,12 @@
 package dev.technici4n.fasttransferlib.impl.item.compat.lba;
 
 import alexiil.mc.lib.attributes.AttributeList;
+import alexiil.mc.lib.attributes.CustomAttributeAdder;
 import alexiil.mc.lib.attributes.SearchOptions;
 import alexiil.mc.lib.attributes.item.FixedItemInv;
 import alexiil.mc.lib.attributes.item.ItemAttributes;
 import dev.technici4n.fasttransferlib.api.item.ItemApi;
-import dev.technici4n.fasttransferlib.api.item.ItemExtractable;
-import dev.technici4n.fasttransferlib.api.item.ItemInsertable;
-import dev.technici4n.fasttransferlib.api.item.ItemView;
+import dev.technici4n.fasttransferlib.api.item.ItemIo;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.util.math.BlockPos;
@@ -27,7 +26,7 @@ public class LbaCompat {
 	}
 
 	private static void registerLbaInFtl() {
-		ItemApi.SIDED_VIEW.registerBlockFallback((world, pos, state, direction) -> {
+		ItemApi.SIDED.registerBlockFallback((world, pos, state, direction) -> {
 			if (inCompat) return null;
 			inCompat = true;
 			AttributeList<FixedItemInv> to = ItemAttributes.FIXED_INV.getAll(world, pos, SearchOptions.inDirection(direction.getOpposite()));
@@ -41,47 +40,29 @@ public class LbaCompat {
 		});
 	}
 
-	private static @Nullable ItemView getView(World world, BlockPos pos, Direction direction) {
+	private static @Nullable ItemIo getIo(World world, BlockPos pos, Direction direction) {
 		if (inCompat) return null;
 		inCompat = true;
-		@Nullable ItemView view = ItemApi.SIDED_VIEW.get(world, pos, direction);
+		@Nullable ItemIo view = ItemApi.SIDED.get(world, pos, direction);
 		inCompat = false;
 		return view;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private static void registerFtlInLba() {
-		ItemAttributes.EXTRACTABLE.appendBlockAdder(((world, pos, state, to) -> {
+		CustomAttributeAdder lbaBlockAdder = (world, pos, state, to) -> {
 			Direction dir = to.getTargetSide();
 
 			if (dir != null) {
-				ItemView view = getView(world, pos, dir);
+				ItemIo io = getIo(world, pos, dir);
 
-				if (view instanceof ItemExtractable) {
-					to.offer(new LbaExtractable((ItemExtractable) view));
+				if (io != null) {
+					to.offer(new LbaWrappedItemIo(io));
 				}
 			}
-		}));
-		ItemAttributes.INSERTABLE.appendBlockAdder((world, pos, state, to) -> {
-			Direction dir = to.getTargetSide();
-
-			if (dir != null) {
-				ItemView view = getView(world, pos, dir);
-
-				if (view instanceof ItemInsertable) {
-					to.offer(new LbaInsertable((ItemInsertable) view));
-				}
-			}
-		});
-		ItemAttributes.FIXED_INV_VIEW.appendBlockAdder((world, pos, state, to) -> {
-			Direction dir = to.getTargetSide();
-
-			if (dir != null) {
-				ItemView view = getView(world, pos, dir);
-
-				if (view != null) {
-					to.offer(new LbaFixedInvView(view));
-				}
-			}
-		});
+		};
+		ItemAttributes.EXTRACTABLE.appendBlockAdder(lbaBlockAdder);
+		ItemAttributes.INSERTABLE.appendBlockAdder(lbaBlockAdder);
+		ItemAttributes.FIXED_INV_VIEW.appendBlockAdder(lbaBlockAdder);
 	}
 }

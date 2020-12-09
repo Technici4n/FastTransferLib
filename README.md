@@ -18,42 +18,33 @@ When the API is a bit more fleshed out, builds will be available on https://gith
 
 ## Usage
 ### Item API
-Item transfer is handled by three interfaces: `ItemView`, `ItemInsertable` and `ItemExtractable`.
-* `ItemView` is a read-only view of an inventory.
-* `ItemInsertable` is an `ItemView` that also supports inserting items.
-* `ItemExtractable` is an `ItemView` that supports extracting items.
-* Note that `ItemMovement` provides useful functions for moving items between an `ItemExtractable` and an `ItemInsertable`.
+Item transfer is handled by a single interface: `ItemIo`. It supports reading inventory contents, and optionnaly inserting and extracting items.
+`ItemMovement` provides useful functions for moving items between two `ItemIo`'s.
 
 Note that `ItemStack`s are never transferred directly with this API. Instead, immutable count-less `ItemStack`s called `ItemKey`s are used, and the
 counts must be passed separately. This prevents unneeded allocation, and can make comparison between stacks a lot faster.
 
 Querying an instance of the API is dead simple:
 ```java
-ItemView view = ItemApi.SIDED_VIEW.get(world, blockPos, direction);
-if (view != null) {
+ItemIo io = ItemApi.SIDED.get(world, blockPos, direction);
+if (io != null) {
     // use the view
-}
-if (view instanceof ItemInsertable) {
-    // cast to ItemInsertable and use
-}
-if (view instanceof ItemExtractable) {
-    // cast to ItemExtractable and use
 }
 ```
 
 Registering your block to use the API is also very simple:
 ```java
-ItemApi.SIDED_VIEW.registerForBlocks((world, pos, blockState, direction) -> {
-    // return an ItemView for your block, or null if there is none
+ItemApi.SIDED.registerForBlocks((world, pos, blockState, direction) -> {
+    // return an ItemIo for your block, or null if there is none
 }, BLOCK_INSTANCE, ANOTHER_BLOCK_INSTANCE); // register as many blocks as you want
 ```
 
 If your block is a BlockEntity, it is much more efficient to use `registerForBlockEntities` instead. Ideally, you also want to
 store the API in a field of your block entity, as there can be a lot of queries per tick.
 ```java
-ItemApi.SIDED_VIEW.registerForBlockEntities((blockEntity, direction) -> {
+ItemApi.SIDED.registerForBlockEntities((blockEntity, direction) -> {
     if (blockEntity instanceof YourBlockEntity) {
-        // return your ItemView, ideally a field in the block entity, or null if there is none.
+        // return your ItemIo, ideally a field in the block entity, or null if there is none.
     }
     return null;
 }, BLOCK_ENTITY_TYPE_1, BLOCK_ENTITY_TYPE_2);
@@ -137,23 +128,23 @@ but they also ensure that we don't have to worry about which stacks are safe or 
 ### The API
 This is the entire item api. An `ItemView` is queried, and it must be manually cast to `ItemInsertable` or `ItemExtractable` if possible. 
 ```java
-public interface ItemView { // read-only view
+public interface ItemView { // item inventory
 	int getItemSlotCount(); // number of slots
 	ItemKey getItemKey(int slot); // ItemKey in slot
 	int getItemCount(int slot); // count in slot
 	int getVersion(); // inventory version, must change if the inventory changes
-}
-public interface ItemInsertable extends ItemView { // view that can accept items
-	int insert(ItemKey key, int count, Simulation simulation); // insert, and return leftover
-}
-public interface ItemExtractable extends ItemView { // view that can provide items
+    // INSERTION FUNCTIONS
+    default boolean supportsItemInsertion() { return false; } // false if insert always rejects
+    default int insert(ItemKey key, int count, Simulation simulation) { /* does nothing */ } // insert, and return leftover
+    // EXTRACTION FUNCTIONS
+    default boolean supportsItemExtraction() { return false; } // false if extract always rejects
 	int extract(int slot, ItemKey key, int maxCount, Simulation simulation); // extract
 	default int extract(ItemKey key, int maxCount, Simulation simulation) { /* ... */ } // slotless variant, with default impl
 }
 ```
 
-### `ItemView`
-The first three functions of `ItemView` are as straightforward as one can get, they allow reading the content of an inventory,
+### `ItemIo`
+The first three functions of `ItemIo` are as straightforward as one can get, they allow reading the content of an inventory,
 but without the same restriction as a vanilla `Inventory` regarding the slots. In particular, there is no max stack size, and
 the slots in the inventory need not match physical slots. A barrel would have a single slot, and a large chest would be free
 to merge stacks with the same content if it wants. Note also that it is not possible to modify the inventory in any way.
@@ -164,14 +155,14 @@ of the contents of an inventory can skip rescanning an inventory whose version h
 which must rescan all the Storage Busses every time an item enters or exits the network as it may have been moved to another storage bus.
 This feature is trivial to support for most implementations, yet it can make a huge performance difference for large bases.
 
-### `ItemInsertable`
-A few important points regarding this interface:
+### Insertion functions
+A few important points regarding these two functions:
 * It is optional, which means it's trivial to tell if an inventory supports insertion or not. This is very useful for pipe connections.
-* It's very easy to implement: just one function!
+* It's very easy to implement: just two functions!
 * It leaves distribution entirely to the implementor.
 * The implementor can easily optimize the insertion if they want to.
 
-### `ItemExtractable`
+### Extraction functions
 * Again, it's optional.
 * For most simple inventories, the slot-based function is enough.
 * Inventories are able to optimize extraction through the slotless function if the `ItemKey` to be extracted is known in advance.
@@ -181,7 +172,7 @@ iterating a big inventory using `getItemSlotCount` and `getItemKey` to find out 
 slot the item is already, so you can prevent a lot of work by telling the `ItemExtractable` where to extract from.
 
 ### Final words
-The API provides a few functions to move items between an `ItemInsertable` and an `ItemExtractable` because it is a frequent operation, and it
+The API provides a few functions to move items between two `ItemIo`'s because it is a frequent operation, and it
 can be a bit tricky to get right. The API also provides (or will provide) implementations for simple inventories that could be used
 for chests and similar "simple" containers.
 
@@ -198,7 +189,8 @@ Items are discrete: most players don't expect their diamond to be splittable int
 in small amounts. Forge has been using millibuckets for the smallest amount of fluid that can be transferred, and just uses integers to store the number
 of millibuckets. Millibuckets have the advantage of being very easy to read for the player, but a bucket (1000 units) can't be divided into bottles, ingots or nuggets.
 To solve this, FTL uses millidroplets (1/81000 of a bucket). Buckets can be divided into bottles, ingots or nuggets with no issues, and the fluid amounts
-can still be displayed in a player-friendly fashion as `x + y/81 mb`, or just `x mb` if the amount is a multiple of `81`.
+can still be displayed in a player-friendly fashion as `x + y/81 mb`, or just `x mb` if the amount is a multiple of `81`. FTL includes helpers for displaying
+that as unicode.
 
 The fluid API uses `long`s instead of `int`s because `int`s could be too small when transferring large amounts of buckets, although this probably
 wouldn't matter for most mods anyway.

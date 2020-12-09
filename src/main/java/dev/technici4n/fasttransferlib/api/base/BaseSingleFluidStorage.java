@@ -1,8 +1,7 @@
 package dev.technici4n.fasttransferlib.api.base;
 
 import dev.technici4n.fasttransferlib.api.Simulation;
-import dev.technici4n.fasttransferlib.api.fluid.FluidExtractable;
-import dev.technici4n.fasttransferlib.api.fluid.FluidInsertable;
+import dev.technici4n.fasttransferlib.api.fluid.FluidIo;
 
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
@@ -11,7 +10,7 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-public class BaseSingleFluidStorage implements FluidExtractable, FluidInsertable {
+public class BaseSingleFluidStorage implements FluidIo {
 	protected Fluid fluidKey = Fluids.EMPTY;
 	protected long fluidVolume = 0;
 	protected final long maxCapacity;
@@ -39,6 +38,11 @@ public class BaseSingleFluidStorage implements FluidExtractable, FluidInsertable
 	}
 
 	@Override
+	public boolean supportsFluidInsertion() {
+		return true;
+	}
+
+	@Override
 	public long insert(Fluid fluid, long amount, Simulation simulation) {
 		if (this.fluidKey == Fluids.EMPTY || this.fluidKey == fluid) {
 			long newQuantity = Math.min(fluidVolume + amount, maxCapacity);
@@ -55,6 +59,11 @@ public class BaseSingleFluidStorage implements FluidExtractable, FluidInsertable
 		} else {
 			return amount;
 		}
+	}
+
+	@Override
+	public boolean supportsFluidExtraction() {
+		return true;
 	}
 
 	@Override

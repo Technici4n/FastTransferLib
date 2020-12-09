@@ -14,12 +14,12 @@ import net.fabricmc.fabric.api.provider.v1.item.ItemApiLookup;
 import net.fabricmc.fabric.api.provider.v1.item.ItemApiLookupRegistry;
 
 public class FluidApi {
-	public static final BlockApiLookup<FluidView, @NotNull Direction> SIDED_VIEW =
-			BlockApiLookupRegistry.getLookup(new Identifier("fasttransferlib:sided_fluid_view"), FluidView.class, Direction.class);
-	public static final BlockApiLookup<FluidView, Void> UNSIDED_VIEW =
-			BlockApiLookupRegistry.getLookup(new Identifier("fasttransferlib:unsided_fluid_view"), FluidView.class, Void.class);
-	public static final ItemApiLookup<FluidView, ItemInteractionContext> ITEM_VIEW =
-			ItemApiLookupRegistry.getLookup(new Identifier("fasttransferlib:fluid_view"), FluidView.class, ItemInteractionContext.class);
+	public static final BlockApiLookup<FluidIo, @NotNull Direction> SIDED =
+			BlockApiLookupRegistry.getLookup(new Identifier("fasttransferlib:sided_fluid_io"), FluidIo.class, Direction.class);
+	public static final BlockApiLookup<FluidIo, Void> UNSIDED =
+			BlockApiLookupRegistry.getLookup(new Identifier("fasttransferlib:unsided_fluid"), FluidIo.class, Void.class);
+	public static final ItemApiLookup<FluidIo, ItemInteractionContext> ITEM =
+			ItemApiLookupRegistry.getLookup(new Identifier("fasttransferlib:fluid_io"), FluidIo.class, ItemInteractionContext.class);
 
 	static {
 		VanillaCompat.load();

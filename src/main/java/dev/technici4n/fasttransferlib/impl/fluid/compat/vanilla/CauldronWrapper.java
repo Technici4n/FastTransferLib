@@ -1,8 +1,7 @@
 package dev.technici4n.fasttransferlib.impl.fluid.compat.vanilla;
 
 import dev.technici4n.fasttransferlib.api.Simulation;
-import dev.technici4n.fasttransferlib.api.fluid.FluidExtractable;
-import dev.technici4n.fasttransferlib.api.fluid.FluidInsertable;
+import dev.technici4n.fasttransferlib.api.fluid.FluidIo;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -12,13 +11,18 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-class CauldronWrapper implements FluidInsertable, FluidExtractable {
+class CauldronWrapper implements FluidIo {
 	private final World world;
 	private final BlockPos pos;
 
 	CauldronWrapper(World world, BlockPos pos) {
 		this.world = world;
 		this.pos = pos.toImmutable();
+	}
+
+	@Override
+	public boolean supportsFluidExtraction() {
+		return true;
 	}
 
 	@Override
@@ -39,6 +43,11 @@ class CauldronWrapper implements FluidInsertable, FluidExtractable {
 		}
 
 		return 0;
+	}
+
+	@Override
+	public boolean supportsFluidInsertion() {
+		return true;
 	}
 
 	@Override

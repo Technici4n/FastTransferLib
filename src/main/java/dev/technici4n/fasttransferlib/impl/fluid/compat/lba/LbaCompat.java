@@ -1,13 +1,12 @@
 package dev.technici4n.fasttransferlib.impl.fluid.compat.lba;
 
 import alexiil.mc.lib.attributes.AttributeList;
+import alexiil.mc.lib.attributes.CustomAttributeAdder;
 import alexiil.mc.lib.attributes.SearchOptions;
 import alexiil.mc.lib.attributes.fluid.FixedFluidInv;
 import alexiil.mc.lib.attributes.fluid.FluidAttributes;
 import dev.technici4n.fasttransferlib.api.fluid.FluidApi;
-import dev.technici4n.fasttransferlib.api.fluid.FluidExtractable;
-import dev.technici4n.fasttransferlib.api.fluid.FluidInsertable;
-import dev.technici4n.fasttransferlib.api.fluid.FluidView;
+import dev.technici4n.fasttransferlib.api.fluid.FluidIo;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.util.math.BlockPos;
@@ -27,7 +26,7 @@ public class LbaCompat {
 	}
 
 	private static void registerLbaInFtl() {
-		FluidApi.SIDED_VIEW.registerBlockFallback((world, pos, state, direction) -> {
+		FluidApi.SIDED.registerBlockFallback((world, pos, state, direction) -> {
 			if (inCompat) return null;
 			inCompat = true;
 			AttributeList<FixedFluidInv> to = FluidAttributes.FIXED_INV.getAll(world, pos, SearchOptions.inDirection(direction.getOpposite()));
@@ -41,47 +40,29 @@ public class LbaCompat {
 		});
 	}
 
-	private static @Nullable FluidView getView(World world, BlockPos pos, Direction direction) {
+	private static @Nullable FluidIo getIo(World world, BlockPos pos, Direction direction) {
 		if (inCompat) return null;
 		inCompat = true;
-		@Nullable FluidView view = FluidApi.SIDED_VIEW.get(world, pos, direction);
+		@Nullable FluidIo view = FluidApi.SIDED.get(world, pos, direction);
 		inCompat = false;
 		return view;
 	}
 
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private static void registerFtlInLba() {
-		FluidAttributes.EXTRACTABLE.appendBlockAdder(((world, pos, state, to) -> {
+		CustomAttributeAdder lbaBlockAdder = (world, pos, state, to) -> {
 			Direction dir = to.getTargetSide();
 
 			if (dir != null) {
-				FluidView view = getView(world, pos, dir);
+				FluidIo io = getIo(world, pos, dir);
 
-				if (view instanceof FluidExtractable) {
-					to.offer(new LbaExtractable((FluidExtractable) view));
+				if (io != null) {
+					to.offer(new LbaWrappedFluidIo(io));
 				}
 			}
-		}));
-		FluidAttributes.INSERTABLE.appendBlockAdder((world, pos, state, to) -> {
-			Direction dir = to.getTargetSide();
-
-			if (dir != null) {
-				FluidView view = getView(world, pos, dir);
-
-				if (view instanceof FluidInsertable) {
-					to.offer(new LbaInsertable((FluidInsertable) view));
-				}
-			}
-		});
-		FluidAttributes.FIXED_INV_VIEW.appendBlockAdder((world, pos, state, to) -> {
-			Direction dir = to.getTargetSide();
-
-			if (dir != null) {
-				FluidView view = getView(world, pos, dir);
-
-				if (view != null) {
-					to.offer(new LbaFixedInvView(view));
-				}
-			}
-		});
+		};
+		FluidAttributes.EXTRACTABLE.appendBlockAdder(lbaBlockAdder);
+		FluidAttributes.INSERTABLE.appendBlockAdder(lbaBlockAdder);
+		FluidAttributes.FIXED_INV_VIEW.appendBlockAdder(lbaBlockAdder);
 	}
 }

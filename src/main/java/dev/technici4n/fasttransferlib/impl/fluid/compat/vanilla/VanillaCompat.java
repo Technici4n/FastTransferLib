@@ -4,8 +4,7 @@ import dev.technici4n.fasttransferlib.api.ItemInteractionContext;
 import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.api.fluid.FluidApi;
 import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
-import dev.technici4n.fasttransferlib.api.fluid.FluidExtractable;
-import dev.technici4n.fasttransferlib.api.fluid.FluidInsertable;
+import dev.technici4n.fasttransferlib.api.fluid.FluidIo;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.fluid.Fluid;
@@ -21,14 +20,14 @@ public class VanillaCompat {
 	}
 
 	static {
-		FluidApi.SIDED_VIEW.registerForBlocks((world, pos, state, direction) -> new CauldronWrapper(world, pos),
+		FluidApi.SIDED.registerForBlocks((world, pos, state, direction) -> new CauldronWrapper(world, pos),
 				Blocks.CAULDRON);
-		FluidApi.UNSIDED_VIEW.registerForBlocks((world, pos, state, direction) -> new CauldronWrapper(world, pos),
+		FluidApi.UNSIDED.registerForBlocks((world, pos, state, direction) -> new CauldronWrapper(world, pos),
 				Blocks.CAULDRON);
-		FluidApi.ITEM_VIEW.register(BottleCompat::new, Items.POTION, Items.GLASS_BOTTLE);
+		FluidApi.ITEM.register(BottleCompat::new, Items.POTION, Items.GLASS_BOTTLE);
 	}
 
-	private static class BottleCompat implements FluidExtractable, FluidInsertable {
+	private static class BottleCompat implements FluidIo {
 		ItemStack stack;
 		final ItemInteractionContext context;
 
@@ -53,6 +52,11 @@ public class VanillaCompat {
 		}
 
 		@Override
+		public boolean supportsFluidInsertion() {
+			return true;
+		}
+
+		@Override
 		public long insert(Fluid fluid, long amount, Simulation simulation) {
 			if (PotionUtil.getPotion(stack) != Potions.EMPTY) return amount;
 			if (amount < FluidConstants.BOTTLE) return amount;
@@ -60,6 +64,11 @@ public class VanillaCompat {
 			if (!context.setStack(new ItemStack(Items.POTION), simulation)) return amount;
 			if (simulation.isActing()) stack = new ItemStack(Items.POTION);
 			return amount - FluidConstants.BOTTLE;
+		}
+
+		@Override
+		public boolean supportsFluidExtraction() {
+			return true;
 		}
 
 		@Override

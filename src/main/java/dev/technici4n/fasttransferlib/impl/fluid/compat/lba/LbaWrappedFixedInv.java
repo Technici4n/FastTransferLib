@@ -7,17 +7,21 @@ import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
 import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
 import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
 import dev.technici4n.fasttransferlib.api.Simulation;
-import dev.technici4n.fasttransferlib.api.fluid.FluidExtractable;
-import dev.technici4n.fasttransferlib.api.fluid.FluidInsertable;
+import dev.technici4n.fasttransferlib.api.fluid.FluidIo;
 
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 
-class LbaWrappedFixedInv implements FluidInsertable, FluidExtractable {
+class LbaWrappedFixedInv implements FluidIo {
 	private final FixedFluidInv wrapped;
 
 	LbaWrappedFixedInv(FixedFluidInv wrapped) {
 		this.wrapped = wrapped;
+	}
+
+	@Override
+	public boolean supportsFluidExtraction() {
+		return true;
 	}
 
 	@Override
@@ -33,6 +37,11 @@ class LbaWrappedFixedInv implements FluidInsertable, FluidExtractable {
 		}
 
 		return extracted.amount().asLong(81000, RoundingMode.DOWN);
+	}
+
+	@Override
+	public boolean supportsFluidInsertion() {
+		return true;
 	}
 
 	@Override

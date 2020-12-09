@@ -5,22 +5,24 @@ import java.util.function.Predicate;
 import dev.technici4n.fasttransferlib.api.Simulation;
 
 /**
- * Utilities related to moving items from an {@link ItemExtractable} to another {@link ItemInsertable}.
+ * Utilities related to moving items between two {@link ItemIo}'s.
  */
 public final class ItemMovement {
 	/**
-	 * Move some items from some slots of an {@link ItemExtractable} to an {@link ItemInsertable}.
+	 * Move some items from some slots of an {@link ItemIo} to another {@link ItemIo}.
 	 *
 	 * @param filter    a predicate deciding which items may be moved
-	 * @param from      the extractable to move items from
-	 * @param to        the insertable to move the items to
+	 * @param from      the io to move items from
+	 * @param to        the io to move the items to
 	 * @param maxCount  The maximum number of items to move.
 	 * @param startSlot The first slot of the range to move, inclusive.
 	 * @param endSlot   The last slot of the range to move, exclusive.
 	 * @return The number of items that were moved.
-	 * @throws IndexOutOfBoundsException if the start or end slot is out of bounds of the {@link ItemExtractable}'s slot count.
+	 * @throws IndexOutOfBoundsException if the start or end slot is out of bounds of the source {@link ItemIo}'s slot count.
 	 */
-	public static int moveRange(Predicate<ItemKey> filter, ItemExtractable from, ItemInsertable to, int maxCount, int startSlot, int endSlot) {
+	public static int moveRange(Predicate<ItemKey> filter, ItemIo from, ItemIo to, int maxCount, int startSlot, int endSlot) {
+		if (!from.supportsItemExtraction() || !to.supportsItemInsertion()) return 0;
+
 		int totalMoved = 0;
 
 		for (int i = startSlot; i < endSlot && maxCount > 0; ++i) {
@@ -57,42 +59,42 @@ public final class ItemMovement {
 	}
 
 	/**
-	 * Move some items from some slots of an {@link ItemExtractable} to an {@link ItemInsertable}.
+	 * Move some items from some slots of an {@link ItemIo} to another {@link ItemIo}.
 	 *
-	 * @param from      the extractable to move items from
-	 * @param to        the insertable to move the items to
+	 * @param from      the io to move items from
+	 * @param to        the io to move the items to
 	 * @param maxCount  The maximum number of items to move.
 	 * @param startSlot The first slot of the range to move, inclusive.
 	 * @param endSlot   The last slot of the range to move, exclusive.
 	 * @return The number of items that were moved.
-	 * @throws IndexOutOfBoundsException if the start or end slot is out of bounds of the {@link ItemExtractable}'s slot count.
+	 * @throws IndexOutOfBoundsException if the start or end slot is out of bounds of the source {@link ItemIo}'s slot count.
 	 */
-	public static int moveRange(ItemExtractable from, ItemInsertable to, int maxCount, int startSlot, int endSlot) {
+	public static int moveRange(ItemIo from, ItemIo to, int maxCount, int startSlot, int endSlot) {
 		return moveRange(key -> true, from, to, maxCount, startSlot, endSlot);
 	}
 
 	/**
-	 * Move some items from an {@link ItemExtractable} to an {@link ItemInsertable}.
+	 * Move some items from some slots of an {@link ItemIo} to another {@link ItemIo}.
 	 *
-	 * @param filter   a predicate deciding which items may be moved
-	 * @param from     the extractable to move items from
-	 * @param to       the insertable to move the items to
+	 * @param filter    a predicate deciding which items may be moved
+	 * @param from      the io to move items from
+	 * @param to        the io to move the items to
 	 * @param maxCount The maximum number of items to move.
 	 * @return The number of items that were moved.
 	 */
-	public static int moveMultiple(Predicate<ItemKey> filter, ItemExtractable from, ItemInsertable to, int maxCount) {
+	public static int moveMultiple(Predicate<ItemKey> filter, ItemIo from, ItemIo to, int maxCount) {
 		return moveRange(filter, from, to, maxCount, 0, from.getItemSlotCount());
 	}
 
 	/**
-	 * Move some items from an {@link ItemExtractable} to an {@link ItemInsertable}.
+	 * Move some items from an {@link ItemIo} to another {@link ItemIo}.
 	 *
 	 * @param from     the extractable to move items from
 	 * @param to       the insertable to move the items to
 	 * @param maxCount The maximum number of items to move.
 	 * @return The number of items that were moved.
 	 */
-	public static int moveMultiple(ItemExtractable from, ItemInsertable to, int maxCount) {
+	public static int moveMultiple(ItemIo from, ItemIo to, int maxCount) {
 		// the lambda should be cached because it is stateless
 		return moveMultiple(key -> true, from, to, maxCount);
 	}

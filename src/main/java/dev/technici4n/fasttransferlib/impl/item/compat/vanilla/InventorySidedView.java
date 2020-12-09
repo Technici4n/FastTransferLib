@@ -2,8 +2,7 @@ package dev.technici4n.fasttransferlib.impl.item.compat.vanilla;
 
 import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.api.item.ItemApi;
-import dev.technici4n.fasttransferlib.api.item.ItemExtractable;
-import dev.technici4n.fasttransferlib.api.item.ItemInsertable;
+import dev.technici4n.fasttransferlib.api.item.ItemIo;
 import dev.technici4n.fasttransferlib.api.item.ItemKey;
 
 import net.minecraft.inventory.Inventory;
@@ -12,9 +11,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.Direction;
 
 /**
- * A wrapper around a vanilla Inventory, for {@link ItemApi#SIDED_VIEW}.
+ * A wrapper around a vanilla Inventory, for {@link ItemApi#SIDED}.
  */
-public class InventorySidedView implements ItemInsertable, ItemExtractable {
+public class InventorySidedView implements ItemIo {
 	private final Inventory wrapped;
 	private final SidedInventory wrappedSided;
 	private final int[] slots;
@@ -27,6 +26,11 @@ public class InventorySidedView implements ItemInsertable, ItemExtractable {
 		this.slots = wrappedSided != null ? wrappedSided.getAvailableSlots(direction) : null;
 		this.size = slots == null ? wrapped.size() : slots.length;
 		this.direction = direction;
+	}
+
+	@Override
+	public boolean supportsItemExtraction() {
+		return true;
 	}
 
 	@Override
@@ -45,6 +49,11 @@ public class InventorySidedView implements ItemInsertable, ItemExtractable {
 		}
 
 		return extracted;
+	}
+
+	@Override
+	public boolean supportsItemInsertion() {
+		return true;
 	}
 
 	@Override

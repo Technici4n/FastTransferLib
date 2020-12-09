@@ -3,11 +3,9 @@ package dev.technic4n.fasttransferlib.example.fluid;
 import dev.technici4n.fasttransferlib.api.ItemInteractionContext;
 import dev.technici4n.fasttransferlib.api.fluid.FluidApi;
 import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
-import dev.technici4n.fasttransferlib.api.fluid.FluidExtractable;
-import dev.technici4n.fasttransferlib.api.fluid.FluidInsertable;
 import dev.technici4n.fasttransferlib.api.fluid.FluidMovement;
 import dev.technici4n.fasttransferlib.api.fluid.FluidTextHelper;
-import dev.technici4n.fasttransferlib.api.fluid.FluidView;
+import dev.technici4n.fasttransferlib.api.fluid.FluidIo;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEntityProvider;
@@ -36,13 +34,11 @@ public class SimpleTankBlock extends Block implements BlockEntityProvider {
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
 		if (world.isClient) return ActionResult.CONSUME;
-		FluidView view = FluidApi.SIDED_VIEW.get(world, pos, hit.getSide());
-		FluidView itemView = FluidApi.ITEM_VIEW.get(player.getStackInHand(hand), ItemInteractionContext.of(player, hand));
+		FluidIo view = FluidApi.SIDED.get(world, pos, hit.getSide());
+		FluidIo itemView = FluidApi.ITEM.get(player.getStackInHand(hand), ItemInteractionContext.of(player, hand));
 
-		if (view instanceof FluidInsertable && view.getFluidSlotCount() >= 1 && itemView instanceof FluidExtractable) {
-			FluidInsertable insertable = (FluidInsertable) view;
-			FluidExtractable extractable = (FluidExtractable) itemView;
-			FluidMovement.moveRange(extractable, insertable, FluidConstants.BUCKET * 10);
+		if (view != null && view.getFluidSlotCount() >= 1 && itemView != null) {
+			FluidMovement.moveMultiple(itemView, view, FluidConstants.BUCKET * 10);
 			player.sendMessage(new LiteralText(String.format("Tank Now At %s millibuckets of %s", FluidTextHelper.getUnicodeMillibuckets(view.getFluidAmount(0), true), Registry.FLUID.getId(view.getFluid(0)).toString())), false);
 			player.sendMessage(new LiteralText(String.format("Tank Now At %s millibuckets of %s", FluidTextHelper.getUnicodeMillibuckets(view.getFluidAmount(0), false), Registry.FLUID.getId(view.getFluid(0)).toString())), false);
 		}
