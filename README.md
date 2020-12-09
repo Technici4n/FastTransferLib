@@ -188,7 +188,7 @@ If for some reason you need `FluidKey`s, please open an issue so it can be discu
 Items are discrete: most players don't expect their diamond to be splittable into two "half-diamonds". Players however expect fluids to be transferable
 in small amounts. Forge has been using millibuckets for the smallest amount of fluid that can be transferred, and just uses integers to store the number
 of millibuckets. Millibuckets have the advantage of being very easy to read for the player, but a bucket (1000 units) can't be divided into bottles, ingots or nuggets.
-To solve this, FTL uses millidroplets (1/81000 of a bucket). Buckets can be divided into bottles, ingots or nuggets with no issues, and the fluid amounts
+To solve this, FTL uses droplets (1/81000 of a bucket). Buckets can be divided into bottles, ingots or nuggets with no issues, and the fluid amounts
 can still be displayed in a player-friendly fashion as `x + y/81 mb`, or just `x mb` if the amount is a multiple of `81`. FTL includes helpers for displaying
 that as unicode.
 

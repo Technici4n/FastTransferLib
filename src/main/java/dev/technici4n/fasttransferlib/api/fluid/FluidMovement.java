@@ -14,7 +14,7 @@ public final class FluidMovement {
 	 *
 	 * @param from          the io to move fluid from
 	 * @param to            the io to move fluid to
-	 * @param maxAmount     The maximum amount of fluid to move, in millidroplets.
+	 * @param maxAmount     The maximum amount of fluid to move, in droplets.
 	 * @param startSlot     The first slot of the range to move, inclusive.
 	 * @param endSlot       The last slot of the range to move, exclusive.
 	 * @return The amount of fluid that was moved.

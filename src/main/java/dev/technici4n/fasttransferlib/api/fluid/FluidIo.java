@@ -25,7 +25,7 @@ public interface FluidIo {
 	Fluid getFluid(int slot);
 
 	/**
-	 * Return the amount of fluid stored in a slot, or 0 if there is no fluid. The amount is given in millidroplets (1/81000 of a bucket).
+	 * Return the amount of fluid stored in a slot, or 0 if there is no fluid. The amount is given in droplets (1/81000 of a bucket).
 	 *
 	 * @param slot The slot id, must be between 0 and {@link FluidIo#getFluidSlotCount()}.
 	 * @return the amount of fluid stored in the slot, or 0 if there is no fluid.
@@ -50,13 +50,13 @@ public interface FluidIo {
 	}
 
 	/**
-	 * Insert fluid into this inventory, and return the amount of leftover fluid. The amounts are given in millidroplets (1/81000 of a bucket).
+	 * Insert fluid into this inventory, and return the amount of leftover fluid. The amounts are given in droplets (1/81000 of a bucket).
 	 * Distribution is left entirely to the implementor.
 	 *
 	 * <p>If simulation is {@link Simulation#SIMULATE}, the result of the operation must be returned, but the underlying state of the fluid insertable must not change.
 	 *
 	 * @param fluid      The fluid to insert
-	 * @param amount     The amount of fluid to insert, in millidroplets
+	 * @param amount     The amount of fluid to insert, in droplets
 	 * @param simulation If {@link Simulation#SIMULATE}, do not mutate the insertable
 	 * @return the amount of fluid that could not be inserted
 	 */
@@ -79,7 +79,7 @@ public interface FluidIo {
 	 *
 	 * @param slot       The slot id, must be between 0 and {@link FluidIo#getFluidSlotCount()}.
 	 * @param fluid      The filter for the fluid to extract
-	 * @param maxAmount  The amount of fluid to extract at most, in millidroplets
+	 * @param maxAmount  The amount of fluid to extract at most, in droplets
 	 * @param simulation If {@link Simulation#SIMULATE}, do not mutate the insertable
 	 * @return The amount of fluid extracted
 	 */
@@ -88,12 +88,12 @@ public interface FluidIo {
 	}
 
 	/**
-	 * Extract some fluid from this extractable, matching the passed fluid. The amounts are given in millidroplets (1/81000 of a bucket).
+	 * Extract some fluid from this extractable, matching the passed fluid. The amounts are given in droplets (1/81000 of a bucket).
 	 *
 	 * <p>If simulation is {@link Simulation#SIMULATE}, the result of the operation must be returned, but the underlying state of the fluid extractable must not change.
 	 *
 	 * @param fluid      The filter for the fluid to extract
-	 * @param maxAmount  The amount of fluid to extract at most, in millidroplets
+	 * @param maxAmount  The amount of fluid to extract at most, in droplets
 	 * @param simulation If {@link Simulation#SIMULATE}, do not mutate the insertable
 	 * @return The amount of fluid extracted
 	 * @implNote Implementations are encouraged to override this method with a more performant implementation.
