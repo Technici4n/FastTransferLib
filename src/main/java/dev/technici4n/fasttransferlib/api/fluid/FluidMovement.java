@@ -66,27 +66,6 @@ public final class FluidMovement {
 		return moveRange(from, to, maxAmount, 0, from.getFluidSlotCount());
 	}
 
-	/**
-	 * Return the greatest common divisor of two positive integers.
-	 */
-	public static long gcd(long a, long b) {
-		if (a <= 0 || b <= 0) throw new IllegalArgumentException("Cannot compute gcd of negative numbers.");
-
-		if (a > b) {
-			long t = a;
-			a = b;
-			b = t;
-		}
-
-		while (a != 0) {
-			long t = a;
-			a = b % a;
-			b = t;
-		}
-
-		return b;
-	}
-
 	private FluidMovement() {
 	}
 }

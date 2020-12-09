@@ -6,6 +6,7 @@ import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
 import dev.technici4n.fasttransferlib.api.fluid.FluidExtractable;
 import dev.technici4n.fasttransferlib.api.fluid.FluidInsertable;
 import dev.technici4n.fasttransferlib.api.fluid.FluidMovement;
+import dev.technici4n.fasttransferlib.api.fluid.FluidTextHelper;
 import dev.technici4n.fasttransferlib.api.fluid.FluidView;
 
 import net.minecraft.block.Block;
@@ -13,6 +14,7 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.LiteralText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -41,7 +43,8 @@ public class SimpleTankBlock extends Block implements BlockEntityProvider {
 			FluidInsertable insertable = (FluidInsertable) view;
 			FluidExtractable extractable = (FluidExtractable) itemView;
 			FluidMovement.moveRange(extractable, insertable, FluidConstants.BUCKET * 10);
-			System.out.printf("Tank Now At %d + %d/81 millibuckets %s%n", view.getFluidAmount(0) / 81, view.getFluidAmount(0) % 81, Registry.FLUID.getId(view.getFluid(0)).toString());
+			player.sendMessage(new LiteralText(String.format("Tank Now At %s millibuckets of %s", FluidTextHelper.getUnicodeMillibuckets(view.getFluidAmount(0), true), Registry.FLUID.getId(view.getFluid(0)).toString())), false);
+			player.sendMessage(new LiteralText(String.format("Tank Now At %s millibuckets of %s", FluidTextHelper.getUnicodeMillibuckets(view.getFluidAmount(0), false), Registry.FLUID.getId(view.getFluid(0)).toString())), false);
 		}
 
 		return ActionResult.CONSUME;
