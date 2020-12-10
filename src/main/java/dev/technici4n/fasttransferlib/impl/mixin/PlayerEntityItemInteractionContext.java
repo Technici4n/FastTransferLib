@@ -14,6 +14,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.world.World;
 
 @Mixin(PlayerEntity.class)
+@SuppressWarnings("unused")
 public abstract class PlayerEntityItemInteractionContext extends LivingEntity implements PlayerEntityItemInteractionContextProvider {
 	PlayerEntityItemInteractionContext(EntityType<? extends LivingEntity> entityType, World world) {
 		super(entityType, world);
@@ -23,7 +24,7 @@ public abstract class PlayerEntityItemInteractionContext extends LivingEntity im
 	PlayerInventory inventory;
 
 	@Unique
-	private ItemInteractionContext mainhandItemInteractionContext = (stack, simulation) -> {
+	private final ItemInteractionContext mainhandItemInteractionContext = (stack, simulation) -> {
 		if (simulation.isActing()) {
 			if (getStackInHand(Hand.MAIN_HAND).isEmpty()) {
 				setStackInHand(Hand.MAIN_HAND, stack);
@@ -36,7 +37,7 @@ public abstract class PlayerEntityItemInteractionContext extends LivingEntity im
 	};
 
 	@Unique
-	private ItemInteractionContext offhandItemInteractionContext = (stack, simulation) -> {
+	private final ItemInteractionContext offhandItemInteractionContext = (stack, simulation) -> {
 		if (simulation.isActing()) {
 			if (getStackInHand(Hand.OFF_HAND).isEmpty()) {
 				setStackInHand(Hand.OFF_HAND, stack);
@@ -49,7 +50,7 @@ public abstract class PlayerEntityItemInteractionContext extends LivingEntity im
 	};
 
 	@Unique
-	private ItemInteractionContext cursorItemInteractionContext = (stack, simulation) -> {
+	private final ItemInteractionContext cursorItemInteractionContext = (stack, simulation) -> {
 		if (simulation.isActing()) {
 			if (inventory.getCursorStack().isEmpty()) {
 				inventory.setCursorStack(stack);
@@ -62,12 +63,12 @@ public abstract class PlayerEntityItemInteractionContext extends LivingEntity im
 	};
 
 	@Override
-	public ItemInteractionContext getItemItemInteractionContext(Hand hand) {
+	public ItemInteractionContext getHandContext(Hand hand) {
 		return hand == Hand.MAIN_HAND ? mainhandItemInteractionContext : offhandItemInteractionContext;
 	}
 
 	@Override
-	public ItemInteractionContext getCursorItemItemInteractionContext() {
+	public ItemInteractionContext getCursorContext() {
 		return cursorItemInteractionContext;
 	}
 }

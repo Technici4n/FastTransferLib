@@ -16,7 +16,7 @@ public interface ItemInteractionContext {
 	/**
 	 * Add a stack if possible and return whether the modification was successful.
 	 *
-	 * @param stacks     The extra stacks
+	 * @param stack     The extra stacks
 	 * @param simulation If {@link Simulation#SIMULATE}, do not mutate anything
 	 * @return whether the modification was successful
 	 * @apiNote If a simulation succeeds twice, it is not guaranteed that the action will succeed twice, so it is recommended to only call this function once.
@@ -24,10 +24,10 @@ public interface ItemInteractionContext {
 	boolean addStack(ItemStack stack, Simulation simulation);
 
 	static ItemInteractionContext ofPlayerHand(PlayerEntity player, Hand hand) {
-		return ((PlayerEntityItemInteractionContextProvider) player).getItemItemInteractionContext(hand);
+		return ((PlayerEntityItemInteractionContextProvider) player).getHandContext(hand);
 	}
 
 	static ItemInteractionContext ofCursor(PlayerEntity player) {
-		return ((PlayerEntityItemInteractionContextProvider) player).getCursorItemItemInteractionContext();
+		return ((PlayerEntityItemInteractionContextProvider) player).getCursorContext();
 	}
 }

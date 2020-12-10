@@ -126,19 +126,19 @@ reader is looking for a batteries-included generic resource management library.
 but they also ensure that we don't have to worry about which stacks are safe or not safe to pass to insert/extract functions.
 
 ### The API
-This is the entire item api. An `ItemView` is queried, and it must be manually cast to `ItemInsertable` or `ItemExtractable` if possible. 
+This is the entire item api:
 ```java
-public interface ItemView { // item inventory
+public interface ItemIo { // item inventory
 	int getItemSlotCount(); // number of slots
 	ItemKey getItemKey(int slot); // ItemKey in slot
 	int getItemCount(int slot); // count in slot
-	int getVersion(); // inventory version, must change if the inventory changes
-    // INSERTION FUNCTIONS
-    default boolean supportsItemInsertion() { return false; } // false if insert always rejects
-    default int insert(ItemKey key, int count, Simulation simulation) { /* does nothing */ } // insert, and return leftover
-    // EXTRACTION FUNCTIONS
-    default boolean supportsItemExtraction() { return false; } // false if extract always rejects
-	int extract(int slot, ItemKey key, int maxCount, Simulation simulation); // extract
+	default int getVersion() { /* ... */ } // inventory version, must change if the inventory changes
+	// INSERTION FUNCTIONS
+	default boolean supportsItemInsertion() { return false; } // false if insert always rejects
+	default int insert(ItemKey key, int count, Simulation simulation) { /* does nothing */ } // insert, and return leftover
+	// EXTRACTION FUNCTIONS
+	default boolean supportsItemExtraction() { return false; } // false if extract always rejects
+	default int extract(int slot, ItemKey key, int maxCount, Simulation simulation) { return 0; } // extract
 	default int extract(ItemKey key, int maxCount, Simulation simulation) { /* ... */ } // slotless variant, with default impl
 }
 ```

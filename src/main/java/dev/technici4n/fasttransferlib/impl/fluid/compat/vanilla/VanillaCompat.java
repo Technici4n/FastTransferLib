@@ -62,12 +62,11 @@ public class VanillaCompat {
 			if (PotionUtil.getPotion(stack) != Potions.EMPTY) return amount;
 			if (amount < FluidConstants.BOTTLE) return amount;
 			if (fluid != Fluids.WATER) return amount;
+			if (!context.addStack(new ItemStack(Items.POTION), Simulation.SIMULATE)) return amount;
 
 			if (simulation.isActing()) {
 				stack.decrement(1);
 				context.addStack(new ItemStack(Items.POTION), Simulation.ACT);
-			} else if (stack.getCount() > 1 && !context.addStack(new ItemStack(Items.POTION), Simulation.SIMULATE)) {
-				return amount;
 			}
 
 			return amount - FluidConstants.BOTTLE;
@@ -83,8 +82,13 @@ public class VanillaCompat {
 			if (stack.isEmpty()) return 0;
 			if (PotionUtil.getPotion(stack) != Potions.WATER) return 0;
 			if (maxAmount < FluidConstants.BOTTLE) return 0;
-			if (simulation.isActing()) stack.decrement(1);
-			if (!context.addStack(new ItemStack(Items.GLASS_BOTTLE), simulation)) return 0;
+			if (!context.addStack(new ItemStack(Items.GLASS_BOTTLE), Simulation.SIMULATE)) return 0;
+
+			if (simulation.isActing()) {
+				stack.decrement(1);
+				context.addStack(new ItemStack(Items.GLASS_BOTTLE), Simulation.ACT);
+			}
+
 			return FluidConstants.BOTTLE;
 		}
 	}
