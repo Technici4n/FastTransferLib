@@ -1,7 +1,10 @@
 package dev.technici4n.fasttransferlib.api;
 
+import dev.technici4n.fasttransferlib.impl.fluid.compat.vanilla.PlayerEntityItemInteractionContextProvider;
+
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.Hand;
 
 /**
  * A context for interaction with item-provided item and fluid apis, adding new stacks.
@@ -20,7 +23,11 @@ public interface ItemInteractionContext {
 	 */
 	boolean addStack(ItemStack stack, Simulation simulation);
 
-	static ItemInteractionContext of(PlayerEntity player) {
-		return (ItemInteractionContext) player;
+	static ItemInteractionContext ofPlayerHand(PlayerEntity player, Hand hand) {
+		return ((PlayerEntityItemInteractionContextProvider) player).getItemItemInteractionContext(hand);
+	}
+
+	static ItemInteractionContext ofCursor(PlayerEntity player) {
+		return ((PlayerEntityItemInteractionContextProvider) player).getCursorItemItemInteractionContext();
 	}
 }
