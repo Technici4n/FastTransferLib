@@ -1,40 +1,26 @@
 package dev.technici4n.fasttransferlib.api;
 
-import dev.technici4n.fasttransferlib.impl.fluid.compat.vanilla.PlayerEntityItemInteractionContext;
-
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.Hand;
 
 /**
- * A context for interaction with item-provided item and fluid apis, that allows modifying the stack and passing a new stack.
+ * A context for interaction with item-provided item and fluid apis, adding new stacks.
  *
- * <p>In many cases such as bucket filling/emptying, it is necessary to change the current stack, and also to send extra stacks.
- * For example, filling a stack of 3 empty buckets with water may require changing the stack to 2 empty buckets of water,
- * and storing an additional full bucket of water.
+ * <p>In many cases such as bucket filling/emptying, it is necessary to add stacks other than the current stack.
+ * For example, filling a bottle that is in a stack requires putting the water bottle in the inventory.
  */
 public interface ItemInteractionContext {
 	/**
-	 * Set the new stack if possible and return whether the modification was successful.
-	 *
-	 * @param stack      The new stack
-	 * @param simulation If {@link Simulation#SIMULATE}, do not mutate anything
-	 * @return whether the modification was successful
-	 */
-	boolean setStack(ItemStack stack, Simulation simulation);
-
-	/**
-	 * Add extra stacks if possible and return whether the modification was successful.
+	 * Add a stack if possible and return whether the modification was successful.
 	 *
 	 * @param stacks     The extra stacks
 	 * @param simulation If {@link Simulation#SIMULATE}, do not mutate anything
 	 * @return whether the modification was successful
 	 * @apiNote If a simulation succeeds twice, it is not guaranteed that the action will succeed twice, so it is recommended to only call this function once.
 	 */
-	boolean addExtraStacks(ItemStack stacks, Simulation simulation);
+	boolean addStack(ItemStack stack, Simulation simulation);
 
-	// TODO Cache object on the player with a mixin?
-	static ItemInteractionContext of(PlayerEntity player, Hand hand) {
-		return new PlayerEntityItemInteractionContext(player, hand);
+	static ItemInteractionContext of(PlayerEntity player) {
+		return (ItemInteractionContext) player;
 	}
 }

@@ -58,11 +58,18 @@ public class VanillaCompat {
 
 		@Override
 		public long insert(Fluid fluid, long amount, Simulation simulation) {
+			if (stack.isEmpty()) return amount;
 			if (PotionUtil.getPotion(stack) != Potions.EMPTY) return amount;
 			if (amount < FluidConstants.BOTTLE) return amount;
 			if (fluid != Fluids.WATER) return amount;
-			if (!context.setStack(new ItemStack(Items.POTION), simulation)) return amount;
-			if (simulation.isActing()) stack = new ItemStack(Items.POTION);
+
+			if (simulation.isActing()) {
+				stack.decrement(1);
+				context.addStack(new ItemStack(Items.POTION), Simulation.ACT);
+			} else if (stack.getCount() > 1 && !context.addStack(new ItemStack(Items.POTION), Simulation.SIMULATE)) {
+				return amount;
+			}
+
 			return amount - FluidConstants.BOTTLE;
 		}
 
@@ -73,10 +80,11 @@ public class VanillaCompat {
 
 		@Override
 		public long extract(int slot, Fluid fluid, long maxAmount, Simulation simulation) {
+			if (stack.isEmpty()) return 0;
 			if (PotionUtil.getPotion(stack) != Potions.WATER) return 0;
 			if (maxAmount < FluidConstants.BOTTLE) return 0;
-			if (!context.setStack(new ItemStack(Items.GLASS_BOTTLE), simulation)) return 0;
-			if (simulation.isActing()) stack = new ItemStack(Items.GLASS_BOTTLE);
+			if (simulation.isActing()) stack.decrement(1);
+			if (!context.addStack(new ItemStack(Items.GLASS_BOTTLE), simulation)) return 0;
 			return FluidConstants.BOTTLE;
 		}
 	}

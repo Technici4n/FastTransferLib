@@ -1,0 +1,12 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.technici4n.fasttransferlib.impl.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "mixins": [
+    "PlayerEntityItemInteractionContext"
+   ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
