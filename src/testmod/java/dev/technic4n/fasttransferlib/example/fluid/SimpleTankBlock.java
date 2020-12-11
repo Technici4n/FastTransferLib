@@ -1,6 +1,6 @@
 package dev.technic4n.fasttransferlib.example.fluid;
 
-import dev.technici4n.fasttransferlib.api.ItemInteractionContext;
+import dev.technici4n.fasttransferlib.api.ContainerItemContext;
 import dev.technici4n.fasttransferlib.api.fluid.FluidApi;
 import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
 import dev.technici4n.fasttransferlib.api.fluid.FluidMovement;
@@ -35,7 +35,7 @@ public class SimpleTankBlock extends Block implements BlockEntityProvider {
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
 		if (world.isClient) return ActionResult.CONSUME;
 		FluidIo view = FluidApi.SIDED.get(world, pos, hit.getSide());
-		FluidIo itemView = FluidApi.ITEM.get(player.getStackInHand(hand), ItemInteractionContext.ofPlayerHand(player, hand));
+		FluidIo itemView = FluidApi.ITEM.get(player.getStackInHand(hand), ContainerItemContext.ofPlayerHand(player, hand));
 
 		if (view != null && view.getFluidSlotCount() >= 1 && itemView != null) {
 			FluidMovement.moveMultiple(itemView, view, FluidConstants.BUCKET * 10);

@@ -1,10 +1,11 @@
 package dev.technici4n.fasttransferlib.impl.fluid.compat.vanilla;
 
-import dev.technici4n.fasttransferlib.api.ItemInteractionContext;
+import dev.technici4n.fasttransferlib.api.ContainerItemContext;
 import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.api.fluid.FluidApi;
 import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
 import dev.technici4n.fasttransferlib.api.fluid.FluidIo;
+import dev.technici4n.fasttransferlib.api.item.ItemKey;
 import dev.technici4n.fasttransferlib.impl.mixin.BucketItemAccess;
 
 import net.minecraft.block.Blocks;
@@ -37,9 +38,9 @@ public class VanillaCompat {
 
 	private static class BucketCompat implements FluidIo {
 		ItemStack stack;
-		final ItemInteractionContext context;
+		final ContainerItemContext context;
 
-		private BucketCompat(ItemStack stack, ItemInteractionContext context) {
+		private BucketCompat(ItemStack stack, ContainerItemContext context) {
 			this.stack = stack;
 			this.context = context;
 		}
@@ -72,13 +73,7 @@ public class VanillaCompat {
 			if (!(stack.getItem() instanceof BucketItem)) return amount;
 			if (getFluid(0) != Fluids.EMPTY) return amount;
 			if (amount < FluidConstants.BUCKET) return amount;
-			if (!context.addStack(new ItemStack(fluid.getBucketItem()), Simulation.SIMULATE)) return amount;
-
-			if (simulation.isActing()) {
-				stack.decrement(1);
-				context.addStack(new ItemStack(fluid.getBucketItem()), Simulation.ACT);
-			}
-
+			if (!context.transform(ItemKey.of(fluid.getBucketItem()), simulation)) return amount;
 			return amount - FluidConstants.BUCKET;
 		}
 
@@ -91,22 +86,16 @@ public class VanillaCompat {
 		public long extract(int slot, Fluid fluid, long maxAmount, Simulation simulation) {
 			if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Item");
 			if (getFluid(0) == Fluids.EMPTY || getFluid(0) != fluid) return 0;
-			if (!context.addStack(new ItemStack(Items.BUCKET), Simulation.SIMULATE)) return 0;
-
-			if (simulation.isActing()) {
-				stack.decrement(1);
-				context.addStack(new ItemStack(Items.BUCKET), Simulation.ACT);
-			}
-
+			if (!context.transform(ItemKey.of(Items.BUCKET), simulation)) return 0;
 			return FluidConstants.BUCKET;
 		}
 	}
 
 	private static class BottleCompat implements FluidIo {
 		ItemStack stack;
-		final ItemInteractionContext context;
+		final ContainerItemContext context;
 
-		private BottleCompat(ItemStack stack, ItemInteractionContext context) {
+		private BottleCompat(ItemStack stack, ContainerItemContext context) {
 			this.stack = stack;
 			this.context = context;
 		}
@@ -139,13 +128,7 @@ public class VanillaCompat {
 			if (PotionUtil.getPotion(stack) != Potions.EMPTY) return amount;
 			if (amount < FluidConstants.BOTTLE) return amount;
 			if (fluid != Fluids.WATER) return amount;
-			if (!context.addStack(new ItemStack(Items.POTION), Simulation.SIMULATE)) return amount;
-
-			if (simulation.isActing()) {
-				stack.decrement(1);
-				context.addStack(new ItemStack(Items.POTION), Simulation.ACT);
-			}
-
+			if (!context.transform(ItemKey.of(Items.POTION), simulation)) return amount;
 			return amount - FluidConstants.BOTTLE;
 		}
 
@@ -160,13 +143,7 @@ public class VanillaCompat {
 			if (stack.isEmpty()) return 0;
 			if (PotionUtil.getPotion(stack) != Potions.WATER) return 0;
 			if (maxAmount < FluidConstants.BOTTLE) return 0;
-			if (!context.addStack(new ItemStack(Items.GLASS_BOTTLE), Simulation.SIMULATE)) return 0;
-
-			if (simulation.isActing()) {
-				stack.decrement(1);
-				context.addStack(new ItemStack(Items.GLASS_BOTTLE), Simulation.ACT);
-			}
-
+			if (!context.transform(ItemKey.of(Items.GLASS_BOTTLE), simulation)) return 0;
 			return FluidConstants.BOTTLE;
 		}
 	}
