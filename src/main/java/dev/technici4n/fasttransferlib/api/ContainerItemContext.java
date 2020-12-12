@@ -33,7 +33,7 @@ public interface ContainerItemContext {
 		return new PlayerEntityContainerItemContexts.Hand(player, hand);
 	}
 
-	static ContainerItemContext ofCursor(PlayerEntity player) {
+	static ContainerItemContext ofPlayerCursor(PlayerEntity player) {
 		return new PlayerEntityContainerItemContexts.Cursor(player);
 	}
 }

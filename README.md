@@ -33,7 +33,8 @@ dependencies {
 ```
 In `gradle.properties`:
 ```properties
-ftl_version=0.1.0 
+# put latest version here, check the commits!
+ftl_version=0.1.0
 ```
 
 ## Usage

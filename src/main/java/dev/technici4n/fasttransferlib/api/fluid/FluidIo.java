@@ -99,7 +99,7 @@ public interface FluidIo {
 	 * @implNote Implementations are encouraged to override this method with a more performant implementation.
 	 */
 	default long extract(Fluid fluid, long maxAmount, Simulation simulation) {
-		if (!supportsFluidInsertion()) return 0;
+		if (!supportsFluidExtraction()) return 0;
 
 		for (int i = 0; i < getFluidSlotCount(); ++i) {
 			long extracted = extract(i, fluid, maxAmount, simulation);
