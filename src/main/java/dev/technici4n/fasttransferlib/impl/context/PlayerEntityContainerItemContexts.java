@@ -21,25 +21,18 @@ public class PlayerEntityContainerItemContexts {
 
 		@Override
 		public boolean transform(ItemKey into, Simulation simulation) {
+			if (getCount() <= 0) throw new RuntimeException("No item to transform!");
+
 			if (simulation.isActing()) {
 				ItemStack cursorItemStack = player.inventory.getCursorStack();
 				cursorItemStack.decrement(1);
 
 				if (cursorItemStack.isEmpty()) {
 					player.inventory.setCursorStack(into.toStack(1));
+				} else if (into.matches(cursorItemStack) && cursorItemStack.getCount() < cursorItemStack.getMaxCount()) {
+					cursorItemStack.increment(1);
 				} else {
-					if (into.equals(ItemKey.of(cursorItemStack))) {
-						int total = cursorItemStack.getCount() + 1;
-						int firstStack = Math.min(total, into.getItem().getMaxCount());
-						cursorItemStack.setCount(firstStack);
-						int secondStack = total - firstStack;
-
-						if (secondStack > 0) {
-							player.inventory.offerOrDrop(player.world, into.toStack(secondStack));
-						}
-					} else {
-						player.inventory.offerOrDrop(player.world, into.toStack(1));
-					}
+					player.inventory.offerOrDrop(player.world, into.toStack());
 				}
 			}
 
@@ -66,25 +59,18 @@ public class PlayerEntityContainerItemContexts {
 
 		@Override
 		public boolean transform(ItemKey into, Simulation simulation) {
+			if (getCount() <= 0) throw new RuntimeException("No item to transform!");
+
 			if (simulation.isActing()) {
-				ItemStack handItemStack = player.getStackInHand(hand);
-				handItemStack.decrement(1);
+				ItemStack handStack = player.getStackInHand(hand);
+				handStack.decrement(1);
 
-				if (handItemStack.isEmpty()) {
+				if (handStack.isEmpty()) {
 					player.setStackInHand(hand, into.toStack(1));
+				} else if (into.matches(handStack) && handStack.getCount() < handStack.getMaxCount()) {
+					handStack.increment(1);
 				} else {
-					if (into.equals(ItemKey.of(handItemStack))) {
-						int total = handItemStack.getCount() + 1;
-						int firstStack = Math.min(total, into.getItem().getMaxCount());
-						handItemStack.setCount(firstStack);
-						int secondStack = total - firstStack;
-
-						if (secondStack > 0) {
-							player.inventory.offerOrDrop(player.world, into.toStack(secondStack));
-						}
-					} else {
-						player.inventory.offerOrDrop(player.world, into.toStack(1));
-					}
+					player.inventory.offerOrDrop(player.world, into.toStack());
 				}
 			}
 
@@ -94,7 +80,7 @@ public class PlayerEntityContainerItemContexts {
 		@Override
 		public int getCount() {
 			ItemStack handItemStack = player.getStackInHand(hand);
-			return itemKey.equals(ItemKey.of(handItemStack)) ? handItemStack.getCount() : 0;
+			return itemKey.matches(handItemStack) ? handItemStack.getCount() : 0;
 		}
 	}
 }

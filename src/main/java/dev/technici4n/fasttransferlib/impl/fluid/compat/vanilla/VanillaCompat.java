@@ -31,16 +31,16 @@ public class VanillaCompat {
 		FluidApi.ITEM.registerFallback((itemKey, context) -> {
 			if (!(itemKey.getItem() instanceof BucketItem)) return null;
 			if (itemKey.getItem() instanceof FishBucketItem) return null;
-			return new BucketCompat(itemKey, context);
+			return new BucketCompat((BucketItem) itemKey.getItem(), context);
 		});
 	}
 
 	private static class BucketCompat implements FluidIo {
-		final ItemKey itemKey;
-		final ContainerItemContext context;
+		private final Fluid fluid;
+		private final ContainerItemContext context;
 
-		private BucketCompat(ItemKey itemKey, ContainerItemContext context) {
-			this.itemKey = itemKey;
+		private BucketCompat(BucketItem item, ContainerItemContext context) {
+			this.fluid = ((BucketItemAccess) item).getFluid();
 			this.context = context;
 		}
 
@@ -51,15 +51,14 @@ public class VanillaCompat {
 
 		@Override
 		public Fluid getFluid(int slot) {
-			if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Item");
-			if (!(itemKey.getItem() instanceof BucketItem)) return Fluids.EMPTY;
-			return ((BucketItemAccess) itemKey.getItem()).getFluid();
+			checkSingleSlot(slot);
+			return fluid;
 		}
 
 		@Override
 		public long getFluidAmount(int slot) {
-			if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Item");
-			return getFluid(0) == Fluids.EMPTY ? 0 : FluidConstants.BUCKET;
+			checkSingleSlot(slot);
+			return fluid == Fluids.EMPTY ? 0 : FluidConstants.BUCKET;
 		}
 
 		@Override
@@ -70,8 +69,7 @@ public class VanillaCompat {
 		@Override
 		public long insert(Fluid fluid, long amount, Simulation simulation) {
 			if (context.getCount() == 0) return amount;
-			if (!(itemKey.getItem() instanceof BucketItem)) return amount;
-			if (getFluid(0) != Fluids.EMPTY) return amount;
+			if (this.fluid != Fluids.EMPTY) return amount;
 			if (amount < FluidConstants.BUCKET) return amount;
 			if (!context.transform(ItemKey.of(fluid.getBucketItem()), simulation)) return amount;
 			return amount - FluidConstants.BUCKET;
@@ -84,9 +82,9 @@ public class VanillaCompat {
 
 		@Override
 		public long extract(int slot, Fluid fluid, long maxAmount, Simulation simulation) {
-			if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Item");
+			checkSingleSlot(slot);
 			if (context.getCount() == 0) return 0;
-			if (getFluid(0) == Fluids.EMPTY || getFluid(0) != fluid) return 0;
+			if (this.fluid == Fluids.EMPTY || this.fluid != fluid) return 0;
 			if (!context.transform(ItemKey.of(Items.BUCKET), simulation)) return 0;
 			return FluidConstants.BUCKET;
 		}
@@ -108,13 +106,13 @@ public class VanillaCompat {
 
 		@Override
 		public Fluid getFluid(int slot) {
-			if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Item");
+			checkSingleSlot(slot);
 			return PotionUtil.getPotion(itemKey.toStack()) == Potions.WATER ? Fluids.WATER : Fluids.EMPTY;
 		}
 
 		@Override
 		public long getFluidAmount(int slot) {
-			if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Item");
+			checkSingleSlot(slot);
 			return PotionUtil.getPotion(itemKey.toStack()) == Potions.WATER ? FluidConstants.BOTTLE : 0;
 		}
 
@@ -140,12 +138,18 @@ public class VanillaCompat {
 
 		@Override
 		public long extract(int slot, Fluid fluid, long maxAmount, Simulation simulation) {
-			if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Item");
+			checkSingleSlot(slot);
 			if (context.getCount() == 0) return 0;
 			if (PotionUtil.getPotion(itemKey.toStack()) != Potions.WATER) return 0;
 			if (maxAmount < FluidConstants.BOTTLE) return 0;
 			if (!context.transform(ItemKey.of(Items.GLASS_BOTTLE), simulation)) return 0;
 			return FluidConstants.BOTTLE;
+		}
+	}
+
+	private static void checkSingleSlot(int slot) {
+		if (slot != 0) {
+			throw new IndexOutOfBoundsException("This item container only has 1 slot, this slot is out of bounds: " + slot);
 		}
 	}
 }

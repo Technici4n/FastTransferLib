@@ -14,7 +14,27 @@ Hopefully it will be merged in fabric api, but more testing has to be done befor
 * Authors of other tech mods have expressed interest in an alternative to LBA as well.
 
 ## Installation
-When the API is a bit more fleshed out, builds will be available on https://github.com/Technici4n/Technici4n-maven.
+```groovy
+repositories {
+    maven {
+        name = "Technici4n"
+        url = "https://raw.githubusercontent.com/Technici4n/Technici4n-maven/master/"
+        content {
+            includeGroup "net.fabricmc.fabric-api" // FTL needs this too
+            includeGroup "dev.technici4n"
+        }
+    }
+}
+
+dependencies {
+    modApi "dev.technici4n:FastTransferLib:${project.ftl_version}"
+    include "dev.technici4n:FastTransferLib:${project.ftl_version}}"
+}
+```
+In `gradle.properties`:
+```properties
+ftl_version=0.1.0 
+```
 
 ## Usage
 ### Item API
