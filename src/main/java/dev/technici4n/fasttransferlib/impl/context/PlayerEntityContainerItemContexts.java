@@ -60,7 +60,7 @@ public class PlayerEntityContainerItemContexts {
 
 		public Hand(PlayerEntity player, net.minecraft.util.Hand hand) {
 			this.player = player;
-			this.itemKey = ItemKey.of(player.getMainHandStack());
+			this.itemKey = ItemKey.of(player.getStackInHand(hand));
 			this.hand = hand;
 		}
 
@@ -93,8 +93,8 @@ public class PlayerEntityContainerItemContexts {
 
 		@Override
 		public int getCount() {
-			ItemStack cursorItemStack = player.inventory.getCursorStack();
-			return itemKey.equals(ItemKey.of(cursorItemStack)) ? cursorItemStack.getCount() : 0;
+			ItemStack handItemStack = player.getStackInHand(hand);
+			return itemKey.equals(ItemKey.of(handItemStack)) ? handItemStack.getCount() : 0;
 		}
 	}
 }

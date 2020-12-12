@@ -13,7 +13,6 @@ import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.FishBucketItem;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
@@ -29,19 +28,19 @@ public class VanillaCompat {
 		FluidApi.UNSIDED.registerForBlocks((world, pos, state, direction) -> new CauldronWrapper(world, pos),
 				Blocks.CAULDRON);
 		FluidApi.ITEM.register(BottleCompat::new, Items.POTION, Items.GLASS_BOTTLE);
-		FluidApi.ITEM.registerFallback((stack, context) -> {
-			if (!(stack.getItem() instanceof BucketItem)) return null;
-			if (stack.getItem() instanceof FishBucketItem) return null;
-			return new BucketCompat(stack, context);
+		FluidApi.ITEM.registerFallback((itemKey, context) -> {
+			if (!(itemKey.getItem() instanceof BucketItem)) return null;
+			if (itemKey.getItem() instanceof FishBucketItem) return null;
+			return new BucketCompat(itemKey, context);
 		});
 	}
 
 	private static class BucketCompat implements FluidIo {
-		ItemStack stack;
+		final ItemKey itemKey;
 		final ContainerItemContext context;
 
-		private BucketCompat(ItemStack stack, ContainerItemContext context) {
-			this.stack = stack;
+		private BucketCompat(ItemKey itemKey, ContainerItemContext context) {
+			this.itemKey = itemKey;
 			this.context = context;
 		}
 
@@ -53,8 +52,8 @@ public class VanillaCompat {
 		@Override
 		public Fluid getFluid(int slot) {
 			if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Item");
-			if (!(stack.getItem() instanceof BucketItem)) return Fluids.EMPTY;
-			return ((BucketItemAccess) stack.getItem()).getFluid();
+			if (!(itemKey.getItem() instanceof BucketItem)) return Fluids.EMPTY;
+			return ((BucketItemAccess) itemKey.getItem()).getFluid();
 		}
 
 		@Override
@@ -70,7 +69,8 @@ public class VanillaCompat {
 
 		@Override
 		public long insert(Fluid fluid, long amount, Simulation simulation) {
-			if (!(stack.getItem() instanceof BucketItem)) return amount;
+			if (context.getCount() == 0) return amount;
+			if (!(itemKey.getItem() instanceof BucketItem)) return amount;
 			if (getFluid(0) != Fluids.EMPTY) return amount;
 			if (amount < FluidConstants.BUCKET) return amount;
 			if (!context.transform(ItemKey.of(fluid.getBucketItem()), simulation)) return amount;
@@ -85,6 +85,7 @@ public class VanillaCompat {
 		@Override
 		public long extract(int slot, Fluid fluid, long maxAmount, Simulation simulation) {
 			if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Item");
+			if (context.getCount() == 0) return 0;
 			if (getFluid(0) == Fluids.EMPTY || getFluid(0) != fluid) return 0;
 			if (!context.transform(ItemKey.of(Items.BUCKET), simulation)) return 0;
 			return FluidConstants.BUCKET;
@@ -92,11 +93,11 @@ public class VanillaCompat {
 	}
 
 	private static class BottleCompat implements FluidIo {
-		ItemStack stack;
+		final ItemKey itemKey;
 		final ContainerItemContext context;
 
-		private BottleCompat(ItemStack stack, ContainerItemContext context) {
-			this.stack = stack;
+		private BottleCompat(ItemKey itemKey, ContainerItemContext context) {
+			this.itemKey = itemKey;
 			this.context = context;
 		}
 
@@ -108,13 +109,13 @@ public class VanillaCompat {
 		@Override
 		public Fluid getFluid(int slot) {
 			if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Item");
-			return PotionUtil.getPotion(stack) == Potions.WATER ? Fluids.WATER : Fluids.EMPTY;
+			return PotionUtil.getPotion(itemKey.toStack()) == Potions.WATER ? Fluids.WATER : Fluids.EMPTY;
 		}
 
 		@Override
 		public long getFluidAmount(int slot) {
 			if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Item");
-			return PotionUtil.getPotion(stack) == Potions.WATER ? FluidConstants.BOTTLE : 0;
+			return PotionUtil.getPotion(itemKey.toStack()) == Potions.WATER ? FluidConstants.BOTTLE : 0;
 		}
 
 		@Override
@@ -124,8 +125,8 @@ public class VanillaCompat {
 
 		@Override
 		public long insert(Fluid fluid, long amount, Simulation simulation) {
-			if (stack.isEmpty()) return amount;
-			if (PotionUtil.getPotion(stack) != Potions.EMPTY) return amount;
+			if (context.getCount() == 0) return amount;
+			if (PotionUtil.getPotion(itemKey.toStack()) != Potions.EMPTY) return amount;
 			if (amount < FluidConstants.BOTTLE) return amount;
 			if (fluid != Fluids.WATER) return amount;
 			if (!context.transform(ItemKey.of(Items.POTION), simulation)) return amount;
@@ -140,8 +141,8 @@ public class VanillaCompat {
 		@Override
 		public long extract(int slot, Fluid fluid, long maxAmount, Simulation simulation) {
 			if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Item");
-			if (stack.isEmpty()) return 0;
-			if (PotionUtil.getPotion(stack) != Potions.WATER) return 0;
+			if (context.getCount() == 0) return 0;
+			if (PotionUtil.getPotion(itemKey.toStack()) != Potions.WATER) return 0;
 			if (maxAmount < FluidConstants.BOTTLE) return 0;
 			if (!context.transform(ItemKey.of(Items.GLASS_BOTTLE), simulation)) return 0;
 			return FluidConstants.BOTTLE;
