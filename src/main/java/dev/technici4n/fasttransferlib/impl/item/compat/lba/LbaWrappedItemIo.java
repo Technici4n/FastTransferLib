@@ -53,7 +53,8 @@ class LbaWrappedItemIo implements FixedItemInvView, ItemTransferable {
 	@Override
 	public ItemStack attemptInsertion(ItemStack stack, Simulation simulation) {
 		int leftover = io.insert(ItemKey.of(stack), stack.getCount(), LbaUtil.getSimulation(simulation));
-		stack.setCount(leftover);
-		return stack;
+		ItemStack ret = stack.copy();
+		ret.setCount(leftover);
+		return ret;
 	}
 }
