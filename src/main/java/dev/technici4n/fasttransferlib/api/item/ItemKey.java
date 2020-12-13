@@ -19,7 +19,7 @@ public interface ItemKey {
 	ItemKey EMPTY = ItemKeyImpl.of(Items.AIR, null);
 
 	default boolean isEmpty() {
-		return this == EMPTY;
+		return this.equals(EMPTY);
 	}
 
 	static ItemKey of(@Nullable ItemStack stack) {
