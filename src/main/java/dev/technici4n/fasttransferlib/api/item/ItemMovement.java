@@ -51,8 +51,6 @@ public final class ItemMovement {
 
 			totalMoved += moved;
 			maxCount -= moved;
-
-			--i; // multiple attempts may be necessary
 		}
 
 		return totalMoved;

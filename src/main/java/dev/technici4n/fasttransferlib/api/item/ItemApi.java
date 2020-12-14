@@ -13,8 +13,6 @@ import net.fabricmc.fabric.api.provider.v1.block.BlockApiLookupRegistry;
 public class ItemApi {
 	public static final BlockApiLookup<ItemIo, @NotNull Direction> SIDED =
 			BlockApiLookupRegistry.getLookup(new Identifier("fasttransferlib:sided_item_io"), ItemIo.class, Direction.class);
-	public static final BlockApiLookup<ItemIo, Void> UNSIDED =
-			BlockApiLookupRegistry.getLookup(new Identifier("fasttransferlib:unsided_item_io"), ItemIo.class, Void.class);
 
 	static {
 		VanillaCompat.init();

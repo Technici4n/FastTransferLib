@@ -7,13 +7,16 @@ import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
 import dev.technici4n.fasttransferlib.api.fluid.FluidIo;
 import dev.technici4n.fasttransferlib.api.item.ItemKey;
 import dev.technici4n.fasttransferlib.impl.mixin.BucketItemAccess;
+import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.block.Blocks;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 import net.minecraft.item.BucketItem;
 import net.minecraft.item.FishBucketItem;
+import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionUtil;
 import net.minecraft.potion.Potions;
 
@@ -25,9 +28,7 @@ public class VanillaCompat {
 	static {
 		FluidApi.SIDED.registerForBlocks((world, pos, state, direction) -> new CauldronWrapper(world, pos),
 				Blocks.CAULDRON);
-		FluidApi.UNSIDED.registerForBlocks((world, pos, state, direction) -> new CauldronWrapper(world, pos),
-				Blocks.CAULDRON);
-		FluidApi.ITEM.register(BottleCompat::new, Items.POTION, Items.GLASS_BOTTLE);
+		FluidApi.ITEM.register(BottleCompat::of, Items.POTION, Items.GLASS_BOTTLE);
 		FluidApi.ITEM.registerFallback((itemKey, context) -> {
 			if (!(itemKey.getItem() instanceof BucketItem)) return null;
 			if (itemKey.getItem() instanceof FishBucketItem) return null;
@@ -91,11 +92,28 @@ public class VanillaCompat {
 	}
 
 	private static class BottleCompat implements FluidIo {
-		final ItemKey itemKey;
-		final ContainerItemContext context;
+		private static final ItemKey WATER_BOTTLE;
+		private final Potion potion;
+		private final ContainerItemContext context;
 
-		private BottleCompat(ItemKey itemKey, ContainerItemContext context) {
-			this.itemKey = itemKey;
+		static {
+			ItemStack waterBottle = new ItemStack(Items.POTION);
+			PotionUtil.setPotion(waterBottle, Potions.WATER);
+			WATER_BOTTLE = ItemKey.of(waterBottle);
+		}
+
+		private static @Nullable BottleCompat of(ItemKey key, ContainerItemContext context) {
+			Potion potion = PotionUtil.getPotion(key.copyTag());
+
+			if (potion == Potions.WATER || potion == Potions.EMPTY) {
+				return new BottleCompat(potion, context);
+			} else {
+				return null;
+			}
+		}
+
+		private BottleCompat(Potion potion, ContainerItemContext context) {
+			this.potion = potion;
 			this.context = context;
 		}
 
@@ -107,13 +125,13 @@ public class VanillaCompat {
 		@Override
 		public Fluid getFluid(int slot) {
 			checkSingleSlot(slot);
-			return PotionUtil.getPotion(itemKey.toStack()) == Potions.WATER ? Fluids.WATER : Fluids.EMPTY;
+			return potion == Potions.WATER ? Fluids.WATER : Fluids.EMPTY;
 		}
 
 		@Override
 		public long getFluidAmount(int slot) {
 			checkSingleSlot(slot);
-			return PotionUtil.getPotion(itemKey.toStack()) == Potions.WATER ? FluidConstants.BOTTLE : 0;
+			return potion == Potions.WATER ? FluidConstants.BOTTLE : 0;
 		}
 
 		@Override
@@ -124,10 +142,10 @@ public class VanillaCompat {
 		@Override
 		public long insert(Fluid fluid, long amount, Simulation simulation) {
 			if (context.getCount() == 0) return amount;
-			if (PotionUtil.getPotion(itemKey.toStack()) != Potions.EMPTY) return amount;
+			if (potion != Potions.EMPTY) return amount;
 			if (amount < FluidConstants.BOTTLE) return amount;
 			if (fluid != Fluids.WATER) return amount;
-			if (!context.transform(ItemKey.of(Items.POTION), simulation)) return amount;
+			if (!context.transform(WATER_BOTTLE, simulation)) return amount;
 			return amount - FluidConstants.BOTTLE;
 		}
 
@@ -140,7 +158,7 @@ public class VanillaCompat {
 		public long extract(int slot, Fluid fluid, long maxAmount, Simulation simulation) {
 			checkSingleSlot(slot);
 			if (context.getCount() == 0) return 0;
-			if (PotionUtil.getPotion(itemKey.toStack()) != Potions.WATER) return 0;
+			if (potion != Potions.WATER) return 0;
 			if (maxAmount < FluidConstants.BOTTLE) return 0;
 			if (!context.transform(ItemKey.of(Items.GLASS_BOTTLE), simulation)) return 0;
 			return FluidConstants.BOTTLE;

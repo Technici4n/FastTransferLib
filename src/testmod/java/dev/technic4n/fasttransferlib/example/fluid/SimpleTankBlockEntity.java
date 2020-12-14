@@ -17,7 +17,6 @@ public class SimpleTankBlockEntity extends BlockEntity {
 
 	public static void init() {
 		FluidApi.SIDED.registerForBlockEntities((blockentity, side) -> ((SimpleTankBlockEntity) blockentity).storage, FluidExample.SIMPLE_TANK_BLOCK_ENTITY);
-		FluidApi.UNSIDED.registerForBlockEntities((blockentity, none) -> ((SimpleTankBlockEntity) blockentity).storage, FluidExample.SIMPLE_TANK_BLOCK_ENTITY);
 	}
 
 	@Override

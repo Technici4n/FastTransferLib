@@ -20,8 +20,6 @@ import net.fabricmc.fabric.api.provider.v1.block.BlockApiLookupRegistry;
 public class FluidApi {
 	public static final BlockApiLookup<FluidIo, @NotNull Direction> SIDED =
 			BlockApiLookupRegistry.getLookup(new Identifier("fasttransferlib:sided_fluid_io"), FluidIo.class, Direction.class);
-	public static final BlockApiLookup<FluidIo, Void> UNSIDED =
-			BlockApiLookupRegistry.getLookup(new Identifier("fasttransferlib:unsided_fluid"), FluidIo.class, Void.class);
 	public static final ItemKeyApiLookup<FluidIo, ContainerItemContext> ITEM =
 			ItemKeyApiLookupRegistry.getLookup(new Identifier("fasttransferlib:fluid_io"), FluidIo.class, ContainerItemContext.class);
 

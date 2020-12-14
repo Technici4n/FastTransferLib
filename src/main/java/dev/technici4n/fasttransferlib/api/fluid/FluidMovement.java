@@ -49,8 +49,6 @@ public final class FluidMovement {
 
 			totalMoved += moved;
 			maxAmount -= moved;
-
-			--i; // multiple attempts may be necessary
 		}
 
 		return totalMoved;
