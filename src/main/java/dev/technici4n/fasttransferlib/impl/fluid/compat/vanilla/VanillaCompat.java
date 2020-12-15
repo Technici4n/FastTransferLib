@@ -72,7 +72,7 @@ public class VanillaCompat {
 			if (context.getCount() == 0) return amount;
 			if (this.fluid != Fluids.EMPTY) return amount;
 			if (amount < FluidConstants.BUCKET) return amount;
-			if (!context.transform(ItemKey.of(fluid.getBucketItem()), simulation)) return amount;
+			if (!context.transform(1, ItemKey.of(fluid.getBucketItem()), simulation)) return amount;
 			return amount - FluidConstants.BUCKET;
 		}
 
@@ -86,7 +86,7 @@ public class VanillaCompat {
 			checkSingleSlot(slot);
 			if (context.getCount() == 0) return 0;
 			if (this.fluid == Fluids.EMPTY || this.fluid != fluid) return 0;
-			if (!context.transform(ItemKey.of(Items.BUCKET), simulation)) return 0;
+			if (!context.transform(1, ItemKey.of(Items.BUCKET), simulation)) return 0;
 			return FluidConstants.BUCKET;
 		}
 	}
@@ -145,7 +145,7 @@ public class VanillaCompat {
 			if (potion != Potions.EMPTY) return amount;
 			if (amount < FluidConstants.BOTTLE) return amount;
 			if (fluid != Fluids.WATER) return amount;
-			if (!context.transform(WATER_BOTTLE, simulation)) return amount;
+			if (!context.transform(1, WATER_BOTTLE, simulation)) return amount;
 			return amount - FluidConstants.BOTTLE;
 		}
 
@@ -160,7 +160,7 @@ public class VanillaCompat {
 			if (context.getCount() == 0) return 0;
 			if (potion != Potions.WATER) return 0;
 			if (maxAmount < FluidConstants.BOTTLE) return 0;
-			if (!context.transform(ItemKey.of(Items.GLASS_BOTTLE), simulation)) return 0;
+			if (!context.transform(1, ItemKey.of(Items.GLASS_BOTTLE), simulation)) return 0;
 			return FluidConstants.BOTTLE;
 		}
 	}

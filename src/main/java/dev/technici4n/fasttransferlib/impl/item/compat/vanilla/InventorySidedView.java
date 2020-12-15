@@ -112,7 +112,7 @@ public class InventorySidedView implements ItemIo {
 
 	@Override
 	public int getItemSlotCount() {
-		return wrapped.size();
+		return size;
 	}
 
 	@Override

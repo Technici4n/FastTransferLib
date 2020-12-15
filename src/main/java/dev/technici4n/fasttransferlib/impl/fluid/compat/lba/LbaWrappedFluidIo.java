@@ -15,6 +15,7 @@ import dev.technici4n.fasttransferlib.api.fluid.FluidIo;
 import dev.technici4n.fasttransferlib.impl.compat.LbaUtil;
 
 import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.Fluids;
 
 class LbaWrappedFluidIo implements FixedFluidInvView, FluidTransferable {
 	private final FluidIo io;
@@ -30,7 +31,8 @@ class LbaWrappedFluidIo implements FixedFluidInvView, FluidTransferable {
 
 	@Override
 	public FluidVolume getInvFluid(int i) {
-		return FluidKeys.get(io.getFluid(i)).withAmount(FluidAmount.of(io.getFluidAmount(i), 81000));
+		Fluid fluid = io.getFluid(i);
+		return fluid == Fluids.EMPTY ? FluidVolumeUtil.EMPTY : FluidKeys.get(fluid).withAmount(FluidAmount.of(io.getFluidAmount(i), 81000));
 	}
 
 	@Override
@@ -40,24 +42,30 @@ class LbaWrappedFluidIo implements FixedFluidInvView, FluidTransferable {
 
 	@Override
 	public FluidVolume attemptExtraction(FluidFilter filter, FluidAmount maxAmount, Simulation simulation) {
+		long maxExtract = maxAmount.asLong(81000, RoundingMode.DOWN);
+		long extracted = 0;
+		FluidKey extractedKey = FluidKeys.EMPTY;
+
 		for (int i = 0; i < io.getFluidSlotCount(); ++i) {
 			Fluid fluid = io.getFluid(i);
+			if (fluid == Fluids.EMPTY) continue;
 			FluidKey key = FluidKeys.get(fluid);
 			if (!filter.matches(key)) continue;
-			long extracted = io.extract(i, fluid, maxAmount.asLong(81000, RoundingMode.DOWN), LbaUtil.getSimulation(simulation));
+			extracted += io.extract(i, fluid, maxExtract - extracted, LbaUtil.getSimulation(simulation));
 
 			if (extracted > 0) {
-				return key.withAmount(FluidAmount.of(extracted, 81000));
+				extractedKey = key;
+				filter = key.exactFilter;
 			}
 		}
 
-		return FluidVolumeUtil.EMPTY;
+		return extractedKey.withAmount(FluidAmount.of(extracted, 81000));
 	}
 
 	@Override
 	public FluidVolume attemptInsertion(FluidVolume fluidVolume, Simulation simulation) {
 		Fluid fluid = fluidVolume.getFluidKey().getRawFluid();
-		if (fluid == null) return fluidVolume;
+		if (fluid == null || fluid == Fluids.EMPTY) return fluidVolume;
 
 		long inserted = fluidVolume.getAmount_F().asLong(81000, RoundingMode.DOWN);
 		inserted -= io.insert(fluid, inserted, LbaUtil.getSimulation(simulation));

@@ -2,7 +2,7 @@ package dev.technici4n.fasttransferlib.api;
 
 import dev.technici4n.fasttransferlib.api.item.ItemKey;
 import dev.technici4n.fasttransferlib.api.item.ItemKeyApiLookup;
-import dev.technici4n.fasttransferlib.impl.context.PlayerEntityContainerItemContexts;
+import dev.technici4n.fasttransferlib.impl.context.PlayerEntityContainerItemContext;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.Hand;
@@ -21,19 +21,21 @@ public interface ContainerItemContext {
 	int getCount();
 
 	/**
-	 * Transform one of the bound items into another item key.
+	 * Transform some of the bound items into another item key.
+	 * @param count How much to transform, must be positive.
 	 * @param into The target item key.
 	 * @param simulation If {@link Simulation#SIMULATE}, do not mutate the inventory
 	 * @return whether the transformation was successful
-	 * @throws RuntimeException If there is no item to replace, that is if {@link ContainerItemContext#getCount getCount} would return 0.
+	 * @throws RuntimeException If the passed count is zero or negative.
+	 * @throws RuntimeException If there aren't enough items to replace, that is if {@link ContainerItemContext#getCount this.getCount()} < count.
 	 */
-	boolean transform(ItemKey into, Simulation simulation);
+	boolean transform(int count, ItemKey into, Simulation simulation);
 
 	static ContainerItemContext ofPlayerHand(PlayerEntity player, Hand hand) {
-		return new PlayerEntityContainerItemContexts.Hand(player, hand);
+		return PlayerEntityContainerItemContext.ofHand(player, hand);
 	}
 
 	static ContainerItemContext ofPlayerCursor(PlayerEntity player) {
-		return new PlayerEntityContainerItemContexts.Cursor(player);
+		return PlayerEntityContainerItemContext.ofCursor(player);
 	}
 }
