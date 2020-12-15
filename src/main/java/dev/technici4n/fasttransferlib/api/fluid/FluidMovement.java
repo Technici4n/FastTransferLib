@@ -36,7 +36,7 @@ public final class FluidMovement {
 			if (moved <= 0) continue;
 
 			// Try to extract that amount to make sure it can be extracted
-			if (from.extract(i, fluid, maxAmount, Simulation.SIMULATE) != moved) continue;
+			if (from.extract(i, fluid, moved, Simulation.SIMULATE) != moved) continue;
 
 			// Move the fluid
 			if (from.extract(i, fluid, moved, Simulation.ACT) != moved) {
