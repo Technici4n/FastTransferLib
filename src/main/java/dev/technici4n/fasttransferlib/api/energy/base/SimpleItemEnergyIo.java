@@ -75,7 +75,7 @@ public class SimpleItemEnergyIo implements EnergyIo {
 
 		if (energy < 1e-9) {
 			if (tag != null) {
-				tag.remove("amount");
+				tag.remove("energy");
 
 				if (tag.isEmpty()) {
 					tag = null;
@@ -86,7 +86,7 @@ public class SimpleItemEnergyIo implements EnergyIo {
 				tag = new CompoundTag();
 			}
 
-			tag.putDouble("amount", energy);
+			tag.putDouble("energy", energy);
 		}
 
 		ItemKey targetKey = ItemKey.of(key.getItem(), tag);

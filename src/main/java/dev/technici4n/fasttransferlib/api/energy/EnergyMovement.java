@@ -16,7 +16,7 @@ public final class EnergyMovement {
 	 */
 	public static double move(EnergyIo from, EnergyIo to, double maxAmount) {
 		maxAmount = from.extract(maxAmount, Simulation.SIMULATE);
-		maxAmount = to.insert(maxAmount, Simulation.ACT);
+		maxAmount -= to.insert(maxAmount, Simulation.ACT);
 		double extracted = from.extract(maxAmount, Simulation.ACT);
 
 		if (Math.abs(extracted - maxAmount) > 1e-9) {
