@@ -4,7 +4,8 @@
   "package": "dev.technici4n.fasttransferlib.impl.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
-    "BucketItemAccess"
+    "BucketItemAccess",
+    "EnergyHandlerAccess"
    ],
   "injectors": {
     "defaultRequire": 1
