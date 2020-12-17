@@ -24,17 +24,20 @@ repositories {
             includeGroup "dev.technici4n"
         }
     }
+    maven {
+        name = "BuildCraft"
+        url = "https://mod-buildcraft.com/maven"
+    }
 }
 
 dependencies {
-    modApi "dev.technici4n:FastTransferLib:${project.ftl_version}"
-    include "dev.technici4n:FastTransferLib:${project.ftl_version}}"
+    modApi include("dev.technici4n:FastTransferLib:${project.ftl_version}")
 }
 ```
 In `gradle.properties`:
 ```properties
 # put latest version here, check the commits!
-ftl_version=0.1.0
+ftl_version=0.1.4
 ```
 
 ## Usage
