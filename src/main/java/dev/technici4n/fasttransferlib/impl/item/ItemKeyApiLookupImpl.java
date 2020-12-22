@@ -14,7 +14,7 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.util.registry.Registry;
 
-import net.fabricmc.fabric.api.provider.v1.ApiProviderMap;
+import net.fabricmc.fabric.api.lookup.v1.ApiProviderMap;
 
 public class ItemKeyApiLookupImpl<T, C> implements ItemKeyApiLookup<T, C> {
 	private static final Logger LOGGER = LogManager.getLogger();

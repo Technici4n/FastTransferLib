@@ -11,7 +11,7 @@ import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.inventory.Inventory;
 import net.minecraft.util.math.Direction;
 
-import net.fabricmc.fabric.api.provider.v1.block.BlockApiLookup;
+import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 
 public class VanillaCompat {
 	public static void init() {
@@ -38,8 +38,8 @@ public class VanillaCompat {
 		}, Blocks.CHEST, Blocks.TRAPPED_CHEST);
 
 		// Fallback for vanilla interfaces
-		ItemApi.SIDED.registerBlockEntityFallback(inventoryProvider);
-		ItemApi.SIDED.registerBlockFallback((world, pos, state, direction) -> {
+		ItemApi.SIDED.registerFallback((world, pos, state, be, direction) -> inventoryProvider.get(be, direction));
+		ItemApi.SIDED.registerFallback((world, pos, state, be, direction) -> {
 			if (state.getBlock() instanceof InventoryProvider) {
 				Inventory inv = ((InventoryProvider) state.getBlock()).getInventory(state, world, pos);
 

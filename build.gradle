@@ -45,9 +45,9 @@ dependencies {
 
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modApi "net.fabricmc.fabric-api:fabric-provider-api-v1:${project.api_provider_version}"
-    include "net.fabricmc.fabric-api:fabric-provider-api-v1:${project.api_provider_version}"
-    modImplementation "alexiil.mc.lib:libblockattributes-all:${project.lba_version}"
+    modApi "net.fabricmc.fabric-api:fabric-api-lookup-api-v1:${project.api_lookup_version}"
+    include "net.fabricmc.fabric-api:fabric-api-lookup-api-v1:${project.api_lookup_version}"
+    modCompileOnly "alexiil.mc.lib:libblockattributes-all:${project.lba_version}"
     modImplementation "teamreborn:energy:${project.tr_energy_version}"
     include "teamreborn:energy:${project.tr_energy_version}"
 

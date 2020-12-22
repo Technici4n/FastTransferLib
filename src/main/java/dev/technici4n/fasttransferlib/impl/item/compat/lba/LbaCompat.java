@@ -26,7 +26,7 @@ public class LbaCompat {
 	}
 
 	private static void registerLbaInFtl() {
-		ItemApi.SIDED.registerBlockFallback((world, pos, state, direction) -> {
+		ItemApi.SIDED.registerFallback((world, pos, state, blockEntity, direction) -> {
 			if (inCompat) return null;
 			inCompat = true;
 			AttributeList<FixedItemInv> to = ItemAttributes.FIXED_INV.getAll(world, pos, SearchOptions.inDirection(direction.getOpposite()));
@@ -64,5 +64,6 @@ public class LbaCompat {
 		ItemAttributes.EXTRACTABLE.appendBlockAdder(lbaBlockAdder);
 		ItemAttributes.INSERTABLE.appendBlockAdder(lbaBlockAdder);
 		ItemAttributes.FIXED_INV_VIEW.appendBlockAdder(lbaBlockAdder);
+		ItemAttributes.GROUPED_INV_VIEW.appendBlockAdder(lbaBlockAdder);
 	}
 }

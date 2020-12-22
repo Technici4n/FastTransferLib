@@ -26,7 +26,7 @@ public class LbaCompat {
 	}
 
 	private static void registerLbaInFtl() {
-		FluidApi.SIDED.registerBlockFallback((world, pos, state, direction) -> {
+		FluidApi.SIDED.registerFallback((world, pos, state, blockEntity, direction) -> {
 			if (inCompat) return null;
 			inCompat = true;
 			AttributeList<FixedFluidInv> to = FluidAttributes.FIXED_INV.getAll(world, pos, SearchOptions.inDirection(direction.getOpposite()));
@@ -64,5 +64,6 @@ public class LbaCompat {
 		FluidAttributes.EXTRACTABLE.appendBlockAdder(lbaBlockAdder);
 		FluidAttributes.INSERTABLE.appendBlockAdder(lbaBlockAdder);
 		FluidAttributes.FIXED_INV_VIEW.appendBlockAdder(lbaBlockAdder);
+		FluidAttributes.GROUPED_INV_VIEW.appendBlockAdder(lbaBlockAdder);
 	}
 }
