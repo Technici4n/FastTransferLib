@@ -1,6 +1,7 @@
 package dev.technici4n.fasttransferlib.impl.fluid.compat.vanilla;
 
 import dev.technici4n.fasttransferlib.api.Simulation;
+import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
 import dev.technici4n.fasttransferlib.api.fluid.FluidIo;
 
 import net.minecraft.block.BlockState;
@@ -12,6 +13,15 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 class CauldronWrapper implements FluidIo {
+	private static final Fluid[] EMPTY_FLUID_ARRAY = {};
+	private static final Fluid[] WATER_ARRAY = {Fluids.WATER};
+	private static final long[][] AMOUNTS = {
+		{},
+		{FluidConstants.BOTTLE},
+		{FluidConstants.BOTTLE * 2},
+		{FluidConstants.BUCKET}
+	};
+
 	private final World world;
 	private final BlockPos pos;
 
@@ -26,7 +36,7 @@ class CauldronWrapper implements FluidIo {
 	}
 
 	@Override
-	public long extract(int slot, Fluid fluid, long maxAmount, Simulation simulation) {
+	public long extract(Fluid fluid, long maxAmount, Simulation simulation) {
 		if (fluid != Fluids.WATER) return 0;
 
 		BlockState state = world.getBlockState(pos);
@@ -71,18 +81,21 @@ class CauldronWrapper implements FluidIo {
 	}
 
 	@Override
-	public int getFluidSlotCount() {
-		return 1;
+	public Fluid[] getFluids() {
+		if (world.getBlockState(pos).get(CauldronBlock.LEVEL) == 0) {
+			return EMPTY_FLUID_ARRAY;
+		} else {
+			return WATER_ARRAY;
+		}
 	}
 
 	@Override
-	public Fluid getFluid(int slot) {
-		return getFluidAmount(0) == 0 ? Fluids.EMPTY : Fluids.WATER;
+	public long[] getFluidAmounts() {
+		return AMOUNTS[world.getBlockState(pos).get(CauldronBlock.LEVEL)];
 	}
 
 	@Override
-	public long getFluidAmount(int slot) {
-		Integer level = world.getBlockState(pos).get(CauldronBlock.LEVEL);
-		return level == null ? 0 : level * 27000;
+	public int getVersion() {
+		return world.getBlockState(pos).get(CauldronBlock.LEVEL);
 	}
 }

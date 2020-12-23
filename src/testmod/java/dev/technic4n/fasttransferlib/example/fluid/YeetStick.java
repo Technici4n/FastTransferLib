@@ -23,8 +23,10 @@ public class YeetStick extends Item {
 		FluidIo fluidIo = FluidApi.SIDED.get(context.getWorld(), context.getBlockPos(), context.getSide());
 
 		if (fluidIo != null && !context.getWorld().isClient) {
-			if (fluidIo.getFluidSlotCount() > 0) {
-				Fluid fluid = fluidIo.getFluid(0);
+			Fluid[] fluids = fluidIo.getFluids();
+
+			if (fluids.length > 0) {
+				Fluid fluid = fluids[0];
 				long extractedAmount = fluidIo.extract(fluid, 2 * FluidConstants.BOTTLE, Simulation.ACT);
 
 				if (extractedAmount > 0) {

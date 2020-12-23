@@ -26,13 +26,20 @@ class LbaWrappedFluidIo implements FixedFluidInvView, FluidTransferable {
 
 	@Override
 	public int getTankCount() {
-		return io.getFluidSlotCount();
+		//TODO: Investigate improving this
+		return 1;
 	}
 
 	@Override
 	public FluidVolume getInvFluid(int i) {
-		Fluid fluid = io.getFluid(i);
-		return fluid == Fluids.EMPTY ? FluidVolumeUtil.EMPTY : FluidKeys.get(fluid).withAmount(FluidAmount.of(io.getFluidAmount(i), 81000));
+		Fluid[] fluids = io.getFluids();
+
+		if (fluids.length == 0) {
+			return FluidVolumeUtil.EMPTY;
+		}
+
+		long[] amounts = io.getFluidAmounts();
+		return FluidKeys.get(fluids[0]).withAmount(FluidAmount.of(amounts[0], 81000));
 	}
 
 	@Override
@@ -45,13 +52,14 @@ class LbaWrappedFluidIo implements FixedFluidInvView, FluidTransferable {
 		long maxExtract = maxAmount.asLong(81000, RoundingMode.DOWN);
 		long extracted = 0;
 		FluidKey extractedKey = FluidKeys.EMPTY;
+		Fluid[] fluids = io.getFluids();
 
-		for (int i = 0; i < io.getFluidSlotCount(); ++i) {
-			Fluid fluid = io.getFluid(i);
+		for (int i = 0; i < fluids.length; ++i) {
+			Fluid fluid = fluids[i];
 			if (fluid == Fluids.EMPTY) continue;
 			FluidKey key = FluidKeys.get(fluid);
 			if (!filter.matches(key)) continue;
-			extracted += io.extract(i, fluid, maxExtract - extracted, LbaUtil.getSimulation(simulation));
+			extracted += io.extract(fluid, maxExtract - extracted, LbaUtil.getSimulation(simulation));
 
 			if (extracted > 0) {
 				extractedKey = key;

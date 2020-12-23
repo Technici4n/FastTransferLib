@@ -4,34 +4,20 @@ import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.impl.fluid.FluidImpl;
 
 import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
 
 /**
  * A fluid inventory.
  */
 public interface FluidIo {
 	/**
-	 * Return the number of slots in the view.
+	 * Returns the fluids contained in this, no duplicate fluids or empty fluids should be returned. The return value should not be mutated by the caller or this.
 	 */
-	int getFluidSlotCount();
+	Fluid[] getFluids();
 
 	/**
-	 * Return the fluid stored in a slot, or {@link Fluids#EMPTY} if there is no fluid.
-	 *
-	 * @param slot The slot id, must be between 0 and {@link FluidIo#getFluidSlotCount()}.
-	 * @return the fluid stored in the slot, or {@link Fluids#EMPTY} if there is no fluid.
-	 * @throws IndexOutOfBoundsException if the slot is not in the range [0, {@link FluidIo#getFluidSlotCount()}).
+	 * Returns the amount of each fluid gotten by getFluids. The return value should not be mutated by the caller or this.
 	 */
-	Fluid getFluid(int slot);
-
-	/**
-	 * Return the amount of fluid stored in a slot, or 0 if there is no fluid. The amount is given in droplets (1/81000 of a bucket).
-	 *
-	 * @param slot The slot id, must be between 0 and {@link FluidIo#getFluidSlotCount()}.
-	 * @return the amount of fluid stored in the slot, or 0 if there is no fluid.
-	 * @throws IndexOutOfBoundsException if the slot is not in the range [0, {@link FluidIo#getFluidSlotCount()}).
-	 */
-	long getFluidAmount(int slot);
+	long[] getFluidAmounts();
 
 	/**
 	 * Return the version of this inventory. If this number is the same for two calls, it is expected
@@ -73,21 +59,6 @@ public interface FluidIo {
 	}
 
 	/**
-	 * Extract some fluid from this extractable, with the same semantics as {@link FluidIo#extract(Fluid, long, Simulation) the slotless variant}.
-	 * The slot parameter, as long as it is in range, can be anything.
-	 * It is however expected that calling this in a loop will be faster for callers that need to move a lot of fluid.
-	 *
-	 * @param slot       The slot id, must be between 0 and {@link FluidIo#getFluidSlotCount()}.
-	 * @param fluid      The filter for the fluid to extract
-	 * @param maxAmount  The amount of fluid to extract at most, in droplets
-	 * @param simulation If {@link Simulation#SIMULATE}, do not mutate the insertable
-	 * @return The amount of fluid extracted
-	 */
-	default long extract(int slot, Fluid fluid, long maxAmount, Simulation simulation) {
-		return 0;
-	}
-
-	/**
 	 * Extract some fluid from this extractable, matching the passed fluid. The amounts are given in droplets (1/81000 of a bucket).
 	 *
 	 * <p>If simulation is {@link Simulation#SIMULATE}, the result of the operation must be returned, but the underlying state of the fluid extractable must not change.
@@ -99,16 +70,6 @@ public interface FluidIo {
 	 * @implNote Implementations are encouraged to override this method with a more performant implementation.
 	 */
 	default long extract(Fluid fluid, long maxAmount, Simulation simulation) {
-		if (!supportsFluidExtraction()) return 0;
-
-		for (int i = 0; i < getFluidSlotCount(); ++i) {
-			long extracted = extract(i, fluid, maxAmount, simulation);
-
-			if (extracted > 0) {
-				return extracted;
-			}
-		}
-
 		return 0;
 	}
 }

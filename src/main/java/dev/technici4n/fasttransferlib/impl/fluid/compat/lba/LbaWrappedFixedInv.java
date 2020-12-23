@@ -1,6 +1,7 @@
 package dev.technici4n.fasttransferlib.impl.fluid.compat.lba;
 
 import java.math.RoundingMode;
+import java.util.ArrayList;
 
 import alexiil.mc.lib.attributes.fluid.FixedFluidInv;
 import alexiil.mc.lib.attributes.fluid.amount.FluidAmount;
@@ -8,6 +9,8 @@ import alexiil.mc.lib.attributes.fluid.volume.FluidKeys;
 import alexiil.mc.lib.attributes.fluid.volume.FluidVolume;
 import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.api.fluid.FluidIo;
+import it.unimi.dsi.fastutil.longs.LongArrayList;
+import it.unimi.dsi.fastutil.longs.LongList;
 
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
@@ -24,7 +27,6 @@ class LbaWrappedFixedInv implements FluidIo {
 		return true;
 	}
 
-	@Override
 	public long extract(int slot, Fluid fluid, long maxAmount, Simulation simulation) {
 		FluidVolume extracted = wrapped.getTank(slot).attemptExtraction(key -> key.getRawFluid() == fluid, FluidAmount.of(maxAmount, 81000), alexiil.mc.lib.attributes.Simulation.SIMULATE);
 
@@ -37,6 +39,19 @@ class LbaWrappedFixedInv implements FluidIo {
 		}
 
 		return extracted.amount().asLong(81000, RoundingMode.DOWN);
+	}
+
+	@Override
+	public long extract(Fluid fluid, long maxAmount, Simulation simulation) {
+		for (int i = 0; i < getFluidSlotCount(); ++i) {
+			long extracted = extract(i, fluid, maxAmount, simulation);
+
+			if (extracted > 0) {
+				return extracted;
+			}
+		}
+
+		return 0;
 	}
 
 	@Override
@@ -59,19 +74,48 @@ class LbaWrappedFixedInv implements FluidIo {
 		return leftover.amount().asLong(81000, RoundingMode.DOWN);
 	}
 
-	@Override
 	public int getFluidSlotCount() {
 		return wrapped.getTankCount();
 	}
 
-	@Override
 	public Fluid getFluid(int slot) {
 		Fluid fluid = wrapped.getTank(slot).get().getFluidKey().getRawFluid();
 		return fluid == null ? Fluids.EMPTY : fluid;
 	}
 
-	@Override
 	public long getFluidAmount(int slot) {
 		return wrapped.getTank(slot).get().amount().asLong(81000, RoundingMode.DOWN);
+	}
+
+	@Override
+	public Fluid[] getFluids() {
+		ArrayList<Fluid> fluids = new ArrayList<>();
+
+		for (int i = 0; i < getFluidSlotCount(); ++i) {
+			Fluid fluid = getFluid(i);
+			if (!fluids.contains(fluid)) fluids.add(fluid);
+		}
+
+		return fluids.toArray(Fluid[]::new);
+	}
+
+	@Override
+	public long[] getFluidAmounts() {
+		ArrayList<Fluid> fluids = new ArrayList<>();
+		LongList result = new LongArrayList();
+
+		for (int i = 0; i < getFluidSlotCount(); ++i) {
+			Fluid fluid = getFluid(i);
+			int index = fluids.indexOf(fluid);
+
+			if (index == -1) {
+				fluids.add(fluid);
+				result.add(getFluidAmount(i));
+			} else {
+				result.set(index, result.getLong(index) + getFluidAmount(i));
+			}
+		}
+
+		return result.toLongArray();
 	}
 }
