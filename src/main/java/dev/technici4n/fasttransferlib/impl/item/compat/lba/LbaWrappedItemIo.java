@@ -19,12 +19,14 @@ class LbaWrappedItemIo implements FixedItemInvView, ItemTransferable {
 
 	@Override
 	public int getSlotCount() {
-		return io.getItemSlotCount();
+		return 25; //TODO: This is stupid and won't work great with ItemIo's that have >25 items in it
 	}
 
 	@Override
 	public ItemStack getInvStack(int slot) {
-		return io.getItemKey(slot).toStack(io.getItemCount(slot));
+		ItemKey[] itemKeys = io.getItemKeys();
+		int[] itemCounts = io.getItemCounts();
+		return slot < itemKeys.length ? itemKeys[slot].toStack(itemCounts[slot]) : ItemStack.EMPTY;
 	}
 
 	@Override
@@ -34,12 +36,14 @@ class LbaWrappedItemIo implements FixedItemInvView, ItemTransferable {
 
 	@Override
 	public ItemStack attemptExtraction(ItemFilter filter, int maxCount, Simulation simulation) {
-		for (int i = 0; i < io.getItemSlotCount(); ++i) {
-			ItemKey key = io.getItemKey(i);
+		ItemKey[] itemKeys = io.getItemKeys();
+
+		for (int i = 0; i < itemKeys.length; ++i) {
+			ItemKey key = itemKeys[i];
 			ItemStack stack = key.toStack();
 			if (!filter.matches(stack)) continue;
 
-			int extracted = io.extract(i, io.getItemKey(i), maxCount, LbaUtil.getSimulation(simulation));
+			int extracted = io.extract(itemKeys[i], maxCount, LbaUtil.getSimulation(simulation));
 
 			if (extracted > 0) {
 				stack.setCount(extracted);
