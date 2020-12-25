@@ -1,9 +1,10 @@
 package dev.technici4n.fasttransferlib.impl.item.compat.vanilla;
 
+import com.google.common.primitives.Ints;
 import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.api.item.ItemApi;
-import dev.technici4n.fasttransferlib.api.item.ItemIo;
 import dev.technici4n.fasttransferlib.api.item.ItemKey;
+import dev.technici4n.fasttransferlib.api.transfer.ResourceIo;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
@@ -13,7 +14,7 @@ import net.minecraft.util.math.Direction;
 /**
  * A wrapper around a vanilla Inventory, for {@link ItemApi#SIDED}.
  */
-public class InventorySidedView implements ItemIo {
+public class InventorySidedView implements ResourceIo<ItemKey> {
 	private final Inventory wrapped;
 	private final SidedInventory wrappedSided;
 	private final int[] slots;
@@ -29,19 +30,19 @@ public class InventorySidedView implements ItemIo {
 	}
 
 	@Override
-	public boolean supportsItemExtraction() {
+	public boolean supportsExtraction() {
 		return true;
 	}
 
 	@Override
-	public int extract(int slot, ItemKey key, int maxCount, Simulation simulation) {
+	public long extract(int slot, ItemKey key, long maxCount, Simulation simulation) {
 		checkBounds(slot);
 		ItemStack stack = wrapped.getStack(slots != null ? slots[slot] : slot);
 
 		if (wrappedSided != null && !wrappedSided.canExtract(slot, stack, direction)) return 0;
 		if (!key.matches(stack)) return 0;
 
-		int extracted = Math.min(maxCount, stack.getCount());
+		int extracted = Math.min(Ints.saturatedCast(maxCount), stack.getCount());
 
 		if (simulation.isActing()) {
 			stack.decrement(extracted);
@@ -52,13 +53,13 @@ public class InventorySidedView implements ItemIo {
 	}
 
 	@Override
-	public boolean supportsItemInsertion() {
+	public boolean supportsInsertion() {
 		return true;
 	}
 
 	@Override
-	public int insert(ItemKey key, int count, Simulation simulation) {
-		ItemStack filter = key.toStack(count);
+	public long insert(ItemKey key, long count, Simulation simulation) {
+		ItemStack filter = key.toStack(1);
 
 		if (wrappedSided == null) {
 			for (int i = 0; i < wrapped.size() && count > 0; ++i) {
@@ -69,7 +70,7 @@ public class InventorySidedView implements ItemIo {
 		} else {
 			for (int slot : slots) {
 				if (wrapped.isValid(slot, filter) && wrappedSided.canExtract(slot, filter, direction)) {
-					int leftover = insert(filter, key, count, simulation, slot);
+					long leftover = insert(filter, key, count, simulation, slot);
 
 					// only allow a single insertion for sided inventories, because some slots may appear multiple times
 					if (leftover < count) {
@@ -83,12 +84,12 @@ public class InventorySidedView implements ItemIo {
 	}
 
 	// internal insert, doesn't check for isValid or canInsert
-	private int insert(ItemStack filter, ItemKey key, int count, Simulation simulation, int targetSlot) {
+	private long insert(ItemStack filter, ItemKey key, long count, Simulation simulation, int targetSlot) {
 		ItemStack target = wrapped.getStack(targetSlot);
 		int maxCount = Math.min(wrapped.getMaxCountPerStack(), filter.getMaxCount());
 
 		if (target.isEmpty()) {
-			int inserted = Math.min(count, maxCount);
+			int inserted = (int) Math.min(count, maxCount);
 
 			if (simulation.isActing()) {
 				wrapped.setStack(targetSlot, key.toStack(inserted));
@@ -97,7 +98,7 @@ public class InventorySidedView implements ItemIo {
 
 			return count - inserted;
 		} else if (key.matches(target)) {
-			int inserted = Math.min(count, maxCount - target.getCount());
+			int inserted = (int) Math.min(count, maxCount - target.getCount());
 
 			if (simulation.isActing()) {
 				target.increment(inserted);
@@ -111,18 +112,18 @@ public class InventorySidedView implements ItemIo {
 	}
 
 	@Override
-	public int getItemSlotCount() {
+	public int getSlotCount() {
 		return size;
 	}
 
 	@Override
-	public ItemKey getItemKey(int slot) {
+	public ItemKey getResourceKey(int slot) {
 		checkBounds(slot);
 		return ItemKey.of(wrapped.getStack(slot));
 	}
 
 	@Override
-	public int getItemCount(int slot) {
+	public long getAmount(int slot) {
 		checkBounds(slot);
 		return wrapped.getStack(slot).getCount();
 	}

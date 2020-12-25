@@ -10,6 +10,6 @@ public class FluidMixin implements FluidKey {
 	@Override
 	@SuppressWarnings("all")
 	public Fluid getFluid() {
-		return (Fluid)(Object) this;
+		return (Fluid) (Object) this;
 	}
 }

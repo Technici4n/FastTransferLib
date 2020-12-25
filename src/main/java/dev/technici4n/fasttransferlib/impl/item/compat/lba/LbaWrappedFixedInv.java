@@ -1,12 +1,13 @@
 package dev.technici4n.fasttransferlib.impl.item.compat.lba;
 
 import alexiil.mc.lib.attributes.item.FixedItemInv;
+import com.google.common.primitives.Ints;
 import dev.technici4n.fasttransferlib.api.Simulation;
-import dev.technici4n.fasttransferlib.api.item.ItemIo;
 import dev.technici4n.fasttransferlib.api.item.ItemKey;
+import dev.technici4n.fasttransferlib.api.transfer.ResourceIo;
 import dev.technici4n.fasttransferlib.impl.compat.LbaUtil;
 
-class LbaWrappedFixedInv implements ItemIo {
+class LbaWrappedFixedInv implements ResourceIo<ItemKey> {
 	private final FixedItemInv wrapped;
 
 	LbaWrappedFixedInv(FixedItemInv wrapped) {
@@ -14,37 +15,37 @@ class LbaWrappedFixedInv implements ItemIo {
 	}
 
 	@Override
-	public boolean supportsItemExtraction() {
+	public boolean supportsExtraction() {
 		return true;
 	}
 
 	@Override
-	public int extract(int slot, ItemKey key, int maxCount, Simulation simulation) {
-		return wrapped.getSlot(slot).attemptExtraction(key::matches, maxCount, LbaUtil.getSimulation(simulation)).getCount();
+	public long extract(int slot, ItemKey key, long maxAmount, Simulation simulation) {
+		return wrapped.getSlot(slot).attemptExtraction(key::matches, Ints.saturatedCast(maxAmount), LbaUtil.getSimulation(simulation)).getCount();
 	}
 
 	@Override
-	public boolean supportsItemInsertion() {
+	public boolean supportsInsertion() {
 		return true;
 	}
 
 	@Override
-	public int insert(ItemKey item, int count, Simulation simulation) {
-		return wrapped.getInsertable().attemptInsertion(item.toStack(count), LbaUtil.getSimulation(simulation)).getCount();
+	public long insert(ItemKey item, long amount, Simulation simulation) {
+		return wrapped.getInsertable().attemptInsertion(item.toStack(Ints.saturatedCast(amount)), LbaUtil.getSimulation(simulation)).getCount();
 	}
 
 	@Override
-	public int getItemSlotCount() {
+	public int getSlotCount() {
 		return wrapped.getSlotCount();
 	}
 
 	@Override
-	public ItemKey getItemKey(int slot) {
+	public ItemKey getResourceKey(int slot) {
 		return ItemKey.of(wrapped.getInvStack(slot));
 	}
 
 	@Override
-	public int getItemCount(int slot) {
+	public long getAmount(int slot) {
 		return wrapped.getInvStack(slot).getCount();
 	}
 }

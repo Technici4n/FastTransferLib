@@ -7,11 +7,21 @@ public interface ResourceIo<K extends ResourceKey> {
 	int getSlotCount();
 	K getResourceKey(int slot);
 	long getAmount(int slot);
-	default int getVersion() { return ItemImpl.version++; }
-	default boolean supportsInsertion() { return false; }
-	default long insert(K key, long amount, Simulation simulation) { return amount; }
-	default boolean supportsExtraction() { return false; }
-	default long extract(int slot, K key, long maxAmount, Simulation simulation) { return 0; }
+	default int getVersion() {
+		return ItemImpl.version++;
+	}
+	default boolean supportsInsertion() {
+		return false;
+	}
+	default long insert(K key, long amount, Simulation simulation) {
+		return amount;
+	}
+	default boolean supportsExtraction() {
+		return false;
+	}
+	default long extract(int slot, K key, long maxAmount, Simulation simulation) {
+		return 0;
+	}
 	default long extract(K key, long maxAmount, Simulation simulation) {
 		if (!supportsExtraction()) return 0;
 
@@ -28,6 +38,6 @@ public interface ResourceIo<K extends ResourceKey> {
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	static <K extends ResourceKey> Class<ResourceIo<K>> asClass() {
-		return (Class<ResourceIo<K>>)(Class) ResourceIo.class;
+		return (Class<ResourceIo<K>>) (Class) ResourceIo.class;
 	}
 }

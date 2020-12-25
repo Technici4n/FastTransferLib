@@ -4,8 +4,6 @@ import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.api.fluid.FluidKey;
 import dev.technici4n.fasttransferlib.api.transfer.ResourceIo;
 
-import net.minecraft.fluid.Fluid;
-import net.minecraft.fluid.Fluids;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;

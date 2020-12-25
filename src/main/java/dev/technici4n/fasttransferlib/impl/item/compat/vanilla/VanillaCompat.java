@@ -1,7 +1,8 @@
 package dev.technici4n.fasttransferlib.impl.item.compat.vanilla;
 
 import dev.technici4n.fasttransferlib.api.item.ItemApi;
-import dev.technici4n.fasttransferlib.api.item.ItemIo;
+import dev.technici4n.fasttransferlib.api.item.ItemKey;
+import dev.technici4n.fasttransferlib.api.transfer.ResourceIo;
 import org.jetbrains.annotations.NotNull;
 
 import net.minecraft.block.Blocks;
@@ -19,7 +20,7 @@ public class VanillaCompat {
 	}
 
 	static {
-		BlockApiLookup.BlockEntityApiProvider<ItemIo, @NotNull Direction> inventoryProvider = (blockEntity, direction) -> {
+		BlockApiLookup.BlockEntityApiProvider<ResourceIo<ItemKey>, @NotNull Direction> inventoryProvider = (blockEntity, direction) -> {
 			if (blockEntity instanceof Inventory) {
 				return new InventorySidedView((Inventory) blockEntity, direction);
 			} else {

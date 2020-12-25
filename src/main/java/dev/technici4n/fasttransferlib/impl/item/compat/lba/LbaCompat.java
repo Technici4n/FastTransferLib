@@ -6,7 +6,8 @@ import alexiil.mc.lib.attributes.SearchOptions;
 import alexiil.mc.lib.attributes.item.FixedItemInv;
 import alexiil.mc.lib.attributes.item.ItemAttributes;
 import dev.technici4n.fasttransferlib.api.item.ItemApi;
-import dev.technici4n.fasttransferlib.api.item.ItemIo;
+import dev.technici4n.fasttransferlib.api.item.ItemKey;
+import dev.technici4n.fasttransferlib.api.transfer.ResourceIo;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.util.math.BlockPos;
@@ -40,12 +41,12 @@ public class LbaCompat {
 		});
 	}
 
-	private static @Nullable ItemIo getIo(World world, BlockPos pos, Direction direction) {
+	private static @Nullable ResourceIo<ItemKey> getIo(World world, BlockPos pos, Direction direction) {
 		if (inCompat) return null;
 		inCompat = true;
-		@Nullable ItemIo view = ItemApi.SIDED.get(world, pos, direction);
+		@Nullable ResourceIo<ItemKey> io = ItemApi.SIDED.get(world, pos, direction);
 		inCompat = false;
-		return view;
+		return io;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -54,7 +55,7 @@ public class LbaCompat {
 			Direction dir = to.getTargetSide();
 
 			if (dir != null) {
-				ItemIo io = getIo(world, pos, dir);
+				ResourceIo<ItemKey> io = getIo(world, pos, dir);
 
 				if (io != null) {
 					to.offer(new LbaWrappedItemIo(io));

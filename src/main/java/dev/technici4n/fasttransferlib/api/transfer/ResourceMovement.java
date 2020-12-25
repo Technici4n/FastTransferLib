@@ -49,9 +49,9 @@ public class ResourceMovement {
 		return moveRange(filter, from, to, maxAmount, 0, from.getSlotCount());
 	}
 
-	public static <K extends ResourceKey> long moveMultiple(ResourceIo<K> from, ResourceIo<K> to, int maxCount) {
+	public static <K extends ResourceKey> long moveMultiple(ResourceIo<K> from, ResourceIo<K> to, long maxAmount) {
 		// the lambda should be cached because it is stateless
-		return moveMultiple(key -> true, from, to, maxCount);
+		return moveMultiple(key -> true, from, to, maxAmount);
 	}
 
 	private ResourceMovement() {
