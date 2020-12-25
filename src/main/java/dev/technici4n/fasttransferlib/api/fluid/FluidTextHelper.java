@@ -1,9 +1,18 @@
 package dev.technici4n.fasttransferlib.api.fluid;
 
+import com.google.common.math.LongMath;
+
+import net.minecraft.fluid.Fluid;
+import net.minecraft.util.registry.Registry;
+
 /**
- * A few helpers to display fluids in unicode.
+ * A few helpers to display fluids.
  */
 public class FluidTextHelper {
+	public static String toString(Fluid fluid) {
+		return Registry.FLUID.getId(fluid).toString();
+	}
+
 	/**
 	 * Return a unicode string representing a fraction, like ¹⁄₈₁.
 	 */
@@ -11,7 +20,7 @@ public class FluidTextHelper {
 		if (numerator < 0 || denominator < 0) throw new IllegalArgumentException("Numerator and denominator must be non negative.");
 
 		if (simplify && denominator != 0) {
-			long g = gcd(numerator, denominator);
+			long g = LongMath.gcd(numerator, denominator);
 			numerator /= g;
 			denominator /= g;
 		}
@@ -50,22 +59,6 @@ public class FluidTextHelper {
 	private static final char[] SUPERSCRIPT = new char[] { '\u2070', '\u00b9', '\u00b2', '\u00b3', '\u2074', '\u2075', '\u2076', '\u2077', '\u2078', '\u2079' };
 	private static final char FRACTION_BAR = '\u2044';
 	private static final char[] SUBSCRIPT = new char[] { '\u2080', '\u2081', '\u2082', '\u2083', '\u2084', '\u2085', '\u2086', '\u2087', '\u2088', '\u2089' };
-
-	private static long gcd(long a, long b) {
-		if (a > b) {
-			long t = b;
-			b = a;
-			a = t;
-		}
-
-		while (a != 0) {
-			long t = a;
-			a = b % a;
-			b = t;
-		}
-
-		return b;
-	}
 
 	private FluidTextHelper() {
 	}
