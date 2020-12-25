@@ -11,8 +11,6 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
 public class BaseSingleFluidStorage implements FluidIo {
-	protected static final Fluid[] EMPTY_FLUID_ARRAY = {};
-	protected static final long[] EMPTY_LONG_ARRAY = {};
 	protected Fluid fluidKey = Fluids.EMPTY;
 	protected long fluidVolume = 0;
 	protected final long maxCapacity;
@@ -23,19 +21,20 @@ public class BaseSingleFluidStorage implements FluidIo {
 	}
 
 	@Override
-	public Fluid[] getFluids() {
-		if (fluidKey == Fluids.EMPTY) return EMPTY_FLUID_ARRAY;
-		Fluid[] result = new Fluid[1];
-		result[0] = fluidKey;
-		return result;
+	public int getFluidSlotCount() {
+		return 1;
 	}
 
 	@Override
-	public long[] getFluidAmounts() {
-		if (fluidKey == Fluids.EMPTY) return EMPTY_LONG_ARRAY;
-		long[] result = new long[1];
-		result[0] = fluidVolume;
-		return result;
+	public Fluid getFluid(int slot) {
+		if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Fluid Storage");
+		return fluidKey;
+	}
+
+	@Override
+	public long getFluidAmount(int slot) {
+		if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Fluid Storage");
+		return fluidVolume;
 	}
 
 	@Override
@@ -68,11 +67,11 @@ public class BaseSingleFluidStorage implements FluidIo {
 	}
 
 	@Override
-	public long extract(Fluid fluid, long maxAmount, Simulation simulation) {
-		long extract = 0;
+	public long extract(int slot, Fluid fluid, long maxAmount, Simulation simulation) {
+		if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Fluid Storage");
 
 		if (fluid == this.fluidKey) {
-			extract = Math.max(maxAmount, fluidVolume);
+			long extract = Math.max(maxAmount, fluidVolume);
 
 			if (simulation.isActing()) {
 				version++;
@@ -81,7 +80,7 @@ public class BaseSingleFluidStorage implements FluidIo {
 			}
 		}
 
-		return extract;
+		return 0;
 	}
 
 	@Override

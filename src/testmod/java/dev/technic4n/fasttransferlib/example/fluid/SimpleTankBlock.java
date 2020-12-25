@@ -13,7 +13,6 @@ import net.minecraft.block.BlockEntityProvider;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.text.LiteralText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -39,19 +38,12 @@ public class SimpleTankBlock extends Block implements BlockEntityProvider {
 		FluidIo view = FluidApi.SIDED.get(world, pos, hit.getSide());
 		FluidIo itemView = FluidApi.ITEM.get(ItemKey.of(player.getStackInHand(hand)), ContainerItemContext.ofPlayerHand(player, hand));
 
-		if (view != null && view.supportsFluidExtraction() && itemView != null) {
-			FluidMovement.move(itemView, view, FluidConstants.BUCKET * 10);
-			Fluid[] fluids = view.getFluids();
-			long[] amounts = view.getFluidAmounts();
-
-			if (fluids.length > 0 && amounts.length > 0) {
-				player.sendMessage(new LiteralText(String.format("Tank Now At %s millibuckets of %s", FluidTextHelper.getUnicodeMillibuckets(amounts[0], true), Registry.FLUID.getId(fluids[0]).toString())), false);
-				player.sendMessage(new LiteralText(String.format("Tank Now At %s millibuckets of %s", FluidTextHelper.getUnicodeMillibuckets(amounts[0], false), Registry.FLUID.getId(fluids[0]).toString())), false);
-			}
-
-			return ActionResult.CONSUME;
+		if (view != null && view.getFluidSlotCount() >= 1 && itemView != null) {
+			FluidMovement.moveMultiple(itemView, view, FluidConstants.BUCKET * 10);
+			player.sendMessage(new LiteralText(String.format("Tank Now At %s millibuckets of %s", FluidTextHelper.getUnicodeMillibuckets(view.getFluidAmount(0), true), Registry.FLUID.getId(view.getFluid(0)).toString())), false);
+			player.sendMessage(new LiteralText(String.format("Tank Now At %s millibuckets of %s", FluidTextHelper.getUnicodeMillibuckets(view.getFluidAmount(0), false), Registry.FLUID.getId(view.getFluid(0)).toString())), false);
 		}
 
-		return ActionResult.PASS;
+		return ActionResult.CONSUME;
 	}
 }
