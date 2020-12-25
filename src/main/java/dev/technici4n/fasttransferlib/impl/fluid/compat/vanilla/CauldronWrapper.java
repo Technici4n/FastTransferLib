@@ -1,7 +1,8 @@
 package dev.technici4n.fasttransferlib.impl.fluid.compat.vanilla;
 
 import dev.technici4n.fasttransferlib.api.Simulation;
-import dev.technici4n.fasttransferlib.api.fluid.FluidIo;
+import dev.technici4n.fasttransferlib.api.fluid.FluidKey;
+import dev.technici4n.fasttransferlib.api.transfer.ResourceIo;
 
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -11,7 +12,7 @@ import net.minecraft.fluid.Fluids;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-class CauldronWrapper implements FluidIo {
+class CauldronWrapper implements ResourceIo<FluidKey> {
 	private final World world;
 	private final BlockPos pos;
 
@@ -21,13 +22,13 @@ class CauldronWrapper implements FluidIo {
 	}
 
 	@Override
-	public boolean supportsFluidExtraction() {
+	public boolean supportsExtraction() {
 		return true;
 	}
 
 	@Override
-	public long extract(int slot, Fluid fluid, long maxAmount, Simulation simulation) {
-		if (fluid != Fluids.WATER) return 0;
+	public long extract(int slot, FluidKey fluid, long maxAmount, Simulation simulation) {
+		if (fluid.getFluid() != Fluids.WATER) return 0;
 
 		BlockState state = world.getBlockState(pos);
 
@@ -46,13 +47,13 @@ class CauldronWrapper implements FluidIo {
 	}
 
 	@Override
-	public boolean supportsFluidInsertion() {
+	public boolean supportsInsertion() {
 		return true;
 	}
 
 	@Override
-	public long insert(Fluid fluid, long amount, Simulation simulation) {
-		if (fluid != Fluids.WATER) return amount;
+	public long insert(FluidKey fluid, long amount, Simulation simulation) {
+		if (fluid.getFluid() != Fluids.WATER) return amount;
 
 		BlockState state = world.getBlockState(pos);
 
@@ -71,17 +72,17 @@ class CauldronWrapper implements FluidIo {
 	}
 
 	@Override
-	public int getFluidSlotCount() {
+	public int getSlotCount() {
 		return 1;
 	}
 
 	@Override
-	public Fluid getFluid(int slot) {
-		return getFluidAmount(0) == 0 ? Fluids.EMPTY : Fluids.WATER;
+	public FluidKey getResourceKey(int slot) {
+		return getAmount(0) == 0 ? FluidKey.EMPTY : FluidKey.of(Fluids.WATER);
 	}
 
 	@Override
-	public long getFluidAmount(int slot) {
+	public long getAmount(int slot) {
 		Integer level = world.getBlockState(pos).get(CauldronBlock.LEVEL);
 		return level == null ? 0 : level * 27000;
 	}
