@@ -1,14 +1,13 @@
 # Fast Transfer Lib
-A library for fast item and fluid transfer for the Fabric ecosystem, based on
-[fabric-provider-api-v1](https://github.com/FabLabsMC/fabric/tree/api-provider/fabric-provider-api-v1).
-Hopefully it will be merged in fabric api, but more testing has to be done before this can happen.
+A fast item, fluid and energy api for the Fabric ecosystem, based on
+[fabric-api-lookup-api-v1](https://github.com/FabricMC/fabric/pull/1234).
 
 ## Goals of the project
-* The first goal of the project is testing the `fabric-provider-api-v1` in a production environment for correctness and performance.
-* The second goal of the project is trying to design a simple yet very efficient design for an item and fluid transfer api for potential inclusion in Fabric API in the future.
+* The major goal of the project is trying to design a simple yet very efficient design for an item and fluid transfer api for potential inclusion in Fabric API in the future.
   In particular, that includes experimenting with fixed base 81000 denominators for the fluid api.
 * For this api to be a drop-in replacement in the current 1.16 ecosystem, it will be bundled with `Inventory`/`SidedInventory` and LBA interop, but that may be removed in the future if it is not necessary anymore.
-  
+* Another goal of this api is to replace the slow and annoying-to-use TR energy api by a much faster and better energy api, **not** for inclusion in Fabric API. To ease the transition, FTL comes with a compat layer that allows it to interact transparently with TR energy blocks. 
+ 
 ## Users of the API
 * This API will be tested in a real-world scenario as a replacement for LBA in Modern Industrialization.
 * Authors of other tech mods have expressed interest in an alternative to LBA as well.
@@ -20,7 +19,7 @@ repositories {
         name = "Technici4n"
         url = "https://raw.githubusercontent.com/Technici4n/Technici4n-maven/master/"
         content {
-            includeGroup "net.fabricmc.fabric-api" // FTL needs this too
+            includeGroup "net.fabricmc.fabric-api" // until fabric-api-lookup-api-v1 is merged
             includeGroup "dev.technici4n"
         }
     }
@@ -37,7 +36,7 @@ dependencies {
 In `gradle.properties`:
 ```properties
 # put latest version here, check the commits!
-ftl_version=0.1.4
+ftl_version=0.2.1
 ```
 
 ## Usage
@@ -52,7 +51,7 @@ Querying an instance of the API is dead simple:
 ```java
 ItemIo io = ItemApi.SIDED.get(world, blockPos, direction);
 if (io != null) {
-    // use the view
+    // use the io
 }
 ```
 
@@ -79,16 +78,16 @@ The fluid transfer API is basically the same as the item api, with the following
 * Fluids are identified by a `Fluid` parameter instead of an `ItemKey` parameter. `FluidKey`s may be considered in the future, but they don't seem
   very useful for now.
 * The amounts are specified in `long`s instead of `int`s.
-* All fluid operations are done in _millidroplets_, 1/81000th of a bucket.
+* All fluid operations are done in _droplets_, 1/81000ths of a bucket.
 
 ### Unsided APIs
-TODO
+No unsided APIs for general inventory reading, for example for HWYLA integration, are provided currently. They may be added in the future.
 
 ### Item-provided APIs
 TODO
 
-## Why use fabric-provider-api-v1
-`fabric-provider-api-v1` is much more flexible than `InventoryProvider` or block entity `instanceof` checks as it allows registering compatibility layers.
+## Why use fabric-api-lookup-api-v1
+`fabric-api-lookup-api-v1` is much more flexible than `InventoryProvider` or block entity `instanceof` checks as it allows registering compatibility layers.
 It also comes with a caching system to massively improve performance for blocks that need to do queries every tick.
 
 ## Item API prior art
@@ -101,7 +100,7 @@ However, the main issue with `Inventory`/`SidedInventory` is that they leak too 
 * Inventory contents can be mutated at will by anyone, and the caller is responsible for calling `markDirty` when that happens.
 * The caller is responsible for fitting inserted items in the target inventory.
 * It is not possible to reliably insert in slots that can hold more than `maxCount` items.
-* It is not possible to optimize insertion or extracting for large inventories.
+* It is not possible to optimize insertion or extraction for large inventories.
 * And so on...
 
 ### IItemHandler
@@ -133,7 +132,7 @@ In spite of that, `ItemExtractable` and `ItemInsertable` are great abstractions 
 
 ### Fluidity
 The author is not very familiar with Fluidity, but a few observations can be made:
-* `fabric-provider-api-v1` is derived from the component and device subsystem of Fluidity.
+* `fabric-api-lookup-api-v1` is derived from the component and device subsystem of Fluidity.
 * Fluidity always distinguishes between a resource and its amount. `ItemStack`s are split into a count and an immutable `Article`.
   In fact, an `Article` in Fluidity can be an item with nbt, a fluid, or even something else. Fluidity uses the same functions for handling all
   types of `Article`s, which makes it very generic and powerful. However, it is the author's opinion that this increases the cognitive load for the user.

@@ -3,9 +3,10 @@
   "id": "fasttransferlib",
   "version": "${version}",
   "name": "Fast Transfer Lib",
-  "description": "A fast item and fluid api based on fabric-provider-api-v1",
+  "description": "A fast item, fluid and energy api for the Fabric ecosystem.",
   "authors": [
-    "Technici4n"
+    "Technici4n",
+    "ThatTrollzer"
   ],
   "contact": {
     "homepage": "https://github.com/Technici4n/FastTransferLib",

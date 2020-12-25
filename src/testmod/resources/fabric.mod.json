@@ -3,9 +3,10 @@
   "id": "fasttransferlib-testmod",
   "version": "${version}",
   "name": "Fast Transfer Lib Testmod",
-  "description": "A testmod for the fast item and fluid api based on fabric-provider-api-v1",
+  "description": "A testmod for the fast item, fluid and energy api for the Fabric ecosystem.",
   "authors": [
-    "Technici4n"
+    "Technici4n",
+    "ThatTrollzer"
   ],
   "contact": {
     "homepage": "https://github.com/Technici4n/FastTransferLib",
