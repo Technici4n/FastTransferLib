@@ -1,12 +1,9 @@
 package dev.technici4n.fasttransferlib.impl.item.compat.vanilla;
 
-import java.util.ArrayList;
-
 import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.api.item.ItemApi;
 import dev.technici4n.fasttransferlib.api.item.ItemIo;
 import dev.technici4n.fasttransferlib.api.item.ItemKey;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
@@ -36,7 +33,9 @@ public class InventorySidedView implements ItemIo {
 		return true;
 	}
 
+	@Override
 	public int extract(int slot, ItemKey key, int maxCount, Simulation simulation) {
+		checkBounds(slot);
 		ItemStack stack = wrapped.getStack(slots != null ? slots[slot] : slot);
 
 		if (wrappedSided != null && !wrappedSided.canExtract(slot, stack, direction)) return 0;
@@ -50,19 +49,6 @@ public class InventorySidedView implements ItemIo {
 		}
 
 		return extracted;
-	}
-
-	@Override
-	public int extract(ItemKey key, int maxCount, Simulation simulation) {
-		for (int i = 0; i < getItemSlotCount(); ++i) {
-			int extracted = extract(i, key, maxCount, simulation);
-
-			if (extracted > 0) {
-				return extracted;
-			}
-		}
-
-		return 0;
 	}
 
 	@Override
@@ -124,41 +110,26 @@ public class InventorySidedView implements ItemIo {
 		}
 	}
 
+	@Override
 	public int getItemSlotCount() {
 		return size;
 	}
 
 	@Override
-	public ItemKey[] getItemKeys() {
-		ArrayList<ItemKey> result = new ArrayList<>();
-
-		for (int i = 0; i < getItemSlotCount(); ++i) {
-			if (wrapped.getStack(i).isEmpty()) continue;
-			ItemKey key = ItemKey.of(wrapped.getStack(i));
-			if (!result.contains(key)) result.add(key);
-		}
-
-		return result.toArray(ItemKey[]::new);
+	public ItemKey getItemKey(int slot) {
+		checkBounds(slot);
+		return ItemKey.of(wrapped.getStack(slot));
 	}
 
 	@Override
-	public int[] getItemCounts() {
-		ArrayList<ItemKey> itemKeys = new ArrayList<>();
-		IntArrayList result = new IntArrayList();
+	public int getItemCount(int slot) {
+		checkBounds(slot);
+		return wrapped.getStack(slot).getCount();
+	}
 
-		for (int i = 0; i < getItemSlotCount(); ++i) {
-			if (wrapped.getStack(i).isEmpty()) continue;
-			ItemKey key = ItemKey.of(wrapped.getStack(i));
-			int index = itemKeys.indexOf(key);
-
-			if (index == -1) {
-				itemKeys.add(key);
-				result.add(wrapped.getStack(i).getCount());
-			} else {
-				result.set(index, result.getInt(index) + wrapped.getStack(i).getCount());
-			}
+	private void checkBounds(int slot) {
+		if (slot < 0 || slot >= size) {
+			throw new IndexOutOfBoundsException();
 		}
-
-		return result.toIntArray();
 	}
 }
