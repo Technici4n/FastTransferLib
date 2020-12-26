@@ -1,7 +1,8 @@
-package dev.technici4n.fasttransferlib.api.base;
+package dev.technici4n.fasttransferlib.api.fluid.base;
 
 import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.api.fluid.FluidIo;
+import dev.technici4n.fasttransferlib.api.fluid.FluidPreconditions;
 
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
@@ -10,14 +11,25 @@ import net.minecraft.network.PacketByteBuf;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;
 
-public class BaseSingleFluidStorage implements FluidIo {
+/**
+ * A base implementation of a simple fluid io with only one slot.
+ * Consider overriding {@link SingleSlotFluidIo#afterChange()} to call markDirty if that makes sense for you.
+ */
+public class SingleSlotFluidIo implements FluidIo {
 	protected Fluid fluidKey = Fluids.EMPTY;
-	protected long fluidVolume = 0;
+	protected long fluidAmount = 0;
 	protected final long maxCapacity;
 	protected int version = 0;
 
-	public BaseSingleFluidStorage(long maxCapacity) {
+	public SingleSlotFluidIo(long maxCapacity) {
 		this.maxCapacity = maxCapacity;
+	}
+
+	/**
+	 * Called after every change.
+	 */
+	protected void afterChange() {
+		++version;
 	}
 
 	@Override
@@ -27,14 +39,14 @@ public class BaseSingleFluidStorage implements FluidIo {
 
 	@Override
 	public Fluid getFluid(int slot) {
-		if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Fluid Storage");
+		FluidPreconditions.checkSingleSlot(slot);
 		return fluidKey;
 	}
 
 	@Override
 	public long getFluidAmount(int slot) {
-		if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Fluid Storage");
-		return fluidVolume;
+		FluidPreconditions.checkSingleSlot(slot);
+		return fluidAmount;
 	}
 
 	@Override
@@ -45,14 +57,14 @@ public class BaseSingleFluidStorage implements FluidIo {
 	@Override
 	public long insert(Fluid fluid, long amount, Simulation simulation) {
 		if (this.fluidKey == Fluids.EMPTY || this.fluidKey == fluid) {
-			long newQuantity = Math.min(fluidVolume + amount, maxCapacity);
-			long inserted = newQuantity - this.fluidVolume;
+			long newQuantity = Math.min(fluidAmount + amount, maxCapacity);
+			long inserted = newQuantity - this.fluidAmount;
 			long leftover = amount - inserted;
 
 			if (simulation.isActing()) {
-				version++;
 				this.fluidKey = fluid;
-				fluidVolume = newQuantity;
+				fluidAmount = newQuantity;
+				afterChange();
 			}
 
 			return leftover;
@@ -68,15 +80,15 @@ public class BaseSingleFluidStorage implements FluidIo {
 
 	@Override
 	public long extract(int slot, Fluid fluid, long maxAmount, Simulation simulation) {
-		if (slot != 0) throw new IllegalArgumentException("Only 1 Slot In This Fluid Storage");
+		FluidPreconditions.checkSingleSlot(slot);
 
 		if (fluid == this.fluidKey) {
-			long extract = Math.max(maxAmount, fluidVolume);
+			long extract = Math.max(maxAmount, fluidAmount);
 
 			if (simulation.isActing()) {
-				version++;
-				fluidVolume -= extract;
-				if (fluidVolume == 0) this.fluidKey = Fluids.EMPTY;
+				fluidAmount -= extract;
+				if (fluidAmount == 0) this.fluidKey = Fluids.EMPTY;
+				afterChange();
 			}
 		}
 
@@ -91,22 +103,22 @@ public class BaseSingleFluidStorage implements FluidIo {
 	public CompoundTag toTag() {
 		CompoundTag result = new CompoundTag();
 		result.putString("fluid", Registry.FLUID.getId(fluidKey).toString());
-		result.putLong("volume", fluidVolume);
+		result.putLong("amount", fluidAmount);
 		return result;
 	}
 
 	public void fromTag(CompoundTag tag) {
 		fluidKey = Registry.FLUID.get(new Identifier(tag.getString("fluid")));
-		fluidVolume = tag.getLong("volume");
+		fluidAmount = tag.getLong("amount");
 	}
 
 	public void toPacket(PacketByteBuf buf) {
 		buf.writeInt(Registry.FLUID.getRawId(fluidKey));
-		buf.writeLong(fluidVolume);
+		buf.writeLong(fluidAmount);
 	}
 
 	public void fromPacket(PacketByteBuf buf) {
 		Registry.FLUID.get(buf.readInt());
-		fluidVolume = buf.readLong();
+		fluidAmount = buf.readLong();
 	}
 }

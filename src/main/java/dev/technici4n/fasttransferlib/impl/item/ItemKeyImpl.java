@@ -62,10 +62,7 @@ public class ItemKeyImpl implements ItemKey {
 
 	@Override
 	public String toString() {
-		return "ItemKeyImpl{" +
-				"item=" + item +
-				", tag=" + tag +
-				'}';
+		return "ItemKeyImpl{item=" + item + ", tag=" + tag + '}';
 	}
 
 	@Override

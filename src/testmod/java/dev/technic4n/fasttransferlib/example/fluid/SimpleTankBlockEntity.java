@@ -1,6 +1,6 @@
 package dev.technic4n.fasttransferlib.example.fluid;
 
-import dev.technici4n.fasttransferlib.api.base.BaseSingleFluidStorage;
+import dev.technici4n.fasttransferlib.api.fluid.base.SingleSlotFluidIo;
 import dev.technici4n.fasttransferlib.api.fluid.FluidApi;
 import dev.technici4n.fasttransferlib.api.fluid.FluidConstants;
 
@@ -9,7 +9,7 @@ import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.nbt.CompoundTag;
 
 public class SimpleTankBlockEntity extends BlockEntity {
-	public BaseSingleFluidStorage storage = new BaseSingleFluidStorage(FluidConstants.BUCKET * 10);
+	public SingleSlotFluidIo storage = new SingleSlotFluidIo(FluidConstants.BUCKET * 10);
 
 	public SimpleTankBlockEntity() {
 		super(FluidExample.SIMPLE_TANK_BLOCK_ENTITY);
