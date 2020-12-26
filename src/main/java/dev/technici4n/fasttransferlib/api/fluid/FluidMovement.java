@@ -1,18 +1,21 @@
 package dev.technici4n.fasttransferlib.api.fluid;
 
+import java.util.function.Predicate;
+
 import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.impl.FtlImpl;
 
 import net.minecraft.fluid.Fluid;
+import net.minecraft.fluid.Fluids;
 
 /**
  * Utilities related to moving fluids between two {@link FluidIo}'s.
  */
-// TODO: add a Predicate<Fluid> parameter
 public final class FluidMovement {
 	/**
 	 * Move some fluid from some slots of a {@link FluidIo} to another {@link FluidIo}.
 	 *
+	 * @param filter        A predicate deciding which fluids may be moved
 	 * @param from          The io to move fluid from.
 	 * @param to            The io to move fluid to.
 	 * @param maxAmount     The maximum amount of fluid to move, in droplets.
@@ -21,14 +24,17 @@ public final class FluidMovement {
 	 * @return The amount of fluid that was moved.
 	 * @throws IndexOutOfBoundsException if somes slots are out of bounds of the source {@link FluidIo}'s slot count.
 	 */
-	public static long moveRange(FluidIo from, FluidIo to, long maxAmount, int startSlot, int endSlot) {
+	public static long moveRange(Predicate<Fluid> filter, FluidIo from, FluidIo to, long maxAmount, int startSlot, int endSlot) {
 		if (!from.supportsFluidExtraction() || !to.supportsFluidInsertion()) return 0;
 
 		long totalMoved = 0;
 
 		for (int i = startSlot; i < endSlot && maxAmount > 0; ++i) {
-			// Try to extract the maximum amount
+			// Check the fluid
 			Fluid fluid = from.getFluid(i);
+			if (fluid == Fluids.EMPTY || !filter.test(fluid)) continue;
+
+			// Try to extract the maximum amount
 			long moved = from.extract(i, fluid, maxAmount, Simulation.SIMULATE);
 			if (moved <= 0) continue;
 
@@ -82,15 +88,43 @@ public final class FluidMovement {
 	}
 
 	/**
+	 * Move some fluid from some slots of a {@link FluidIo} to another {@link FluidIo}.
+	 *
+	 * @param from          The io to move fluid from.
+	 * @param to            The io to move fluid to.
+	 * @param maxAmount     The maximum amount of fluid to move, in droplets.
+	 * @param startSlot     The first slot of the range to move, inclusive.
+	 * @param endSlot       The last slot of the range to move, exclusive.
+	 * @return The amount of fluid that was moved.
+	 * @throws IndexOutOfBoundsException if some slots are out of bounds of the source {@link FluidIo}'s slot count.
+	 */
+	public static long moveRange(FluidIo from, FluidIo to, long maxAmount, int startSlot, int endSlot) {
+		return moveRange(fluid -> true, from, to, maxAmount, startSlot, endSlot);
+	}
+
+	/**
 	 * Move some fluid from a {@link FluidIo} to another {@link FluidIo}.
 	 *
-	 * @param from          the io to move fluid from
-	 * @param to            the io to move fluid to
+	 * @param filter        A predicate deciding which fluids may be moved.
+	 * @param from          The io to move fluid from.
+	 * @param to            The io to move fluid to.
+	 * @param maxAmount     The maximum amount of fluid to move.
+	 * @return The amount of fluid that was moved.
+	 */
+	public static long moveMultiple(Predicate<Fluid> filter, FluidIo from, FluidIo to, long maxAmount) {
+		return moveRange(filter, from, to, maxAmount, 0, from.getFluidSlotCount());
+	}
+
+	/**
+	 * Move some fluid from a {@link FluidIo} to another {@link FluidIo}.
+	 *
+	 * @param from          The io to move fluid from.
+	 * @param to            The io to move fluid to.
 	 * @param maxAmount     The maximum amount of fluid to move.
 	 * @return The amount of fluid that was moved.
 	 */
 	public static long moveMultiple(FluidIo from, FluidIo to, long maxAmount) {
-		return moveRange(from, to, maxAmount, 0, from.getFluidSlotCount());
+		return moveRange(fluid -> true, from, to, maxAmount, 0, from.getFluidSlotCount());
 	}
 
 	private FluidMovement() {

@@ -71,6 +71,9 @@ public interface ItemKey {
 
 	@Nullable CompoundTag copyTag();
 
+	@Override
+	String toString();
+
 	CompoundTag toTag();
 
 	void toPacket(PacketByteBuf buf);

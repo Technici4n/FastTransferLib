@@ -3,6 +3,7 @@ package dev.technici4n.fasttransferlib.api.item;
 import java.util.function.Predicate;
 
 import dev.technici4n.fasttransferlib.api.Simulation;
+import dev.technici4n.fasttransferlib.impl.FtlImpl;
 
 /**
  * Utilities related to moving items between two {@link ItemIo}'s.
@@ -26,8 +27,9 @@ public final class ItemMovement {
 		int totalMoved = 0;
 
 		for (int i = startSlot; i < endSlot && maxCount > 0; ++i) {
+			// Check the item key
 			ItemKey key = from.getItemKey(i);
-			if (!filter.test(key)) continue;
+			if (key.isEmpty() || !filter.test(key)) continue;
 
 			// Try to extract the maximum count
 			int moved = from.extract(i, key, maxCount, Simulation.SIMULATE);
@@ -40,13 +42,39 @@ public final class ItemMovement {
 			// Try to extract again with the maximum count for the insertable, and return if that doesn't match
 			if (from.extract(i, key, moved, Simulation.SIMULATE) != moved) continue;
 
-			// Move the items at last
-			if (from.extract(i, key, moved, Simulation.ACT) != moved) {
-				// TODO: throw
+			// Move the item, extraction part
+			int extracted = from.extract(i, key, moved, Simulation.ACT);
+
+			// This extraction should never fail, as it was simulated just before being acted.
+			// If it fails nonetheless, throw an exception.
+			if (extracted != moved) {
+				String errorMessage = String.format(
+						"Bad ItemIo implementation: %s.\n"
+								+ "Extraction of %d items was simulated, but only %d items could really be extracted.\n"
+								+ "Slot: %d, item key: %s",
+						from, moved, extracted, i, key.toString()
+				);
+				throw new AssertionError(errorMessage);
 			}
 
-			if (to.insert(key, moved, Simulation.ACT) != 0) {
-				// TODO: throw
+			// Move the item, insertion part
+			int leftover = to.insert(key, moved, Simulation.ACT);
+
+			// This insertion can fail in some edge cases. If that happens, we try to re-insert in the source.
+			// If that fails, we simply void the items that could not be inserted, and we print a warning in the console.
+			if (leftover != 0) {
+				long reinsertLeftover = from.insert(key, leftover, Simulation.ACT);
+
+				if (reinsertLeftover != 0) {
+					String errorMessage = String.format(
+							"Bad ItemIo interaction while moving from %s to %s.\n"
+									+ "Insertion of %d items was simulated, but only %d items could really be inserted.\n"
+									+ "%d items could be re-inserted, and %d items were voided.\n"
+									+ "Item key: %s",
+							from, to, moved, moved - leftover, moved - reinsertLeftover, reinsertLeftover, key.toString()
+					);
+					FtlImpl.LOGGER.warn(errorMessage);
+				}
 			}
 
 			totalMoved += moved;

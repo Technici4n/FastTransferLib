@@ -61,12 +61,22 @@ public class ItemKeyImpl implements ItemKey {
 	}
 
 	@Override
+	public String toString() {
+		return "ItemKeyImpl{" +
+				"item=" + item +
+				", tag=" + tag +
+				'}';
+	}
+
+	@Override
 	public boolean equals(Object o) {
+		// succeed fast with == check
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
 		ItemKeyImpl itemKey = (ItemKeyImpl) o;
-		return item == itemKey.item && tagMatches(itemKey.tag);
+		// fail fast with hash code
+		return hashCode == itemKey.hashCode && item == itemKey.item && tagMatches(itemKey.tag);
 	}
 
 	@Override
