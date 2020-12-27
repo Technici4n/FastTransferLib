@@ -1,9 +1,7 @@
 package dev.technici4n.fasttransferlib.api.transfer;
 
 public interface Storage<T> {
-	boolean supportsInsertion();
 	ResourceFunction<T> insertionFunction();
-	boolean supportsExtraction();
 	ResourceFunction<T> extractionFunction();
 
 	boolean isEmpty();
