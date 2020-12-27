@@ -218,14 +218,5 @@ that as unicode.
 The fluid API uses `long`s instead of `int`s because `int`s could be too small when transferring large amounts of buckets, although this probably
 wouldn't matter for most mods anyway.
 
-## Why not support transactions?
-FTL only allows simulating a single operation, which prevents some patterns from existing. A way to solve this would be to introduce transactions,
-which would allow simulating and then rolling back arbitrary transfer operations. Unfortunately, this requires every inventory to support transactions,
-which is non-trivial to do efficiently for even a big chest, and most existing mods don't have a use for it anyway.
-
-Ultimately, the author believes that forcing transaction support for every inventory is not reasonable, for both FTL and Fabric API.
-If this assumption is wrong, it will be possible to deprecate the previous simulation-based API and replace it with transactions in the future,
-but that should not stop simulation from being used _now_.
-
 ## License
 This library is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.
