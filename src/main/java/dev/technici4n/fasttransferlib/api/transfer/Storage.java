@@ -5,7 +5,6 @@ public interface Storage<T> {
 	ResourceFunction<T> extractionFunction();
 
 	boolean isEmpty();
-	boolean isFull();
 	// return true to stop the visit
 	void forEach(Visitor<T> visitor);
 	int getVersion();
