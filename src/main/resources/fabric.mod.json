@@ -14,10 +14,14 @@
   },
   "license": "CC0-1.0",
   "icon": "assets/fasttransferlib/icon.png",
+  "entrypoints": {
+    "main": [
+      "dev.technici4n.fasttransferlib.impl.Ftl"
+    ]
+  },
   "mixins": [
     "fasttransferlib.mixins.json"
   ],
-
   "depends": {
     "fabricloader": ">=0.7.4",
     "fabric-api-lookup-api-v1": "*",

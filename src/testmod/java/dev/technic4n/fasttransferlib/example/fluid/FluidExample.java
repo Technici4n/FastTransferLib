@@ -1,7 +1,10 @@
 package dev.technic4n.fasttransferlib.example.fluid;
 
+import dev.technici4n.fasttransferlib.api.transfer.Storage;
+
 import net.minecraft.block.Material;
 import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.registry.Registry;

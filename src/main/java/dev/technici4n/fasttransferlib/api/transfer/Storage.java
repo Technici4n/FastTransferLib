@@ -1,13 +1,21 @@
 package dev.technici4n.fasttransferlib.api.transfer;
 
-public interface Storage<T> {
-	ResourceFunction<T> insertionFunction();
-	ResourceFunction<T> extractionFunction();
+import dev.technici4n.fasttransferlib.impl.FtlImpl;
 
-	boolean isEmpty();
+public interface Storage<T> {
+	default ResourceFunction<T> insertionFunction() {
+		return ResourceFunction.empty();
+	}
+	default ResourceFunction<T> extractionFunction() {
+		return ResourceFunction.empty();
+	}
+
 	// return true to stop the visit
 	void forEach(Visitor<T> visitor);
-	int getVersion();
+
+	default int getVersion() {
+		return FtlImpl.version++;
+	}
 
 	@FunctionalInterface
 	interface Visitor<T> {
