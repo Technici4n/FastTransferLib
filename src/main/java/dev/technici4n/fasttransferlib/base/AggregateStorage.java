@@ -30,9 +30,13 @@ public class AggregateStorage<T> implements Storage<T> {
 	}
 
 	@Override
-	public void forEach(Visitor<T> visitor) {
+	public boolean forEach(Visitor<T> visitor) {
 		for (Storage<T> part : parts) {
-			part.forEach(visitor);
+			if (part.forEach(visitor)) {
+				return true;
+			}
 		}
+
+		return false;
 	}
 }

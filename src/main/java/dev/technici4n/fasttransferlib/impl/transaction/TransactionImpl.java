@@ -107,7 +107,13 @@ public class TransactionImpl implements Transaction {
 
 			allowAccess = false;
 			transaction.stateStorage.computeIfAbsent(participant, Participant::onEnlist);
+			GLOBAL_PARTICIPANTS.add(participant);
 			allowAccess = true;
 		}
+	}
+
+	public static boolean isOpen() {
+		validateGlobalState();
+		return stackPointer != -1;
 	}
 }

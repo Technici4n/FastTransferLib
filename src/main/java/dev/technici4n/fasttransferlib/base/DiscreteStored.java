@@ -1,6 +1,5 @@
 package dev.technici4n.fasttransferlib.base;
 
-import dev.technici4n.fasttransferlib.api.Fraction;
 import dev.technici4n.fasttransferlib.api.transfer.Stored;
 
 public interface DiscreteStored<T> extends Stored<T> {
@@ -10,7 +9,7 @@ public interface DiscreteStored<T> extends Stored<T> {
 	}
 
 	@Override
-	default Fraction amount() {
-		return Fraction.of(count());
+	default long denominator() {
+		return 1;
 	}
 }

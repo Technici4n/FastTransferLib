@@ -10,8 +10,8 @@ public interface Storage<T> {
 		return ResourceFunction.empty();
 	}
 
-	// return true to stop the visit
-	void forEach(Visitor<T> visitor);
+	// if true is returned, the visit was stopped
+	boolean forEach(Visitor<T> visitor);
 
 	default int getVersion() {
 		return FtlImpl.version++;

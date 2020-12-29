@@ -1,6 +1,5 @@
 package dev.technici4n.fasttransferlib.impl;
 
-import dev.technici4n.fasttransferlib.api.Fraction;
 import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.api.transfer.ResourceFunction;
 import org.apache.logging.log4j.LogManager;
@@ -19,11 +18,6 @@ public class FtlImpl {
 		@Override
 		public long apply(Object resource, long numerator, long denominator, Simulation simulation) {
 			return 0;
-		}
-
-		@Override
-		public Fraction apply(Object resource, Fraction amount, Simulation simulation) {
-			return Fraction.ZERO;
 		}
 
 		@Override

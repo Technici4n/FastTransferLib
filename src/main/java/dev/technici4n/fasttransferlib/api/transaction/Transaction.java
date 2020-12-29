@@ -32,4 +32,20 @@ public interface Transaction extends AutoCloseable {
 	static void enlistIfOpen(Participant participant) {
 		TransactionImpl.enlistIfOpen(participant);
 	}
+
+	/**
+	 * @return True if a transaction is currently open, false otherwise.
+	 */
+	static boolean isOpen() {
+		return TransactionImpl.isOpen();
+	}
+
+	/**
+	 * Call {@link Participant#onFinalSuccess} if no transaction is currently open.
+	 */
+	static void successIfNotOpen(Participant participant) {
+		if (!isOpen()) {
+			participant.onFinalSuccess();
+		}
+	}
 }

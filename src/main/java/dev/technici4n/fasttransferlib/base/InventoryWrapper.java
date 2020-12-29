@@ -10,7 +10,6 @@ import com.google.common.primitives.Ints;
 import dev.technici4n.fasttransferlib.api.item.ItemKey;
 import dev.technici4n.fasttransferlib.api.item.ItemPreconditions;
 import dev.technici4n.fasttransferlib.api.transaction.Participant;
-import dev.technici4n.fasttransferlib.api.transaction.Transaction;
 import dev.technici4n.fasttransferlib.api.transfer.ResourceFunction;
 import dev.technici4n.fasttransferlib.api.transfer.Storage;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +30,7 @@ public class InventoryWrapper {
 		return new AggregateStorage<>(slots);
 	}
 
-	private static class InventoryStored implements Storage<ItemKey>, DiscreteStored<ItemKey>, Participant {
+	private static final class InventoryStored implements Storage<ItemKey>, DiscreteStored<ItemKey>, Participant {
 		private final Inventory inventory;
 		private final int slot;
 		private final DiscreteResourceFunction<ItemKey> insertionFunction;
@@ -51,21 +50,17 @@ public class InventoryWrapper {
 					if (inventory.isValid(slot, keyStack)) {
 						int inserted = Math.min(keyStack.getMaxCount(), count);
 
-						if (simulation.isActing()) {
-							Transaction.enlistIfOpen(this);
+						simulation.wrapModification(this, () -> {
 							keyStack.setCount(inserted);
 							inventory.setStack(slot, keyStack);
-						}
+						});
 
 						return inserted;
 					}
 				} else if (itemKey.matches(stack)) {
 					int inserted = Math.min(stack.getMaxCount() - stack.getCount(), count);
 
-					if (simulation.isActing()) {
-						Transaction.enlistIfOpen(this);
-						stack.increment(inserted);
-					}
+					simulation.wrapModification(this, () -> stack.increment(inserted));
 
 					return inserted;
 				}
@@ -80,10 +75,7 @@ public class InventoryWrapper {
 				if (itemKey.matches(stack)) {
 					int extracted = Math.min(stack.getCount(), count);
 
-					if (simulation.isActing()) {
-						Transaction.enlistIfOpen(this);
-						stack.decrement(extracted);
-					}
+					simulation.wrapModification(this, () -> stack.decrement(extracted));
 
 					return extracted;
 				}
@@ -102,10 +94,12 @@ public class InventoryWrapper {
 		}
 
 		@Override
-		public void forEach(Visitor<ItemKey> visitor) {
+		public boolean forEach(Visitor<ItemKey> visitor) {
 			if (!inventory.getStack(slot).isEmpty()) {
-				visitor.visit(this);
+				return visitor.visit(this);
 			}
+
+			return false;
 		}
 
 		@Override
@@ -125,7 +119,9 @@ public class InventoryWrapper {
 
 		@Override
 		public void onClose(@Nullable Object state, boolean success) {
-			inventory.setStack(slot, (ItemStack) state);
+			if (!success) {
+				inventory.setStack(slot, (ItemStack) state);
+			}
 		}
 
 		@Override
