@@ -1,7 +1,7 @@
 package dev.technici4n.fasttransferlib.impl;
 
 import dev.technici4n.fasttransferlib.api.Simulation;
-import dev.technici4n.fasttransferlib.api.transfer.ResourceFunction;
+import dev.technici4n.fasttransferlib.api.transfer.StorageFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -9,7 +9,7 @@ public class FtlImpl {
 	public static final Logger LOGGER = LogManager.getLogger("FastTransferLib");
 	public static int version = 0;
 	@SuppressWarnings("rawtypes")
-	public static final ResourceFunction EMPTY = new ResourceFunction() {
+	public static final StorageFunction EMPTY = new StorageFunction() {
 		@Override
 		public long apply(Object resource, long count, Simulation simulation) {
 			return 0;
@@ -21,8 +21,8 @@ public class FtlImpl {
 		}
 
 		@Override
-		public boolean canApply() {
-			return false;
+		public boolean isEmpty() {
+			return true;
 		}
 	};
 }

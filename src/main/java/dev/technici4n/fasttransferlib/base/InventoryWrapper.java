@@ -10,7 +10,7 @@ import com.google.common.primitives.Ints;
 import dev.technici4n.fasttransferlib.api.item.ItemKey;
 import dev.technici4n.fasttransferlib.api.item.ItemPreconditions;
 import dev.technici4n.fasttransferlib.api.transaction.Participant;
-import dev.technici4n.fasttransferlib.api.transfer.ResourceFunction;
+import dev.technici4n.fasttransferlib.api.transfer.StorageFunction;
 import dev.technici4n.fasttransferlib.api.transfer.Storage;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,17 +26,17 @@ public class InventoryWrapper {
 	}
 
 	private static Storage<ItemKey> innerOf(Inventory inventory) {
-		List<InventoryStored> slots = IntStream.range(0, inventory.size()).mapToObj(i -> new InventoryStored(inventory, i)).collect(Collectors.toList());
+		List<InventoryStorageView> slots = IntStream.range(0, inventory.size()).mapToObj(i -> new InventoryStorageView(inventory, i)).collect(Collectors.toList());
 		return new AggregateStorage<>(slots);
 	}
 
-	private static final class InventoryStored implements Storage<ItemKey>, DiscreteStored<ItemKey>, Participant {
+	private static final class InventoryStorageView implements Storage<ItemKey>, DiscreteStorageView<ItemKey>, Participant {
 		private final Inventory inventory;
 		private final int slot;
-		private final DiscreteResourceFunction<ItemKey> insertionFunction;
-		private final DiscreteResourceFunction<ItemKey> extractionFunction;
+		private final DiscreteStorageFunction<ItemKey> insertionFunction;
+		private final DiscreteStorageFunction<ItemKey> extractionFunction;
 
-		private InventoryStored(Inventory inventory, int slot) {
+		private InventoryStorageView(Inventory inventory, int slot) {
 			this.inventory = inventory;
 			this.slot = slot;
 			this.insertionFunction = (itemKey, longCount, simulation) -> {
@@ -84,12 +84,12 @@ public class InventoryWrapper {
 			};
 		}
 
-		public DiscreteResourceFunction<ItemKey> insertionFunction() {
+		public DiscreteStorageFunction<ItemKey> insertionFunction() {
 			return insertionFunction;
 		}
 
 		@Override
-		public ResourceFunction<ItemKey> extractionFunction() {
+		public StorageFunction<ItemKey> extractionFunction() {
 			return extractionFunction;
 		}
 
@@ -108,7 +108,7 @@ public class InventoryWrapper {
 		}
 
 		@Override
-		public long count() {
+		public long amount() {
 			return inventory.getStack(slot).getCount();
 		}
 

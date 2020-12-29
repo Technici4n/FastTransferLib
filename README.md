@@ -105,7 +105,7 @@ However, the main issue with `Inventory`/`SidedInventory` is that they leak too 
 
 ### IItemHandler
 The standard Forge capability for handling items. It is clearly an improvement over Vanilla's interfaces, but:
-* Although forbidden by the API contract, the caller can still modify stored `ItemStack`s directly.
+* Although forbidden by the API contract, the caller can still modify storageView `ItemStack`s directly.
 * Iterating over all pairs of slots is still in the API contract, although workarounds exist.
 * There is no way to know if a large inventory has changed without rescanning its entire contents. This is particularly
   annoying for mods such as Applied Energistics 2 which have to rescan the entire network when an item enters or exits it.

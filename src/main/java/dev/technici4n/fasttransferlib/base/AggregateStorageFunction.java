@@ -4,28 +4,28 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.technici4n.fasttransferlib.api.Simulation;
-import dev.technici4n.fasttransferlib.api.transfer.ResourceFunction;
+import dev.technici4n.fasttransferlib.api.transfer.StorageFunction;
 
-public class AggregateResourceFunction<T> implements ResourceFunction<T> {
-	private final List<ResourceFunction<T>> parts;
-	private final boolean canApply;
+public class AggregateStorageFunction<T> implements StorageFunction<T> {
+	private final List<StorageFunction<T>> parts;
+	private final boolean isEmpty;
 
-	public AggregateResourceFunction(List<? extends ResourceFunction<T>> parts) {
+	public AggregateStorageFunction(List<? extends StorageFunction<T>> parts) {
 		this.parts = new ArrayList<>(parts);
-		boolean canApply = false;
-		for (ResourceFunction<T> part : parts) {
-			if (part.canApply()) {
-				canApply = true;
+		boolean isEmpty = true;
+		for (StorageFunction<T> part : parts) {
+			if (!part.isEmpty()) {
+				isEmpty = false;
 			}
 		}
-		this.canApply = canApply;
+		this.isEmpty = isEmpty;
 	}
 
 	@Override
 	public long apply(T resource, long count, Simulation simulation) {
 		long total = 0;
 
-		for (ResourceFunction<T> part : parts) {
+		for (StorageFunction<T> part : parts) {
 			total += part.apply(resource, count - total, simulation);
 		}
 
@@ -36,7 +36,7 @@ public class AggregateResourceFunction<T> implements ResourceFunction<T> {
 	public long apply(T resource, long numerator, long denominator, Simulation simulation) {
 		long total = 0;
 
-		for (ResourceFunction<T> part : parts) {
+		for (StorageFunction<T> part : parts) {
 			total += part.apply(resource, numerator - total, denominator, simulation);
 		}
 
@@ -44,7 +44,7 @@ public class AggregateResourceFunction<T> implements ResourceFunction<T> {
 	}
 
 	@Override
-	public boolean canApply() {
-		return canApply;
+	public boolean isEmpty() {
+		return isEmpty;
 	}
 }
