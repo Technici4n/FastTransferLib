@@ -22,22 +22,22 @@ public class AggregateStorageFunction<T> implements StorageFunction<T> {
 	}
 
 	@Override
-	public long apply(T resource, long count, Simulation simulation) {
+	public long apply(T resource, long amount) {
 		long total = 0;
 
 		for (StorageFunction<T> part : parts) {
-			total += part.apply(resource, count - total, simulation);
+			total += part.apply(resource, amount - total);
 		}
 
 		return total;
 	}
 
 	@Override
-	public long apply(T resource, long numerator, long denominator, Simulation simulation) {
+	public long apply(T resource, long numerator, long denominator) {
 		long total = 0;
 
 		for (StorageFunction<T> part : parts) {
-			total += part.apply(resource, numerator - total, denominator, simulation);
+			total += part.apply(resource, numerator - total, denominator);
 		}
 
 		return total;

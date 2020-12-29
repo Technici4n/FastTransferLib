@@ -1,6 +1,5 @@
 package dev.technici4n.fasttransferlib.impl;
 
-import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.api.transfer.StorageFunction;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,12 +10,12 @@ public class FtlImpl {
 	@SuppressWarnings("rawtypes")
 	public static final StorageFunction EMPTY = new StorageFunction() {
 		@Override
-		public long apply(Object resource, long count, Simulation simulation) {
+		public long apply(Object resource, long amount) {
 			return 0;
 		}
 
 		@Override
-		public long apply(Object resource, long numerator, long denominator, Simulation simulation) {
+		public long apply(Object resource, long numerator, long denominator) {
 			return 0;
 		}
 

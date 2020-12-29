@@ -10,6 +10,7 @@ import com.google.common.primitives.Ints;
 import dev.technici4n.fasttransferlib.api.item.ItemKey;
 import dev.technici4n.fasttransferlib.api.item.ItemPreconditions;
 import dev.technici4n.fasttransferlib.api.transaction.Participant;
+import dev.technici4n.fasttransferlib.api.transaction.Transaction;
 import dev.technici4n.fasttransferlib.api.transfer.StorageFunction;
 import dev.technici4n.fasttransferlib.api.transfer.Storage;
 import org.jetbrains.annotations.Nullable;
@@ -39,7 +40,7 @@ public class InventoryWrapper {
 		private InventoryStorageView(Inventory inventory, int slot) {
 			this.inventory = inventory;
 			this.slot = slot;
-			this.insertionFunction = (itemKey, longCount, simulation) -> {
+			this.insertionFunction = (itemKey, longCount) -> {
 				ItemPreconditions.notEmpty(itemKey);
 				int count = Math.min(Ints.saturatedCast(longCount), inventory.getMaxCountPerStack());
 				ItemStack stack = inventory.getStack(slot);
@@ -50,7 +51,7 @@ public class InventoryWrapper {
 					if (inventory.isValid(slot, keyStack)) {
 						int inserted = Math.min(keyStack.getMaxCount(), count);
 
-						simulation.wrapModification(this, () -> {
+						Transaction.wrapModification(this, () -> {
 							keyStack.setCount(inserted);
 							inventory.setStack(slot, keyStack);
 						});
@@ -60,14 +61,14 @@ public class InventoryWrapper {
 				} else if (itemKey.matches(stack)) {
 					int inserted = Math.min(stack.getMaxCount() - stack.getCount(), count);
 
-					simulation.wrapModification(this, () -> stack.increment(inserted));
+					Transaction.wrapModification(this, () -> stack.increment(inserted));
 
 					return inserted;
 				}
 
 				return 0;
 			};
-			this.extractionFunction = (itemKey, longCount, simulation) -> {
+			this.extractionFunction = (itemKey, longCount) -> {
 				ItemPreconditions.notEmpty(itemKey);
 				int count = Ints.saturatedCast(longCount);
 				ItemStack stack = inventory.getStack(slot);
@@ -75,7 +76,7 @@ public class InventoryWrapper {
 				if (itemKey.matches(stack)) {
 					int extracted = Math.min(stack.getCount(), count);
 
-					simulation.wrapModification(this, () -> stack.decrement(extracted));
+					Transaction.wrapModification(this, () -> stack.decrement(extracted));
 
 					return extracted;
 				}

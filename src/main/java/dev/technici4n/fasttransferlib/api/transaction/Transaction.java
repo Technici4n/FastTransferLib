@@ -17,6 +17,12 @@ public interface Transaction extends AutoCloseable {
 	void commit();
 
 	/**
+	 * Rollback, called automatically at the end of try-with-resources.
+	 */
+	@Override
+	void close();
+
+	/**
 	 * Open a new transaction.
 	 * It must always be used in a try-with-resources block.
 	 * If the transaction is not rolled back or committed when it is closed, it will be rolled back.
@@ -47,5 +53,11 @@ public interface Transaction extends AutoCloseable {
 		if (!isOpen()) {
 			participant.onFinalSuccess();
 		}
+	}
+
+	static void wrapModification(Participant participant, Runnable runnable) {
+		enlistIfOpen(participant);
+		runnable.run();
+		successIfNotOpen(participant);
 	}
 }

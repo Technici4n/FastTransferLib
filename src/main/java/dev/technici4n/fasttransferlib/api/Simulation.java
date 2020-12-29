@@ -14,12 +14,4 @@ public enum Simulation {
 	public boolean isActing() {
 		return this == ACT;
 	}
-
-	public void wrapModification(Participant participant, Runnable runnable) {
-		if (isActing()) {
-			Transaction.enlistIfOpen(participant);
-			runnable.run();
-			Transaction.successIfNotOpen(participant);
-		}
-	}
 }

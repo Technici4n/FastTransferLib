@@ -54,6 +54,9 @@ dependencies {
     afterEvaluate {
         testmodImplementation sourceSets.main.output
     }
+
+    testImplementation("org.junit.jupiter:junit-jupiter-api:5.7.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
 }
 
 processResources {
@@ -125,4 +128,8 @@ tasks.withType(net.fabricmc.loom.task.AbstractRunTask) {
 checkstyle {
     configFile = file("checkstyle.xml")
     toolVersion = "8.31"
+}
+
+test {
+    useJUnitPlatform()
 }

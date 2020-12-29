@@ -1,11 +1,10 @@
 package dev.technici4n.fasttransferlib.api.transfer;
 
-import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.impl.FtlImpl;
 
 public interface StorageFunction<T> {
-	long apply(T resource, long count, Simulation simulation);
-	long apply(T resource, long numerator, long denominator, Simulation simulation);
+	long apply(T resource, long amount);
+	long apply(T resource, long numerator, long denominator);
 
 	default boolean isEmpty() {
 		return false;

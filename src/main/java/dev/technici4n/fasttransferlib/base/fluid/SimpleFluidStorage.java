@@ -1,8 +1,8 @@
 package dev.technici4n.fasttransferlib.base.fluid;
 
-import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.api.fluid.FluidPreconditions;
 import dev.technici4n.fasttransferlib.api.transaction.Participant;
+import dev.technici4n.fasttransferlib.api.transaction.Transaction;
 import dev.technici4n.fasttransferlib.api.transfer.Storage;
 import dev.technici4n.fasttransferlib.api.transfer.StorageFunction;
 import dev.technici4n.fasttransferlib.base.FixedDenominatorStorageFunction;
@@ -14,9 +14,9 @@ import net.minecraft.fluid.Fluids;
 public class SimpleFluidStorage implements Storage<Fluid>, FixedDenominatorStorageView<Fluid>, Participant {
 	public final long denominator;
 	public final long capacity;
-	protected Fluid fluid = Fluids.EMPTY;
-	protected long amount = 0;
-	protected int version = 0;
+	public Fluid fluid = Fluids.EMPTY;
+	public long amount = 0;
+	public int version = 0;
 	protected final FixedDenominatorStorageFunction<Fluid> insertionFunction;
 	protected final FixedDenominatorStorageFunction<Fluid> extractionFunction;
 
@@ -30,13 +30,13 @@ public class SimpleFluidStorage implements Storage<Fluid>, FixedDenominatorStora
 			}
 
 			@Override
-			public long applyFixedDenominator(Fluid resource, long numerator, Simulation simulation) {
+			public long applyFixedDenominator(Fluid resource, long numerator) {
 				FluidPreconditions.notEmpty(resource);
 
 				if (fluid == Fluids.EMPTY) {
 					long inserted = Math.min(capacity, numerator);
 
-					simulation.wrapModification(SimpleFluidStorage.this, () -> {
+					Transaction.wrapModification(SimpleFluidStorage.this, () -> {
 						fluid = resource;
 						amount = inserted;
 					});
@@ -45,7 +45,7 @@ public class SimpleFluidStorage implements Storage<Fluid>, FixedDenominatorStora
 				} else if (fluid == resource) {
 					long inserted = Math.min(capacity - amount, numerator);
 
-					simulation.wrapModification(SimpleFluidStorage.this, () -> amount += inserted);
+					Transaction.wrapModification(SimpleFluidStorage.this, () -> amount += inserted);
 
 					return inserted;
 				}
@@ -60,13 +60,13 @@ public class SimpleFluidStorage implements Storage<Fluid>, FixedDenominatorStora
 			}
 
 			@Override
-			public long applyFixedDenominator(Fluid resource, long numerator, Simulation simulation) {
+			public long applyFixedDenominator(Fluid resource, long numerator) {
 				FluidPreconditions.notEmpty(resource);
 
 				if (fluid != Fluids.EMPTY) {
 					long extracted = Math.min(amount, numerator);
 
-					simulation.wrapModification(SimpleFluidStorage.this, () -> {
+					Transaction.wrapModification(SimpleFluidStorage.this, () -> {
 						amount -= extracted;
 						if (amount == 0) fluid = Fluids.EMPTY;
 					});
