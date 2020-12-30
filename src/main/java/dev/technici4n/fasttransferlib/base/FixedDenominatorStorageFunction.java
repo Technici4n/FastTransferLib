@@ -1,5 +1,7 @@
 package dev.technici4n.fasttransferlib.base;
 
+import com.google.common.math.LongMath;
+import dev.technici4n.fasttransferlib.api.transaction.Transaction;
 import dev.technici4n.fasttransferlib.api.transfer.StorageFunction;
 
 public interface FixedDenominatorStorageFunction<T> extends StorageFunction<T> {
@@ -21,7 +23,29 @@ public interface FixedDenominatorStorageFunction<T> extends StorageFunction<T> {
 			return applyFixedDenominator(resource, numerator / ratio) * ratio;
 		} else {
 			// otherwise, the transfer will necessarily happen with the gcd of the denominators
-			// TODO: write this nightmare
+			long g = LongMath.gcd(ownDenom, denominator);
+			long factor = denominator / g;
+			long ownFactor = ownDenom / g;
+			long commonAmount = numerator / factor;
+
+			// the first try uses commonAmount, and returns if it is successful
+			// the second try uses the rounded-down amount returned by the first try
+			for (int tries = 0; tries < 2 && commonAmount > 0; ++tries) {
+				try (Transaction tx = Transaction.open()) {
+					// try to apply with the common amount
+					long result = applyFixedDenominator(resource, commonAmount * ownFactor);
+
+					// if the result can be converted back to the gcd, this is successful.
+					if (result % ownFactor == 0) {
+						tx.commit();
+						return result / ownFactor * factor;
+					} else {
+						// otherwise, rollback and try rounding down
+						commonAmount = result / ownFactor;
+					}
+				}
+			}
+
 			return 0;
 		}
 	}

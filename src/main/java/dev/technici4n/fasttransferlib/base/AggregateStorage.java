@@ -8,12 +8,12 @@ import dev.technici4n.fasttransferlib.api.transfer.StorageFunction;
 import dev.technici4n.fasttransferlib.api.transfer.Storage;
 
 // sadly doesn't support versioning :(
-public class AggregateStorage<T> implements Storage<T> {
-	private final List<Storage<T>> parts;
+public class AggregateStorage<T, S extends Storage<T>> implements Storage<T> {
+	private final List<S> parts;
 	private final StorageFunction<T> insertionFunction;
 	private final StorageFunction<T> extractionFunction;
 
-	public AggregateStorage(List<? extends Storage<T>> parts) {
+	public AggregateStorage(List<S> parts) {
 		this.parts = new ArrayList<>(parts);
 		this.insertionFunction = new AggregateStorageFunction<>(parts.stream().map(Storage::insertionFunction).collect(Collectors.toList()));
 		this.extractionFunction = new AggregateStorageFunction<>(parts.stream().map(Storage::extractionFunction).collect(Collectors.toList()));
@@ -31,7 +31,7 @@ public class AggregateStorage<T> implements Storage<T> {
 
 	@Override
 	public boolean forEach(Visitor<T> visitor) {
-		for (Storage<T> part : parts) {
+		for (S part : parts) {
 			if (part.forEach(visitor)) {
 				return true;
 			}

@@ -75,4 +75,25 @@ public class SimpleFluidStorageTests {
 		// but tx1 was reverted, so the storage should be empty again
 		ensureEmpty(storage);
 	}
+
+	@Test
+	void testDenoms() {
+		SimpleFluidStorage storage = new SimpleFluidStorage(8, 8);
+
+		try (Transaction tx = Transaction.open()) {
+			// trying to insert 5/6 should insert 3/6 and fail to insert 2/6.
+			assertEquals(3, storage.insertionFunction().apply(Fluids.WATER, 5, 6));
+			// make sure 4/8 is now in the storage
+			ensureState(storage, Fluids.WATER, 4);
+			// now, trying to insert 7/6 should try to insert 6/6 first, but in the end only 3/6 should be inserted
+			assertEquals(3, storage.insertionFunction().apply(Fluids.WATER, 7, 6));
+			// make sure 8/8 is now in the storage
+			ensureState(storage, Fluids.WATER, 8);
+			// commit
+			tx.commit();
+		}
+
+		// make sure that after a committed transaction 8/8 is still stored
+		ensureState(storage, Fluids.WATER, 8);
+	}
 }
