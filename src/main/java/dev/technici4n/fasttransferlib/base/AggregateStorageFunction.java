@@ -3,7 +3,6 @@ package dev.technici4n.fasttransferlib.base;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.api.transfer.StorageFunction;
 
 public class AggregateStorageFunction<T> implements StorageFunction<T> {
@@ -13,11 +12,13 @@ public class AggregateStorageFunction<T> implements StorageFunction<T> {
 	public AggregateStorageFunction(List<? extends StorageFunction<T>> parts) {
 		this.parts = new ArrayList<>(parts);
 		boolean isEmpty = true;
+
 		for (StorageFunction<T> part : parts) {
 			if (!part.isEmpty()) {
 				isEmpty = false;
 			}
 		}
+
 		this.isEmpty = isEmpty;
 	}
 

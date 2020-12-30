@@ -1,5 +1,9 @@
 package dev.technici4n.fasttransferlib.api.transaction;
 
+/**
+ * An object that can take part atomically in a {@link Transaction}.
+ * @see Transaction
+ */
 public interface Participant {
 	/**
 	 * Return the state to be put in the Transaction for this participant.

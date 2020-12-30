@@ -1,9 +1,7 @@
 package dev.technici4n.fasttransferlib.impl.transaction;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.IdentityHashMap;
-import java.util.Set;
 
 import dev.technici4n.fasttransferlib.api.transaction.Participant;
 import dev.technici4n.fasttransferlib.api.transaction.Transaction;
@@ -11,7 +9,6 @@ import dev.technici4n.fasttransferlib.api.transaction.Transaction;
 public class TransactionImpl implements Transaction {
 	private static Thread serverThread = null;
 
-	private static final Set<Participant> GLOBAL_PARTICIPANTS = Collections.newSetFromMap(new IdentityHashMap<>());
 	private static final ArrayList<TransactionImpl> STACK = new ArrayList<>();
 	private static int stackPointer = -1;
 	private static boolean allowAccess = true;
@@ -57,10 +54,9 @@ public class TransactionImpl implements Transaction {
 		// notify participants
 		stateStorage.forEach((participant, state) -> participant.onClose(state, success));
 
-		// if root, do the final update
+		// if root and success, call onFinalSuccess
 		if (stackPointer == 0 && success) {
-			GLOBAL_PARTICIPANTS.forEach(Participant::onFinalSuccess);
-			GLOBAL_PARTICIPANTS.clear();
+			stateStorage.keySet().forEach(Participant::onFinalSuccess);
 		}
 
 		// clear things up
@@ -103,11 +99,12 @@ public class TransactionImpl implements Transaction {
 		validateGlobalState();
 
 		if (stackPointer != -1) {
-			TransactionImpl transaction = STACK.get(stackPointer);
-
 			allowAccess = false;
-			transaction.stateStorage.computeIfAbsent(participant, Participant::onEnlist);
-			GLOBAL_PARTICIPANTS.add(participant);
+
+			for (int i = 0; i <= stackPointer; ++i) {
+				STACK.get(i).stateStorage.computeIfAbsent(participant, Participant::onEnlist);
+			}
+
 			allowAccess = true;
 		}
 	}
