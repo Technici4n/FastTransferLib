@@ -1,5 +1,6 @@
 package dev.technici4n.fasttransferlib.api.transfer;
 
+import dev.technici4n.fasttransferlib.api.transaction.Transaction;
 import dev.technici4n.fasttransferlib.base.AggregateStorage;
 import dev.technici4n.fasttransferlib.impl.FtlImpl;
 
@@ -29,6 +30,10 @@ public interface Storage<T> {
 	 * and implementations are encouraged to throw an exception if that happens.</p>
 	 */
 	default int getVersion() {
+		if (Transaction.isOpen()) {
+			throw new IllegalStateException("getVersion() may not be called during a transaction.");
+		}
+
 		return FtlImpl.version++;
 	}
 

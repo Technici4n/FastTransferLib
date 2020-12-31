@@ -55,4 +55,11 @@ public interface Transaction extends AutoCloseable {
 	static Transaction open() {
 		return TransactionImpl.open();
 	}
+
+	/**
+	 * Return whether a transaction is currently open.
+	 */
+	static boolean isOpen() {
+		return TransactionImpl.isOpen();
+	}
 }

@@ -112,4 +112,10 @@ public class TransactionImpl implements Transaction {
 		STACK.get(stackPointer).isOpen = true;
 		return STACK.get(stackPointer);
 	}
+
+	public static boolean isOpen() {
+		validateGlobalState();
+
+		return stackPointer != -1;
+	}
 }
