@@ -12,7 +12,6 @@ import dev.technici4n.fasttransferlib.api.item.ItemPreconditions;
 import dev.technici4n.fasttransferlib.api.transaction.Participant;
 import dev.technici4n.fasttransferlib.api.transfer.StorageFunction;
 import dev.technici4n.fasttransferlib.api.transfer.Storage;
-import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
@@ -30,7 +29,7 @@ public class InventoryWrapper {
 		return new AggregateStorage<>(slots);
 	}
 
-	private static final class InventoryStorageView implements Storage<ItemKey>, IntegerStorageView<ItemKey>, Participant {
+	private static final class InventoryStorageView implements Storage<ItemKey>, IntegerStorageView<ItemKey>, Participant<ItemStack> {
 		private final Inventory inventory;
 		private final int slot;
 		private final IntegerStorageFunction<ItemKey> insertionFunction;
@@ -108,14 +107,14 @@ public class InventoryWrapper {
 		}
 
 		@Override
-		public @Nullable Object onEnlist() {
+		public ItemStack onEnlist() {
 			return inventory.getStack(slot).copy();
 		}
 
 		@Override
-		public void onClose(@Nullable Object state, boolean success) {
+		public void onClose(ItemStack state, boolean success) {
 			if (!success) {
-				inventory.setStack(slot, (ItemStack) state);
+				inventory.setStack(slot, state);
 			}
 		}
 

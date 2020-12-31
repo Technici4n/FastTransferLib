@@ -2,6 +2,7 @@ package dev.technici4n.fasttransferlib.impl.transaction;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.Map;
 
 import dev.technici4n.fasttransferlib.api.transaction.Participant;
 import dev.technici4n.fasttransferlib.api.transaction.Transaction;
@@ -13,6 +14,7 @@ public class TransactionImpl implements Transaction {
 	private static int stackPointer = -1;
 	private static boolean allowAccess = true;
 
+	@SuppressWarnings("rawtypes")
 	private final IdentityHashMap<Participant, Object> stateStorage = new IdentityHashMap<>();
 	private boolean isOpen = false;
 
@@ -47,12 +49,16 @@ public class TransactionImpl implements Transaction {
 		}
 	}
 
+	@SuppressWarnings({ "unchecked", "rawtypes" })
 	private void close(boolean success) {
 		validateCurrent();
 		// block transaction operations
 		allowAccess = false;
+
 		// notify participants
-		stateStorage.forEach((participant, state) -> participant.onClose(state, success));
+		for (Map.Entry<Participant, Object> entry : stateStorage.entrySet()) {
+			entry.getKey().onClose(entry.getValue(), success);
+		}
 
 		// if root and success, call onFinalSuccess
 		if (stackPointer == 0 && success) {
@@ -83,7 +89,7 @@ public class TransactionImpl implements Transaction {
 	}
 
 	@Override
-	public void enlist(Participant participant) {
+	public void enlist(Participant<?> participant) {
 		validateCurrent();
 		allowAccess = false;
 

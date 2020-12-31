@@ -45,7 +45,7 @@ public interface Transaction extends AutoCloseable {
 	 * {@link Participant#onEnlist} will be called for every transaction in the transaction stack in which it is not enlisted yet,
 	 * from the oldest transaction to the most recent one.
 	 */
-	void enlist(Participant participant);
+	void enlist(Participant<?> participant);
 
 	/**
 	 * Open a new transaction.

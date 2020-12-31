@@ -38,11 +38,13 @@ public class SimpleFluidStorageTests {
 		SimpleFluidStorage storage = new SimpleFluidStorage(10, 100);
 		// test initial state
 		ensureEmpty(storage);
+
 		// test insertion
 		try (Transaction tx = Transaction.open()) {
 			assertEquals(50, storage.insertionFunction().apply(Fluids.LAVA, 50, 10, tx));
 			tx.commit();
 		}
+
 		ensureState(storage, Fluids.LAVA, 50);
 
 		// test extraction inside a transaction

@@ -11,7 +11,7 @@ import dev.technici4n.fasttransferlib.base.FixedDenominatorStorageView;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.fluid.Fluids;
 
-public class SimpleFluidStorage implements Storage<Fluid>, FixedDenominatorStorageView<Fluid>, Participant {
+public class SimpleFluidStorage implements Storage<Fluid>, FixedDenominatorStorageView<Fluid>, Participant<Object> {
 	public final long denominator;
 	public final long capacity;
 	public Fluid fluid = Fluids.EMPTY;

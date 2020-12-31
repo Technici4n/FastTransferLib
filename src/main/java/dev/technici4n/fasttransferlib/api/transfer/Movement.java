@@ -21,6 +21,7 @@ public class Movement {
 			try (Transaction tx = Transaction.open()) {
 				// check how much can be inserted
 				long accepted = to.insertionFunction().apply(resource, maxExtracted, tx);
+
 				// extract it, or rollback if the amounts don't match
 				if (from.extractionFunction().apply(resource, accepted, tx) == accepted) {
 					totalMoved[0] += accepted;
