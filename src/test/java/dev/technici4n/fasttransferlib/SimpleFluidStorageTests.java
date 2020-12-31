@@ -39,17 +39,20 @@ public class SimpleFluidStorageTests {
 		// test initial state
 		ensureEmpty(storage);
 		// test insertion
-		assertEquals(50, storage.insertionFunction().apply(Fluids.LAVA, 50, 10));
+		try (Transaction tx = Transaction.open()) {
+			assertEquals(50, storage.insertionFunction().apply(Fluids.LAVA, 50, 10, tx));
+			tx.commit();
+		}
 		ensureState(storage, Fluids.LAVA, 50);
 
 		// test extraction inside a transaction
-		try (Transaction ignored = Transaction.open()) {
-			assertEquals(50, storage.extractionFunction().apply(Fluids.LAVA, 50, 10));
+		try (Transaction tx = Transaction.open()) {
+			assertEquals(50, storage.extractionFunction().apply(Fluids.LAVA, 50, 10, tx));
 			// test that the storage is now empty
 			ensureEmpty(storage);
 		}
 
-		// test that it rollbacked correctly
+		// test that it rolled back correctly
 		ensureState(storage, Fluids.LAVA, 50);
 	}
 
@@ -61,7 +64,7 @@ public class SimpleFluidStorageTests {
 		try (Transaction tx1 = Transaction.open()) {
 			try (Transaction tx2 = Transaction.open()) {
 				// insert water
-				assertEquals(50, storage.insertionFunction().apply(Fluids.WATER, 50, 10));
+				assertEquals(50, storage.insertionFunction().apply(Fluids.WATER, 50, 10, tx2));
 				// make sure it was inserted
 				ensureState(storage, Fluids.WATER, 50);
 				// commit
@@ -82,11 +85,11 @@ public class SimpleFluidStorageTests {
 
 		try (Transaction tx = Transaction.open()) {
 			// trying to insert 5/6 should insert 3/6 and fail to insert 2/6.
-			assertEquals(3, storage.insertionFunction().apply(Fluids.WATER, 5, 6));
+			assertEquals(3, storage.insertionFunction().apply(Fluids.WATER, 5, 6, tx));
 			// make sure 4/8 is now in the storage
 			ensureState(storage, Fluids.WATER, 4);
 			// now, trying to insert 7/6 should try to insert 6/6 first, but in the end only 3/6 should be inserted
-			assertEquals(3, storage.insertionFunction().apply(Fluids.WATER, 7, 6));
+			assertEquals(3, storage.insertionFunction().apply(Fluids.WATER, 7, 6, tx));
 			// make sure 8/8 is now in the storage
 			ensureState(storage, Fluids.WATER, 8);
 			// commit

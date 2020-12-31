@@ -40,43 +40,19 @@ public interface Transaction extends AutoCloseable {
 	void close();
 
 	/**
+	 * Enlist the participant in the current transaction and all its parents if there is an open transaction,
+	 * and if the participant isn't yet enlisted.
+	 * {@link Participant#onEnlist} will be called for every transaction in the transaction stack in which it is not enlisted yet,
+	 * from the oldest transaction to the most recent one.
+	 */
+	void enlist(Participant participant);
+
+	/**
 	 * Open a new transaction.
 	 * It must always be used in a try-with-resources block.
 	 * If the transaction is not rolled back or committed when it is closed, it will be rolled back.
 	 */
 	static Transaction open() {
 		return TransactionImpl.open();
-	}
-
-	/**
-	 * Enlist the participant in the current transaction and all its parents if there is an open transaction,
-	 * and if the participant isn't yet enlisted.
-	 * {@link Participant#onEnlist} will be called for every transaction in the transaction stack in which it is not enlisted yet,
-	 * from the oldest transaction to the most recent one.
-	 */
-	static void enlistIfOpen(Participant participant) {
-		TransactionImpl.enlistIfOpen(participant);
-	}
-
-	/**
-	 * @return True if a transaction is currently open, false otherwise.
-	 */
-	static boolean isOpen() {
-		return TransactionImpl.isOpen();
-	}
-
-	/**
-	 * Call {@link Participant#onFinalSuccess} if no transaction is currently open.
-	 */
-	static void successIfNotOpen(Participant participant) {
-		if (!isOpen()) {
-			participant.onFinalSuccess();
-		}
-	}
-
-	static void wrapModification(Participant participant, Runnable runnable) {
-		enlistIfOpen(participant);
-		runnable.run();
-		successIfNotOpen(participant);
 	}
 }

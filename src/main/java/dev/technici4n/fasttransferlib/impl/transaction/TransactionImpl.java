@@ -82,6 +82,18 @@ public class TransactionImpl implements Transaction {
 		}
 	}
 
+	@Override
+	public void enlist(Participant participant) {
+		validateCurrent();
+		allowAccess = false;
+
+		for (int i = 0; i <= stackPointer; ++i) {
+			STACK.get(i).stateStorage.computeIfAbsent(participant, Participant::onEnlist);
+		}
+
+		allowAccess = true;
+	}
+
 	public static Transaction open() {
 		validateGlobalState();
 
@@ -93,24 +105,5 @@ public class TransactionImpl implements Transaction {
 
 		STACK.get(stackPointer).isOpen = true;
 		return STACK.get(stackPointer);
-	}
-
-	public static void enlistIfOpen(Participant participant) {
-		validateGlobalState();
-
-		if (stackPointer != -1) {
-			allowAccess = false;
-
-			for (int i = 0; i <= stackPointer; ++i) {
-				STACK.get(i).stateStorage.computeIfAbsent(participant, Participant::onEnlist);
-			}
-
-			allowAccess = true;
-		}
-	}
-
-	public static boolean isOpen() {
-		validateGlobalState();
-		return stackPointer != -1;
 	}
 }

@@ -3,6 +3,7 @@ package dev.technici4n.fasttransferlib.base;
 import java.util.ArrayList;
 import java.util.List;
 
+import dev.technici4n.fasttransferlib.api.transaction.Transaction;
 import dev.technici4n.fasttransferlib.api.transfer.StorageFunction;
 
 public class AggregateStorageFunction<T> implements StorageFunction<T> {
@@ -23,22 +24,22 @@ public class AggregateStorageFunction<T> implements StorageFunction<T> {
 	}
 
 	@Override
-	public long apply(T resource, long amount) {
+	public long apply(T resource, long amount, Transaction tx) {
 		long total = 0;
 
 		for (StorageFunction<T> part : parts) {
-			total += part.apply(resource, amount - total);
+			total += part.apply(resource, amount - total, tx);
 		}
 
 		return total;
 	}
 
 	@Override
-	public long apply(T resource, long numerator, long denominator) {
+	public long apply(T resource, long numerator, long denominator, Transaction tx) {
 		long total = 0;
 
 		for (StorageFunction<T> part : parts) {
-			total += part.apply(resource, numerator - total, denominator);
+			total += part.apply(resource, numerator - total, denominator, tx);
 		}
 
 		return total;

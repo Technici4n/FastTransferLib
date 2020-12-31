@@ -6,21 +6,21 @@ import dev.technici4n.fasttransferlib.api.transfer.StorageFunction;
 
 public interface FixedDenominatorStorageFunction<T> extends StorageFunction<T> {
 	long denominator();
-	long applyFixedDenominator(T resource, long numerator);
+	long applyFixedDenominator(T resource, long numerator, Transaction tx);
 
 	@Override
-	default long apply(T resource, long amount) {
-		return apply(resource, amount, 1);
+	default long apply(T resource, long amount, Transaction tx) {
+		return apply(resource, amount, 1, tx);
 	}
 
 	@Override
-	default long apply(T resource, long numerator, long denominator) {
+	default long apply(T resource, long numerator, long denominator, Transaction tx) {
 		long ownDenom = denominator();
 
 		if (denominator % ownDenom == 0) {
 			// if the passed denominator is a multiple of this denominator, handling is trivial
 			long ratio = denominator / ownDenom;
-			return applyFixedDenominator(resource, numerator / ratio) * ratio;
+			return applyFixedDenominator(resource, numerator / ratio, tx) * ratio;
 		} else {
 			// otherwise, the transfer will necessarily happen with the gcd of the denominators
 			long g = LongMath.gcd(ownDenom, denominator);
@@ -31,13 +31,13 @@ public interface FixedDenominatorStorageFunction<T> extends StorageFunction<T> {
 			// the first try uses commonAmount, and returns if it is successful
 			// the second try uses the rounded-down amount returned by the first try
 			for (int tries = 0; tries < 2 && commonAmount > 0; ++tries) {
-				try (Transaction tx = Transaction.open()) {
+				try (Transaction subtx = Transaction.open()) {
 					// try to apply with the common amount
-					long result = applyFixedDenominator(resource, commonAmount * ownFactor);
+					long result = applyFixedDenominator(resource, commonAmount * ownFactor, subtx);
 
 					// if the result can be converted back to the gcd, this is successful.
 					if (result % ownFactor == 0) {
-						tx.commit();
+						subtx.commit();
 						return result / ownFactor * factor;
 					} else {
 						// otherwise, rollback and try rounding down

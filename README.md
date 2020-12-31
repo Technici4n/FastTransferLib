@@ -4,8 +4,7 @@ A fast item, fluid and energy api for the Fabric ecosystem, based on
 
 ## Goals of the project
 * The major goal of the project is trying to design a simple yet very efficient design for an item and fluid transfer api for potential inclusion in Fabric API in the future.
-  In particular, that includes experimenting with fixed base 81000 denominators for the fluid api.
-* For this api to be a drop-in replacement in the current 1.16 ecosystem, it will be bundled with `Inventory`/`SidedInventory` and LBA interop, but that may be removed in the future if it is not necessary anymore.
+* For this api to be a drop-in replacement in the current 1.16 ecosystem, it will be bundled with `Inventory`/`SidedInventory` interop, and LBA if that proves to be possible, but that may be removed in the future if it is not necessary anymore.
 * Another goal of this api is to replace the slow and annoying-to-use TR energy api by a much faster and better energy api, **not** for inclusion in Fabric API. To ease the transition, FTL comes with a compat layer that allows it to interact transparently with TR energy blocks. 
  
 ## Users of the API
@@ -13,6 +12,7 @@ A fast item, fluid and energy api for the Fabric ecosystem, based on
 * Authors of other tech mods have expressed interest in an alternative to LBA as well.
 
 ## Installation
+**FTL IS BEING REWORKED, THE ENERGY API IS STABLE BUT NOT THE REST. Please don't use it for item or fluid transfer for now.**
 ```groovy
 repositories {
     maven {
@@ -39,51 +39,7 @@ In `gradle.properties`:
 ftl_version=0.2.1
 ```
 
-## Usage
-### Item API
-Item transfer is handled by a single interface: `ItemIo`. It supports reading inventory contents, and optionnaly inserting and extracting items.
-`ItemMovement` provides useful functions for moving items between two `ItemIo`'s.
-
-Note that `ItemStack`s are never transferred directly with this API. Instead, immutable count-less `ItemStack`s called `ItemKey`s are used, and the
-counts must be passed separately. This prevents unneeded allocation, and can make comparison between stacks a lot faster.
-
-Querying an instance of the API is dead simple:
-```java
-ItemIo io = ItemApi.SIDED.get(world, blockPos, direction);
-if (io != null) {
-    // use the io
-}
-```
-
-Registering your block to use the API is also very simple:
-```java
-ItemApi.SIDED.registerForBlocks((world, pos, blockState, direction) -> {
-    // return an ItemIo for your block, or null if there is none
-}, BLOCK_INSTANCE, ANOTHER_BLOCK_INSTANCE); // register as many blocks as you want
-```
-
-If your block is a BlockEntity, it is much more efficient to use `registerForBlockEntities` instead. Ideally, you also want to
-store the API in a field of your block entity, as there can be a lot of queries per tick.
-```java
-ItemApi.SIDED.registerForBlockEntities((blockEntity, direction) -> {
-    if (blockEntity instanceof YourBlockEntity) {
-        // return your ItemIo, ideally a field in the block entity, or null if there is none.
-    }
-    return null;
-}, BLOCK_ENTITY_TYPE_1, BLOCK_ENTITY_TYPE_2);
-```
-
-### Fluid API
-The fluid transfer API is basically the same as the item api, with the following differences:
-* Fluids are identified by a `Fluid` parameter instead of an `ItemKey` parameter. `FluidKey`s may be considered in the future, but they don't seem
-  very useful for now.
-* The amounts are specified in `long`s instead of `int`s.
-* All fluid operations are done in _droplets_, 1/81000ths of a bucket.
-
-### Unsided APIs
-No unsided APIs for general inventory reading, for example for HWYLA integration, are provided currently. They may be added in the future.
-
-### Item-provided APIs
+## API overview and usage
 TODO
 
 ## Why use fabric-api-lookup-api-v1
@@ -131,92 +87,32 @@ Finally, without defensive copies, it is still possible to modify `ItemStack`s d
 In spite of that, `ItemExtractable` and `ItemInsertable` are great abstractions to work with, and LBA is clearly a big improvement over the vanilla interfaces.
 
 ### Fluidity
-The author is not very familiar with Fluidity, but a few observations can be made:
-* `fabric-api-lookup-api-v1` is derived from the component and device subsystem of Fluidity.
-* Fluidity always distinguishes between a resource and its amount. `ItemStack`s are split into a count and an immutable `Article`.
-  In fact, an `Article` in Fluidity can be an item with nbt, a fluid, or even something else. Fluidity uses the same functions for handling all
-  types of `Article`s, which makes it very generic and powerful. However, it is the author's opinion that this increases the cognitive load for the user.
-* Like LBA, Fluidity has a lot of API surface, which can make it hard to understand.
-* On top of simulations, Fluidity provides a transaction system, allowing arbitrarily complex transfer operations to be simulated and reverted if necessary.
-  This allows some patterns that are simply not possible with APIs that only allow simulating one operation at the time like IItemHandler and LBA.
+FTL is very much inspired by a subset of Fluidity, but Fluidity is by no means simple to understand. As its author Grondag puts it:
+> It is much more extensive than the Fabric project would likely want to take on.
 
-A lot of other things can probably be said about Fluidity. The author hasn't studied it very closely, but he strongly recommends giving it a try if the
-reader is looking for a batteries-included generic resource management library.
+FTL is an attempt at reducing Fluidity to the bare minimum, keeping about 80% of the features with 20% of the complexity.
+Let us review how FTL differs from Fluidity:
+* Fluidity storages can accept any kind of resource (item, fluid, ...) because all of that is abstracted in an `Article`.
+  This introduces `ArticleType` to handle serialization of the various resources,
+  and forces storages to check the article type.
+  It also introduces the need for an equivalent of a `boolean canInsert(ArticleType type)` function.
+  
+  In practice however, most storages would only accept some kind of resource anyway, so FTL uses a generic `T` parameter instead.
+  In FTL, a `Storage<Fluid>` and a `Storage<ItemKey>` would be used for fluids and items respectively,
+  but this genericity is solely there to prevent code duplication. Separate access methods must be used for fluid and item storages.
+  This removes the need for `Article`, `ArticleType`, `ArticleTypeRegistry`, and a lot of other functions.
+  FTL however introduces `ItemKey` for item management, which can be thought of as a specialization of `Article` for items.
+* Fluidity has a change notification system for its storages, and with this change notification system comes the need to keep track of virtual slots,
+  called handles in fluidity. This introduces a lot of complexity.
+  FTL simply has a versioning system, which is obviously not as powerful or efficient as proper change notification,
+  but removes the need for anything related to listeners, event streams, registration, unregistration, handle change events, and handles.
+* Explicit simulation was removed in FTL, because it should be possible to achieve the same with an optimized transaction implementation.
 
-## Item API design
-### ItemKey
-`ItemKey`s solve the problem of `ItemStack` mutation and allocation. Not only do they prevent users from modifying stacks through a read-only view,
-but they also ensure that we don't have to worry about which stacks are safe or not safe to pass to insert/extract functions.
+With these changes, FTL is able to have only 3 core transfer api classes: `Storage<T>`, `StorageView<T>` and `StorageFunction<T>`.
+The complexity comes from the base implementations, the `Inventory` compat wrapper, and the `Participant` and `Transaction` system,
+which are unavoidable anyway.
 
-### The API
-This is the entire item api:
-```java
-public interface ItemIo { // item inventory
-	int getItemSlotCount(); // number of slots
-	ItemKey getItemKey(int slot); // ItemKey in slot
-	int getItemCount(int slot); // count in slot
-	default int getVersion() { /* ... */ } // inventory version, must change if the inventory changes
-	// INSERTION FUNCTIONS
-	default boolean supportsItemInsertion() { return false; } // false if insert always rejects
-	default int insert(ItemKey key, int count, Simulation simulation) { /* does nothing */ } // insert, and return leftover
-	// EXTRACTION FUNCTIONS
-	default boolean supportsItemExtraction() { return false; } // false if extract always rejects
-	default int extract(int slot, ItemKey key, int maxCount, Simulation simulation) { return 0; } // extract
-	default int extract(ItemKey key, int maxCount, Simulation simulation) { /* ... */ } // slotless variant, with default impl
-}
-```
-
-### `ItemIo`
-The first three functions of `ItemIo` are as straightforward as one can get, they allow reading the content of an inventory,
-but without the same restriction as a vanilla `Inventory` regarding the slots. In particular, there is no max stack size, and
-the slots in the inventory need not match physical slots. A barrel would have a single slot, and a large chest would be free
-to merge stacks with the same content if it wants. Note also that it is not possible to modify the inventory in any way.
-
-The `getVersion` is an optional function provided by the API. The _version_ of an inventory **must** change when the inventory
-changes, but the value may also change even if the inventory itself hasn't changed. The idea is that pipes that maintain a cache
-of the contents of an inventory can skip rescanning an inventory whose version hasn't changed. This is very important for AE2,
-which must rescan all the Storage Busses every time an item enters or exits the network as it may have been moved to another storage bus.
-This feature is trivial to support for most implementations, yet it can make a huge performance difference for large bases.
-
-### Insertion functions
-A few important points regarding these two functions:
-* It is optional, which means it's trivial to tell if an inventory supports insertion or not. This is very useful for pipe connections.
-* It's very easy to implement: just two functions!
-* It leaves distribution entirely to the implementor.
-* The implementor can easily optimize the insertion if they want to.
-
-### Extraction functions
-* Again, it's optional.
-* For most simple inventories, the slot-based function is enough.
-* Inventories are able to optimize extraction through the slotless function if the `ItemKey` to be extracted is known in advance.
-
-But why have a slot-based function when the slotless function gives more freedom to the implementor? The point is that if you are
-iterating a big inventory using `getItemSlotCount` and `getItemKey` to find out which items can be extracted, you know in which
-slot the item is already, so you can prevent a lot of work by telling the `ItemExtractable` where to extract from.
-
-### Final words
-The API provides a few functions to move items between two `ItemIo`'s because it is a frequent operation, and it
-can be a bit tricky to get right. The API also provides (or will provide) implementations for simple inventories that could be used
-for chests and similar "simple" containers.
-
-Overall, the author feels that this API hits a sweet spot between flexibility and performance, solving most issues with vanilla `(Sided)Inventory`,
-`IItemHandler` and LBA while keeping the API surface minimal.
-
-## Fluid API design
-The design of the fluid api is almost identical to that of the item api, with a few differences.
-
-It uses `Fluid` instances instead of `FluidKey` because fluids look sufficient for now.
-If for some reason you need `FluidKey`s, please open an issue so it can be discussed. For now, the author hasn't found a convincing use case for it.
-
-Items are discrete: most players don't expect their diamond to be splittable into two "half-diamonds". Players however expect fluids to be transferable
-in small amounts. Forge has been using millibuckets for the smallest amount of fluid that can be transferred, and just uses integers to store the number
-of millibuckets. Millibuckets have the advantage of being very easy to read for the player, but a bucket (1000 units) can't be divided into bottles, ingots or nuggets.
-To solve this, FTL uses droplets (1/81000 of a bucket). Buckets can be divided into bottles, ingots or nuggets with no issues, and the fluid amounts
-can still be displayed in a player-friendly fashion as `x + y/81 mb`, or just `x mb` if the amount is a multiple of `81`. FTL includes helpers for displaying
-that as unicode.
-
-The fluid API uses `long`s instead of `int`s because `int`s could be too small when transferring large amounts of buckets, although this probably
-wouldn't matter for most mods anyway.
+Note also that `fabric-api-lookup-api-v1` is derived from the component and device subsystem of Fluidity.
 
 ## License
 This library is available under the CC0 license. Feel free to learn from it and incorporate it in your own projects.

@@ -30,23 +30,19 @@ public class SimpleFluidStorage implements Storage<Fluid>, FixedDenominatorStora
 			}
 
 			@Override
-			public long applyFixedDenominator(Fluid resource, long numerator) {
+			public long applyFixedDenominator(Fluid resource, long numerator, Transaction tx) {
 				FluidPreconditions.notEmpty(resource);
 
 				if (fluid == Fluids.EMPTY) {
 					long inserted = Math.min(capacity, numerator);
-
-					Transaction.wrapModification(SimpleFluidStorage.this, () -> {
-						fluid = resource;
-						amount = inserted;
-					});
-
+					tx.enlist(SimpleFluidStorage.this);
+					fluid = resource;
+					amount = inserted;
 					return inserted;
 				} else if (fluid == resource) {
 					long inserted = Math.min(capacity - amount, numerator);
-
-					Transaction.wrapModification(SimpleFluidStorage.this, () -> amount += inserted);
-
+					tx.enlist(SimpleFluidStorage.this);
+					amount += inserted;
 					return inserted;
 				}
 
@@ -60,17 +56,14 @@ public class SimpleFluidStorage implements Storage<Fluid>, FixedDenominatorStora
 			}
 
 			@Override
-			public long applyFixedDenominator(Fluid resource, long numerator) {
+			public long applyFixedDenominator(Fluid resource, long numerator, Transaction tx) {
 				FluidPreconditions.notEmpty(resource);
 
 				if (fluid != Fluids.EMPTY) {
 					long extracted = Math.min(amount, numerator);
-
-					Transaction.wrapModification(SimpleFluidStorage.this, () -> {
-						amount -= extracted;
-						if (amount == 0) fluid = Fluids.EMPTY;
-					});
-
+					tx.enlist(SimpleFluidStorage.this);
+					amount -= extracted;
+					if (amount == 0) fluid = Fluids.EMPTY;
 					return extracted;
 				}
 
