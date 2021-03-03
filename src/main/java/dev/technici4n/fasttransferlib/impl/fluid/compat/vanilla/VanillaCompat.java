@@ -26,7 +26,7 @@ public class VanillaCompat {
 	}
 
 	static {
-		FluidApi.SIDED.registerForBlocks((world, pos, state, direction) -> new CauldronWrapper(world, pos),
+		FluidApi.SIDED.registerForBlocks((world, pos, state, be, direction) -> new CauldronWrapper(world, pos),
 				Blocks.CAULDRON);
 		FluidApi.ITEM.register(BottleCompat::of, Items.POTION, Items.GLASS_BOTTLE);
 		FluidApi.ITEM.registerFallback((itemKey, context) -> {

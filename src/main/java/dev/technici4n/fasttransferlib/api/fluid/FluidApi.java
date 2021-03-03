@@ -15,11 +15,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
-import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookupRegistry;
 
 public class FluidApi {
 	public static final BlockApiLookup<FluidIo, @NotNull Direction> SIDED =
-			BlockApiLookupRegistry.getLookup(new Identifier("fasttransferlib:sided_fluid_io"), FluidIo.class, Direction.class);
+			BlockApiLookup.get(new Identifier("fasttransferlib:sided_fluid_io"), FluidIo.class, Direction.class);
 	public static final ItemKeyApiLookup<FluidIo, ContainerItemContext> ITEM =
 			ItemKeyApiLookupRegistry.getLookup(new Identifier("fasttransferlib:fluid_io"), FluidIo.class, ContainerItemContext.class);
 

@@ -35,7 +35,7 @@ public class SimpleTankBlock extends Block implements BlockEntityProvider {
 	@Override
 	public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
 		if (world.isClient) return ActionResult.CONSUME;
-		FluidIo view = FluidApi.SIDED.get(world, pos, hit.getSide());
+		FluidIo view = FluidApi.SIDED.find(world, pos, hit.getSide());
 		FluidIo itemView = FluidApi.ITEM.get(ItemKey.of(player.getStackInHand(hand)), ContainerItemContext.ofPlayerHand(player, hand));
 
 		if (view != null && view.getFluidSlotCount() >= 1 && itemView != null) {

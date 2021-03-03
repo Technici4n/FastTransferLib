@@ -32,13 +32,13 @@ public class VanillaCompat {
 				BlockEntityType.DISPENSER, BlockEntityType.DROPPER, BlockEntityType.FURNACE, BlockEntityType.BLAST_FURNACE,
 				BlockEntityType.SMOKER, BlockEntityType.BARREL, BlockEntityType.BREWING_STAND, BlockEntityType.HOPPER,
 				BlockEntityType.SHULKER_BOX);
-		ItemApi.SIDED.registerForBlocks((world, pos, state, direction) -> {
+		ItemApi.SIDED.registerForBlocks((world, pos, state, be, direction) -> {
 			Inventory inv = ChestBlock.getInventory((ChestBlock) state.getBlock(), state, world, pos, true);
 			return inv == null ? null : new InventorySidedView(inv, direction);
 		}, Blocks.CHEST, Blocks.TRAPPED_CHEST);
 
 		// Fallback for vanilla interfaces
-		ItemApi.SIDED.registerFallback((world, pos, state, be, direction) -> inventoryProvider.get(be, direction));
+		ItemApi.SIDED.registerFallback((world, pos, state, be, direction) -> inventoryProvider.find(be, direction));
 		ItemApi.SIDED.registerFallback((world, pos, state, be, direction) -> {
 			if (state.getBlock() instanceof InventoryProvider) {
 				Inventory inv = ((InventoryProvider) state.getBlock()).getInventory(state, world, pos);

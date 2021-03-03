@@ -24,7 +24,7 @@ public class YeetStick extends Item {
 
 	@Override
 	public ActionResult useOnBlock(ItemUsageContext context) {
-		FluidIo fluidIo = FluidApi.SIDED.get(context.getWorld(), context.getBlockPos(), context.getSide());
+		FluidIo fluidIo = FluidApi.SIDED.find(context.getWorld(), context.getBlockPos(), context.getSide());
 
 		if (fluidIo != null && !context.getWorld().isClient) {
 			if (fluidIo.getFluidSlotCount() > 0 && fluidIo.getFluid(0) != Fluids.EMPTY) {
@@ -40,7 +40,7 @@ public class YeetStick extends Item {
 			}
 		}
 
-		ItemIo itemIo = ItemApi.SIDED.get(context.getWorld(), context.getBlockPos(), context.getSide());
+		ItemIo itemIo = ItemApi.SIDED.find(context.getWorld(), context.getBlockPos(), context.getSide());
 
 		if (itemIo != null && !context.getWorld().isClient) {
 			if (itemIo.getItemSlotCount() > 0 && !itemIo.getItemKey(0).isEmpty()) {

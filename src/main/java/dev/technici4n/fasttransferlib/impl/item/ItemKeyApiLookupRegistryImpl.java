@@ -4,7 +4,7 @@ import dev.technici4n.fasttransferlib.api.item.ItemKeyApiLookup;
 
 import net.minecraft.util.Identifier;
 
-import net.fabricmc.fabric.api.lookup.v1.ApiLookupMap;
+import net.fabricmc.fabric.api.lookup.v1.custom.ApiLookupMap;
 
 public final class ItemKeyApiLookupRegistryImpl {
 	private static final ApiLookupMap<ItemKeyApiLookupImpl<?, ?>> PROVIDERS = ApiLookupMap.create(ItemKeyApiLookupImpl::new);

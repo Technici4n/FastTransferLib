@@ -43,7 +43,7 @@ public class LbaCompat {
 	private static @Nullable FluidIo getIo(World world, BlockPos pos, Direction direction) {
 		if (inCompat) return null;
 		inCompat = true;
-		@Nullable FluidIo view = FluidApi.SIDED.get(world, pos, direction);
+		@Nullable FluidIo view = FluidApi.SIDED.find(world, pos, direction);
 		inCompat = false;
 		return view;
 	}

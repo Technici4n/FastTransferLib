@@ -14,32 +14,36 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.util.registry.Registry;
 
-import net.fabricmc.fabric.api.lookup.v1.ApiProviderMap;
+import net.fabricmc.fabric.api.lookup.v1.custom.ApiProviderMap;
 
-public class ItemKeyApiLookupImpl<T, C> implements ItemKeyApiLookup<T, C> {
+public class ItemKeyApiLookupImpl<A, C> implements ItemKeyApiLookup<A, C> {
 	private static final Logger LOGGER = LogManager.getLogger();
-	private final ApiProviderMap<Item, ItemKeyApiProvider<T, C>> providerMap = ApiProviderMap.create();
-	private final List<ItemKeyApiProvider<T, C>> fallbackProviders = new CopyOnWriteArrayList<>();
+	private final ApiProviderMap<Item, ItemKeyApiProvider<A, C>> providerMap = ApiProviderMap.create();
+	private final List<ItemKeyApiProvider<A, C>> fallbackProviders = new CopyOnWriteArrayList<>();
+
+	@SuppressWarnings("unused")
+	public ItemKeyApiLookupImpl(Class<?> apiClass, Class<?> contextClass) {
+	}
 
 	@Nullable
 	@Override
-	public T get(ItemKey itemKey, C context) {
+	public A get(ItemKey itemKey, C context) {
 		Objects.requireNonNull(itemKey, "ItemKey cannot be null");
 		// Providers have the final say whether a null context is allowed.
 
 		@Nullable
-		final ItemKeyApiProvider<T, C> provider = providerMap.get(itemKey.getItem());
+		final ItemKeyApiProvider<A, C> provider = providerMap.get(itemKey.getItem());
 
 		if (provider != null) {
-			T instance = provider.get(itemKey, context);
+			A instance = provider.get(itemKey, context);
 
 			if (instance != null) {
 				return instance;
 			}
 		}
 
-		for (ItemKeyApiProvider<T, C> fallbackProvider : fallbackProviders) {
-			T instance = fallbackProvider.get(itemKey, context);
+		for (ItemKeyApiProvider<A, C> fallbackProvider : fallbackProviders) {
+			A instance = fallbackProvider.get(itemKey, context);
 
 			if (instance != null) {
 				return instance;
@@ -50,7 +54,7 @@ public class ItemKeyApiLookupImpl<T, C> implements ItemKeyApiLookup<T, C> {
 	}
 
 	@Override
-	public void register(ItemKeyApiProvider<T, C> provider, ItemConvertible... items) {
+	public void register(ItemKeyApiProvider<A, C> provider, ItemConvertible... items) {
 		Objects.requireNonNull(provider, "ItemApiProvider cannot be null");
 
 		for (ItemConvertible item : items) {
@@ -64,7 +68,7 @@ public class ItemKeyApiLookupImpl<T, C> implements ItemKeyApiLookup<T, C> {
 	}
 
 	@Override
-	public void registerFallback(ItemKeyApiProvider<T, C> provider) {
+	public void registerFallback(ItemKeyApiProvider<A, C> provider) {
 		Objects.requireNonNull(provider, "ItemApiProvider cannot be null");
 
 		fallbackProviders.add(provider);

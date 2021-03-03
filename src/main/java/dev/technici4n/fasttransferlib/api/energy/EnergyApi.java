@@ -14,11 +14,10 @@ import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
 
 import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
-import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookupRegistry;
 
 public class EnergyApi {
 	public static final BlockApiLookup<EnergyIo, @NotNull Direction> SIDED =
-			BlockApiLookupRegistry.getLookup(new Identifier("fasttransferlib:sided_energy_io"), EnergyIo.class, Direction.class);
+			BlockApiLookup.get(new Identifier("fasttransferlib:sided_energy_io"), EnergyIo.class, Direction.class);
 	public static final ItemKeyApiLookup<EnergyIo, ContainerItemContext> ITEM =
 			ItemKeyApiLookupRegistry.getLookup(new Identifier("fasttransferlib:energy_io"), EnergyIo.class, ContainerItemContext.class);
 

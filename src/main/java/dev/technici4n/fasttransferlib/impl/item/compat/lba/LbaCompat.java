@@ -43,7 +43,7 @@ public class LbaCompat {
 	private static @Nullable ItemIo getIo(World world, BlockPos pos, Direction direction) {
 		if (inCompat) return null;
 		inCompat = true;
-		@Nullable ItemIo view = ItemApi.SIDED.get(world, pos, direction);
+		@Nullable ItemIo view = ItemApi.SIDED.find(world, pos, direction);
 		inCompat = false;
 		return view;
 	}
