@@ -15,13 +15,6 @@ group = project.maven_group
 
 repositories {
     maven {
-        name = "Technici4n"
-        url = "https://raw.githubusercontent.com/Technici4n/Technici4n-maven/master/"
-        content {
-            includeGroup "net.fabricmc.fabric-api"
-        }
-    }
-    maven {
         name = "BuildCraft"
         url = "https://mod-buildcraft.com/maven"
         content {
@@ -43,10 +36,9 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
+    modApi "net.fabricmc.fabric-api:fabric-api-lookup-api-v1:${project.api_lookup_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
-    modApi "net.fabricmc.fabric-api:fabric-api-lookup-api-v1:${project.api_lookup_version}"
-    include "net.fabricmc.fabric-api:fabric-api-lookup-api-v1:${project.api_lookup_version}"
     modCompileOnly "alexiil.mc.lib:libblockattributes-all:${project.lba_version}"
     modImplementation "teamreborn:energy:${project.tr_energy_version}"
     include "teamreborn:energy:${project.tr_energy_version}"
