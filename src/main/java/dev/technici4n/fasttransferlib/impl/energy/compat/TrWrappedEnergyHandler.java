@@ -26,7 +26,7 @@ public class TrWrappedEnergyHandler implements EnergyIo {
 
 	@Override
 	public boolean supportsInsertion() {
-		return handler.getMaxInput() > 1e-9;
+		return true; // sadly we can't do better :-(
 	}
 
 	@Override
@@ -39,7 +39,7 @@ public class TrWrappedEnergyHandler implements EnergyIo {
 
 	@Override
 	public boolean supportsExtraction() {
-		return handler.getMaxOutput() > 1e-9;
+		return true; // sadly we can't do better :-(
 	}
 
 	@Override
