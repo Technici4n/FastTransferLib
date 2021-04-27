@@ -1,6 +1,8 @@
 # Fast Transfer Lib
-A fast item, fluid and energy api for the Fabric ecosystem, based on
+A fast ~~item, fluid and~~ energy api for the Fabric ecosystem, based on
 [fabric-api-lookup-api-v1](https://github.com/FabricMC/fabric/pull/1234).
+
+**UPDATE: the item/fluid API is not supported, it is superseded by my Fabric API PRs.** The energy API is however stable and used by actual mods such as Industrial Revolution and Wireless Networks.
 
 ## Goals of the project
 * The major goal of the project is trying to design a simple yet very efficient design for an item and fluid transfer api for potential inclusion in Fabric API in the future.
@@ -19,7 +21,6 @@ repositories {
         name = "Technici4n"
         url = "https://raw.githubusercontent.com/Technici4n/Technici4n-maven/master/"
         content {
-            includeGroup "net.fabricmc.fabric-api" // until fabric-api-lookup-api-v1 is merged
             includeGroup "dev.technici4n"
         }
     }
