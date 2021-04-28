@@ -1,6 +1,7 @@
 package dev.technici4n.fasttransferlib.api.energy;
 
 import dev.technici4n.fasttransferlib.impl.energy.EnergyImpl;
+import dev.technici4n.fasttransferlib.impl.energy.compat.ftl_from_tr.EmptyEnergyIo;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -17,6 +18,7 @@ public class EnergyApi {
 			BlockApiLookup.get(new Identifier("fasttransferlib:sided_energy_io"), EnergyIo.class, Direction.class);
 	public static final ItemApiLookup<EnergyIo, Void> ITEM =
 			ItemApiLookup.get(new Identifier("fasttransferlib:energy_io"), EnergyIo.class, Void.class);
+	public static final EnergyIo EMPTY = new EmptyEnergyIo();
 
 	public static @Nullable EnergyIo ofPlayerHand(PlayerEntity player, Hand hand) {
 		return ITEM.find(player.getStackInHand(hand), null);

@@ -1,12 +1,9 @@
 # Fast Transfer Lib
-A clean, simple and fast energy api for the Fabric ecosystem, compatible one-way with Tech Reborn Energy.*
+A clean, simple and fast energy api for the Fabric ecosystem, with **bidirectional** compatibility with Tech Reborn Energy.
 Currently used by Industrial Revolution and Wireless Networks, with support from other mods as well.
  
 FTL is based on the [Fabric API Lookup module](https://github.com/FabricMC/fabric/tree/1.16/fabric-api-lookup-api-v1),
 with an experimental extension for item API support, currently [an open Fabric API PR](https://github.com/FabricMC/fabric/pull/1352).
-
-\* Compatible one-way means that users of FTL can interact with blocks and items using TR Energy, but TR cables won't work with FTL machines.
-This restriction may be lifted in the future.
 
 ## Installation
 ```groovy

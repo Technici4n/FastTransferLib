@@ -6,6 +6,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 
 import dev.technici4n.fasttransferlib.api.energy.EnergyApi;
+import dev.technici4n.fasttransferlib.impl.energy.compat.ftl_from_tr.FtlFromTrEnergyCompat;
 import dev.technici4n.fasttransferlib.impl.mixin.EnergyAccess;
 import org.jetbrains.annotations.Nullable;
 import team.reborn.energy.EnergyHandler;
@@ -20,10 +21,17 @@ public class TrEnergyCompat {
 	private static EnergyHandler getHandlerFast(Object object) {
 		if (object == null) return null;
 
-		for (Map.Entry<Predicate<Object>, Function<Object, EnergyStorage>> holder : EnergyAccess.getHolders().entrySet()) {
-			if (holder.getKey().test(object)) {
-				return createEnergyHandler(holder.getValue().apply(object));
+		if (IN_COMPAT.get() != IN_COMPAT_TRUE) {
+			IN_COMPAT.set(IN_COMPAT_TRUE);
+
+			for (Map.Entry<Predicate<Object>, Function<Object, EnergyStorage>> holder : EnergyAccess.getHolders().entrySet()) {
+				if (holder.getKey().test(object)) {
+					IN_COMPAT.remove();
+					return createEnergyHandler(holder.getValue().apply(object));
+				}
 			}
+
+			IN_COMPAT.remove();
 		}
 
 		return null;
@@ -38,6 +46,9 @@ public class TrEnergyCompat {
 			throw new RuntimeException("Failed to create EnergyHandler in FTL compat", e);
 		}
 	}
+
+	public static final Object IN_COMPAT_TRUE = new Object();
+	public static final ThreadLocal<Object> IN_COMPAT = new ThreadLocal<>();
 
 	static {
 		// Block compat
@@ -63,6 +74,9 @@ public class TrEnergyCompat {
 
 			return null;
 		});
+
+		// Cursed FTL from TR compat
+		FtlFromTrEnergyCompat.init();
 
 		try {
 			handlerConstructor = EnergyHandler.class.getDeclaredConstructor(EnergyStorage.class);
