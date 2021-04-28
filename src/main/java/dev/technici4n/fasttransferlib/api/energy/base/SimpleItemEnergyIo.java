@@ -1,12 +1,12 @@
 package dev.technici4n.fasttransferlib.api.energy.base;
 
-import dev.technici4n.fasttransferlib.api.ContainerItemContext;
+import com.google.common.base.Preconditions;
 import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.api.energy.EnergyIo;
-import dev.technici4n.fasttransferlib.api.item.ItemKey;
-import dev.technici4n.fasttransferlib.api.item.ItemKeyApiLookup;
 
-import net.minecraft.nbt.CompoundTag;
+import net.minecraft.item.ItemStack;
+
+import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 
 /**
  * An energy io for an item. Energy is stored in the "energy" key of the tag if there is some, or it's 0 if there is no tag.
@@ -17,26 +17,29 @@ public class SimpleItemEnergyIo implements EnergyIo {
 	private final double capacity;
 	private final double maxInsertion;
 	private final double maxExtraction;
-	private final double energy;
-	private final ItemKey key;
-	private final ContainerItemContext ctx;
+	private final ItemStack stack;
 
-	public static ItemKeyApiLookup.ItemKeyApiProvider<EnergyIo, ContainerItemContext> getProvider(double capacity, double maxInsertion, double maxExtraction) {
-		return (key, ctx) -> new SimpleItemEnergyIo(capacity, maxInsertion, maxExtraction, key, ctx);
+	public static ItemApiLookup.ItemApiProvider<EnergyIo, Void> getProvider(double capacity, double maxInsertion, double maxExtraction) {
+		return (stack, void_) -> new SimpleItemEnergyIo(capacity, maxInsertion, maxExtraction, stack);
 	}
 
-	private SimpleItemEnergyIo(double capacity, double maxInsertion, double maxExtraction, ItemKey key, ContainerItemContext ctx) {
+	private SimpleItemEnergyIo(double capacity, double maxInsertion, double maxExtraction, ItemStack stack) {
+		Preconditions.checkArgument(stack.getCount() >= 1, "Stack must have a count of at least 1");
+
 		this.capacity = capacity;
 		this.maxInsertion = simplify(maxInsertion);
 		this.maxExtraction = simplify(maxExtraction);
-		this.energy = Math.min(key.hasTag() ? simplify(key.copyTag().getDouble("energy")) : 0, capacity);
-		this.key = key;
-		this.ctx = ctx;
+		this.stack = stack;
 	}
 
+	@SuppressWarnings("ConstantConditions")
 	@Override
 	public double getEnergy() {
-		return energy;
+		if (stack.hasTag()) {
+			return simplify(stack.getTag().getDouble("energy") * stack.getCount());
+		} else {
+			return 0;
+		}
 	}
 
 	@Override
@@ -51,10 +54,9 @@ public class SimpleItemEnergyIo implements EnergyIo {
 
 	@Override
 	public double insert(double amount, Simulation simulation) {
-		if (ctx.getCount() <= 0) return amount;
-		double inserted = Math.min(Math.min(amount, maxInsertion), capacity - energy);
-		double newAmount = simplify(energy + inserted / ctx.getCount());
-		return changeStoredEnergy(newAmount, simulation) ? simplify(amount - inserted) : amount;
+		double inserted = Math.min(Math.min(amount, maxInsertion), capacity - getEnergy());
+		incrementEnergy(inserted, simulation);
+		return simplify(amount - inserted);
 	}
 
 	@Override
@@ -64,33 +66,21 @@ public class SimpleItemEnergyIo implements EnergyIo {
 
 	@Override
 	public double extract(double maxAmount, Simulation simulation) {
-		if (ctx.getCount() <= 0) return 0;
-		double extracted = Math.min(Math.min(maxAmount, maxExtraction), energy);
-		double newAmount = simplify(energy - extracted / ctx.getCount());
-		return changeStoredEnergy(newAmount, simulation) ? simplify(extracted) : 0;
+		double extracted = Math.min(Math.min(maxAmount, maxExtraction), getEnergy());
+		incrementEnergy(-extracted, simulation);
+		return simplify(extracted);
 	}
 
-	private boolean changeStoredEnergy(double energy, Simulation simulation) {
-		CompoundTag tag = key.copyTag();
+	private void incrementEnergy(double increment, Simulation simulation) {
+		double newEnergy = (getEnergy() + increment) / stack.getCount();
 
-		if (energy < 1e-9) {
-			if (tag != null) {
-				tag.remove("energy");
-
-				if (tag.isEmpty()) {
-					tag = null;
-				}
+		if (simulation.isActing()) {
+			if (newEnergy < 1e-9) {
+				stack.removeSubTag("energy");
+			} else {
+				stack.getOrCreateTag().putDouble("energy", newEnergy);
 			}
-		} else {
-			if (tag == null) {
-				tag = new CompoundTag();
-			}
-
-			tag.putDouble("energy", energy);
 		}
-
-		ItemKey targetKey = ItemKey.of(key.getItem(), tag);
-		return ctx.transform(ctx.getCount(), targetKey, simulation);
 	}
 
 	private static double simplify(double energy) {

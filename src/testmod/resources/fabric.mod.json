@@ -15,7 +15,6 @@
   "license": "CC0-1.0",
   "entrypoints": {
     "main": [
-      "dev.technic4n.fasttransferlib.example.fluid.FluidExample"
     ]
   },
   "environment": "*",

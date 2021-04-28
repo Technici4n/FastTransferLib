@@ -3,6 +3,7 @@ package dev.technici4n.fasttransferlib.impl.energy.compat;
 import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.api.energy.EnergyIo;
 import dev.technici4n.fasttransferlib.impl.mixin.EnergyHandlerAccess;
+import org.jetbrains.annotations.Nullable;
 import team.reborn.energy.EnergyHandler;
 
 import net.minecraft.util.math.Direction;
@@ -10,7 +11,7 @@ import net.minecraft.util.math.Direction;
 public class TrWrappedEnergyHandler implements EnergyIo {
 	private final EnergyHandler handler;
 
-	public TrWrappedEnergyHandler(EnergyHandler handler, Direction direction) {
+	public TrWrappedEnergyHandler(EnergyHandler handler, @Nullable Direction direction) {
 		this.handler = handler.side(direction);
 	}
 

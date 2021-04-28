@@ -40,12 +40,25 @@ public class TrEnergyCompat {
 	}
 
 	static {
+		// Block compat
 		EnergyApi.SIDED.registerFallback((world, pos, state, blockEntity, direction) -> {
 			@Nullable
 			EnergyHandler handler = getHandlerFast(blockEntity);
 
 			if (handler != null) {
 				return new TrWrappedEnergyHandler(handler, direction);
+			}
+
+			return null;
+		});
+
+		// Item compat
+		EnergyApi.ITEM.registerFallback((itemStack, void_) -> {
+			@Nullable
+			EnergyHandler handler = getHandlerFast(itemStack);
+
+			if (handler != null) {
+				return new TrWrappedEnergyHandler(handler, null);
 			}
 
 			return null;

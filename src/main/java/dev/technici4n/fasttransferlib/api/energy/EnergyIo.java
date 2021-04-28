@@ -23,7 +23,7 @@ public interface EnergyIo {
 	 * and insert-only cables should not connect.
 	 */
 	default boolean supportsInsertion() {
-		return false;
+		return true;
 	}
 
 	/**
@@ -44,7 +44,7 @@ public interface EnergyIo {
 	 * and extract-only cables should not connect.
 	 */
 	default boolean supportsExtraction() {
-		return false;
+		return true;
 	}
 
 	/**
