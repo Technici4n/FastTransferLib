@@ -9,7 +9,7 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import team.reborn.energy.Energy;
 import team.reborn.energy.EnergyStorage;
 
-@Mixin(Energy.class)
+@Mixin(value = Energy.class, remap = false)
 public interface EnergyAccess {
 	@Accessor("holderRegistry")
 	static HashMap<Predicate<Object>, Function<Object, EnergyStorage>> getHolders() {

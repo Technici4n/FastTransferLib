@@ -43,6 +43,7 @@ public class FtlFromTrEnergyCompat {
 						@Override
 						public EnergyIo getIo(EnergySide side) {
 							int ordinal = side.ordinal();
+
 							if (ordinal < 6 && ioArray[ordinal] != null) {
 								return ioArray[ordinal];
 							} else {

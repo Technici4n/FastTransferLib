@@ -1,6 +1,7 @@
 package dev.technici4n.fasttransferlib.impl.mixin;
 
-import static dev.technici4n.fasttransferlib.api.Simulation.*;
+import static dev.technici4n.fasttransferlib.api.Simulation.ACT;
+import static dev.technici4n.fasttransferlib.api.Simulation.SIMULATE;
 
 import dev.technici4n.fasttransferlib.api.energy.EnergyIo;
 import dev.technici4n.fasttransferlib.impl.energy.compat.ftl_from_tr.EnergyIoWrapper;
@@ -14,7 +15,7 @@ import team.reborn.energy.EnergyHandler;
 import team.reborn.energy.EnergySide;
 import team.reborn.energy.EnergyStorage;
 
-@Mixin(EnergyHandler.class)
+@Mixin(value = EnergyHandler.class, remap = false)
 public abstract class EnergyHandlerMixin {
 	@Shadow
 	private EnergyStorage holder;
