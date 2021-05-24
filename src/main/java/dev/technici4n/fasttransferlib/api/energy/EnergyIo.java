@@ -48,7 +48,7 @@ public interface EnergyIo {
 	}
 
 	/**
-	 * Extract energy from this inventory, and return the amount of leftover energy.
+	 * Extract energy from this inventory, and return the amount of energy that was extracted.
 	 *
 	 * <p>If simulation is {@link Simulation#SIMULATE}, the result of the operation must be returned, but the underlying state of the object must not change.
 	 *
