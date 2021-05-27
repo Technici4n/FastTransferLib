@@ -42,10 +42,21 @@ public abstract class EnergyHandlerMixin {
 		}
 	}
 
-	@Inject(at = @At("HEAD"), method = "set")
+	@Inject(at = @At("HEAD"), method = "set", cancellable = true)
 	public void hookSet(double amount, CallbackInfo ci) {
 		if (holder instanceof EnergyIoWrapper) {
-			throw new UnsupportedOperationException();
+			// Ok let's try to be smart here.
+			EnergyIoWrapper wrapper = (EnergyIoWrapper) holder;
+			EnergyIo io = wrapper.getIo(side);
+			double ioEnergy = io.getEnergy();
+
+			if (ioEnergy > amount) {
+				io.extract(ioEnergy - amount, ACT);
+			} else {
+				io.insert(amount - ioEnergy, ACT);
+			}
+
+			ci.cancel();
 		}
 	}
 
