@@ -6,6 +6,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.Hand;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Direction;
@@ -24,8 +25,8 @@ public class EnergyApi {
 		return ITEM.find(player.getStackInHand(hand), null);
 	}
 
-	public static @Nullable EnergyIo ofPlayerCursor(PlayerEntity player) {
-		return ITEM.find(player.inventory.getCursorStack(), null);
+	public static @Nullable EnergyIo ofPlayerCursor(ScreenHandler screenHandler) {
+		return ITEM.find(screenHandler.getCursorStack(), null);
 	}
 
 	static {
