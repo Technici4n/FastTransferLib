@@ -17,9 +17,13 @@
   "mixins": [
     "fasttransferlib.mixins.json"
   ],
-
+  "entrypoints": {
+    "main": [
+      "dev.technici4n.fasttransferlib.experimental.impl.FtlExperimental"
+    ]
+  },
   "depends": {
     "fabricloader": ">=0.7.4",
-    "fabric-api-lookup-api-v1": ">=1.1.0"
+    "fabric": ">=0.35"
   }
 }
