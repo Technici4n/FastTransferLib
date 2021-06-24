@@ -16,8 +16,8 @@ import net.minecraft.item.ItemStack;
 
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidKey;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidPreconditions;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.InsertionOnlyStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
@@ -58,7 +58,7 @@ public class EmptyItemsRegistry {
 
 			@Override
 			public long insert(FluidKey fluid, long maxAmount, Transaction transaction) {
-				FluidPreconditions.notEmptyNotNegative(fluid, maxAmount);
+				StoragePreconditions.notEmptyNotNegative(fluid, maxAmount);
 
 				if (ctx.getCount(transaction) == 0) return 0;
 				FillInfo fillInfo = acceptedFluids.get(fluid);

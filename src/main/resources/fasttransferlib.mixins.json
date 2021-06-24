@@ -8,6 +8,8 @@
     "EnergyAccess",
     "EnergyHandlerAccess",
     "EnergyHandlerMixin",
+    "HopperBlockEntityAccessor",
+    "HopperBlockEntityMixin",
     "ItemMixin"
    ],
   "injectors": {

@@ -7,7 +7,7 @@ import dev.technici4n.fasttransferlib.experimental.api.context.ContainerItemCont
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
 
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidKey;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidPreconditions;
+import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ExtractionOnlyStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleViewIterator;
@@ -50,7 +50,7 @@ public class SimpleFluidContainingItem implements ExtractionOnlyStorage<FluidKey
 
 	@Override
 	public long extract(FluidKey resource, long maxAmount, Transaction transaction) {
-		FluidPreconditions.notEmptyNotNegative(resource, maxAmount);
+		StoragePreconditions.notEmptyNotNegative(resource, maxAmount);
 
 		if (maxAmount >= amount && resource == fluid && ctx.getCount(transaction) > 0) {
 			if (ctx.transform(1, keyMapping.apply(sourceKey), transaction)) {

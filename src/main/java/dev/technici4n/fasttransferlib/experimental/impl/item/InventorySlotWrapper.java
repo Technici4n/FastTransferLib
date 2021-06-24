@@ -2,11 +2,11 @@ package dev.technici4n.fasttransferlib.experimental.impl.item;
 
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemPreconditions;
-import dev.technici4n.fasttransferlib.experimental.api.storage.SingleSlotStorage;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 

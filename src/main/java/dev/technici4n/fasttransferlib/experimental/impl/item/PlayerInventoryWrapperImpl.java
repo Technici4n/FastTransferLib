@@ -6,11 +6,11 @@ import java.util.List;
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemPreconditions;
 import dev.technici4n.fasttransferlib.experimental.api.item.PlayerInventoryWrapper;
-import dev.technici4n.fasttransferlib.experimental.api.storage.SingleSlotStorage;
 
 import net.minecraft.entity.player.PlayerInventory;
 
 import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 
@@ -48,7 +48,7 @@ class PlayerInventoryWrapperImpl extends CombinedStorage<ItemKey, InventorySlotW
 	}
 
 	@Override
-	public SingleSlotStorage<ItemKey> slotWrapper(int slot) {
+	public SingleSlotStorage<ItemKey> getSlot(int slot) {
 		return parts.get(slot);
 	}
 

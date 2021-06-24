@@ -5,11 +5,11 @@ import java.util.Map;
 import com.google.common.collect.MapMaker;
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemPreconditions;
-import dev.technici4n.fasttransferlib.experimental.api.storage.SingleSlotStorage;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 

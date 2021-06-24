@@ -16,8 +16,8 @@ import net.minecraft.util.Identifier;
 
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidKey;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidPreconditions;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
 
 // TODO: delegate to static FluidApiImpl functions so that other impl classes can be package private
 public class ItemFluidStorage {
@@ -53,7 +53,7 @@ public class ItemFluidStorage {
 	 */
 	public static void registerFullItem(Item fullItem, FluidKey fluid, long amount, Function<ItemKey, ItemKey> keyMapping) {
 		ItemPreconditions.notEmpty(fullItem);
-		FluidPreconditions.notEmpty(fluid);
+		StoragePreconditions.notEmptyNotNegative(fluid, amount);
 		Preconditions.checkArgument(amount > 0);
 
 		ITEM.registerForItems((stack, ctx) -> new SimpleFluidContainingItem(ctx, ItemKey.of(stack), fluid, amount, keyMapping), fullItem);
@@ -75,8 +75,7 @@ public class ItemFluidStorage {
 	// TODO: pick parameter order, probably the same for both methods?
 	public static void registerEmptyItem(Item emptyItem, FluidKey fluid, long amount, Function<ItemKey, ItemKey> keyMapping) {
 		ItemPreconditions.notEmpty(emptyItem);
-		FluidPreconditions.notEmpty(fluid);
-		Preconditions.checkArgument(amount > 0);
+		StoragePreconditions.notEmptyNotNegative(fluid, amount);
 		Objects.requireNonNull(keyMapping);
 
 		EmptyItemsRegistry.registerEmptyItem(emptyItem, fluid, amount, keyMapping);

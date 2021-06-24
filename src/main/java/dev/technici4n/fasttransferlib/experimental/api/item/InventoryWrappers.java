@@ -2,7 +2,6 @@ package dev.technici4n.fasttransferlib.experimental.api.item;
 
 import java.util.Objects;
 
-import dev.technici4n.fasttransferlib.experimental.api.storage.SingleSlotStorage;
 import dev.technici4n.fasttransferlib.experimental.impl.item.CursorSlotWrapper;
 import dev.technici4n.fasttransferlib.experimental.impl.item.InventoryWrappersImpl;
 import org.jetbrains.annotations.Nullable;
@@ -15,6 +14,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.math.Direction;
 
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 
 /**
  * Wraps {@link Inventory} and {@link PlayerInventory} as {@link Storage}
@@ -37,7 +37,7 @@ public final class InventoryWrappers {
 	 */
 	// TODO: should we throw if we receive a PlayerInventory? (it's probably a
 	// mistake)
-	public static Storage<ItemKey> of(Inventory inventory, @Nullable Direction direction) {
+	public static InventoryWrapper of(Inventory inventory, @Nullable Direction direction) {
 		Objects.requireNonNull(inventory, "Null inventory is not supported.");
 		return InventoryWrappersImpl.of(inventory, direction);
 	}

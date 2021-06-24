@@ -37,7 +37,6 @@ dependencies {
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
     modApi include("net.fabricmc.fabric-api:fabric-transfer-api-v1:${project.transfer_api_version}")
-    modApi include("net.fabricmc.fabric-api:fabric-api-lookup-api-v1:${project.api_lookup_version}")
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     modImplementation "teamreborn:energy:${project.tr_energy_version}"

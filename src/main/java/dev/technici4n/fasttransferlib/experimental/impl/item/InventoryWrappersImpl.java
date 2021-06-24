@@ -6,6 +6,7 @@ import java.util.WeakHashMap;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+import dev.technici4n.fasttransferlib.experimental.api.item.InventoryWrapper;
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
 import org.jetbrains.annotations.Nullable;
 
@@ -14,38 +15,35 @@ import net.minecraft.inventory.Inventory;
 import net.minecraft.inventory.SidedInventory;
 import net.minecraft.util.math.Direction;
 
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 
 public class InventoryWrappersImpl {
 	// List<Storage<ItemKey>> has 7 values.
 	// The 6 first for the various directions, and the last element for a null
 	// direction.
-	private static final WeakHashMap<Inventory, List<Storage<ItemKey>>> WRAPPERS = new WeakHashMap<>();
+	private static final WeakHashMap<Inventory, List<InventoryWrapper>> WRAPPERS = new WeakHashMap<>();
 
-	public static Storage<ItemKey> of(Inventory inventory, @Nullable Direction direction) {
-		List<Storage<ItemKey>> storages = WRAPPERS.computeIfAbsent(inventory, InventoryWrappersImpl::buildWrappers);
+	public static InventoryWrapper of(Inventory inventory, @Nullable Direction direction) {
+		List<InventoryWrapper> storages = WRAPPERS.computeIfAbsent(inventory, InventoryWrappersImpl::buildWrappers);
 		return direction != null ? storages.get(direction.ordinal()) : storages.get(6);
 	}
 
-	private static List<Storage<ItemKey>> buildWrappers(Inventory inventory) {
-		List<Storage<ItemKey>> result = new ArrayList<>(7); // 6 directions + null
+	private static List<InventoryWrapper> buildWrappers(Inventory inventory) {
+		List<InventoryWrapper> result = new ArrayList<>(7); // 6 directions + null
 
 		// wrapper around the whole inventory
 		List<InventorySlotWrapper> slots = IntStream.range(0, inventory.size()).mapToObj(i -> new InventorySlotWrapper(inventory, i))
 				.collect(Collectors.toList());
-		Storage<ItemKey> fullWrapper = inventory instanceof PlayerInventory ? new PlayerInventoryWrapperImpl(slots, (PlayerInventory) inventory)
-				: new CombinedStorage<>(slots);
+		InventoryWrapper fullWrapper = inventory instanceof PlayerInventory ? new PlayerInventoryWrapperImpl(slots, (PlayerInventory) inventory)
+				: new InventoryWrapperImpl((List) slots);
 
-		if (inventory instanceof SidedInventory) {
-			// sided logic, only use the slots returned by SidedInventory#getAvailableSlots,
-			// and check canInsert/canExtract
-			SidedInventory sidedInventory = (SidedInventory) inventory;
-
+		if (inventory instanceof SidedInventory sidedInventory) {
+			// sided logic, only use the slots returned by SidedInventory#getAvailableSlots, and check canInsert/canExtract
 			for (Direction direction : Direction.values()) {
 				List<SidedInventorySlotWrapper> sideSlots = IntStream.of(sidedInventory.getAvailableSlots(direction))
-						.mapToObj(slot -> new SidedInventorySlotWrapper(slots.get(slot), sidedInventory, direction)).collect(Collectors.toList());
-				result.add(new CombinedStorage<>(sideSlots));
+						.mapToObj(slot -> new SidedInventorySlotWrapper(slots.get(slot), sidedInventory, direction)).toList();
+				result.add(new InventoryWrapperImpl((List) sideSlots));
 			}
 		} else {
 			// unsided logic, just use the same Storage 7 times
@@ -56,5 +54,16 @@ public class InventoryWrappersImpl {
 
 		result.add(fullWrapper);
 		return result;
+	}
+
+	private static class InventoryWrapperImpl extends CombinedStorage<ItemKey, SingleSlotStorage<ItemKey>> implements InventoryWrapper {
+		InventoryWrapperImpl(List<SingleSlotStorage<ItemKey>> parts) {
+			super(parts);
+		}
+
+		@Override
+		public SingleSlotStorage<ItemKey> getSlot(int index) {
+			return parts.get(index);
+		}
 	}
 }

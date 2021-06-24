@@ -5,26 +5,24 @@ import dev.technici4n.fasttransferlib.experimental.api.context.ContainerItemCont
 import dev.technici4n.fasttransferlib.experimental.api.item.InventoryWrappers;
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
 import dev.technici4n.fasttransferlib.experimental.api.item.PlayerInventoryWrapper;
-import dev.technici4n.fasttransferlib.experimental.api.storage.SingleSlotStorage;
 
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.Hand;
 
-import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
+import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 
 public class PlayerEntityContainerItemContext implements ContainerItemContext {
 	private final ItemKey boundKey;
-	private final Storage<ItemKey> slot;
+	private final SingleSlotStorage<ItemKey> slot;
 	private final PlayerInventoryWrapper wrapper;
 
 	public static ContainerItemContext ofHand(PlayerEntity player, Hand hand) {
 		PlayerInventoryWrapper wrapper = InventoryWrappers.ofPlayerInventory(player.getInventory());
 		int slot = hand == Hand.MAIN_HAND ? player.getInventory().selectedSlot : PlayerInventory.OFF_HAND_SLOT;
-		return new PlayerEntityContainerItemContext(wrapper.slotWrapper(slot), wrapper);
+		return new PlayerEntityContainerItemContext(wrapper.getSlot(slot), wrapper);
 	}
 
 	public static ContainerItemContext ofCursor(PlayerEntity player, ScreenHandler screenHandler) {
@@ -45,15 +43,7 @@ public class PlayerEntityContainerItemContext implements ContainerItemContext {
 
 	@Override
 	public long getCount(Transaction tx) {
-		long count = 0;
-
-		for (StorageView<ItemKey> view : slot.iterable(tx)) {
-			if (view.resource().equals(boundKey)) {
-				count = view.amount();
-			}
-		}
-
-		return count;
+		return slot.resource().equals(boundKey) ? slot.amount() : 0;
 	}
 
 	@Override
