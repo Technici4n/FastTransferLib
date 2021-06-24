@@ -45,7 +45,7 @@ public class HopperBlockEntityMixin {
 			method = "extract(Lnet/minecraft/world/World;Lnet/minecraft/block/entity/Hopper;)Z",
 			cancellable = true
 	)
-	public static void hookExtract(World world, Hopper hopper, CallbackInfoReturnable<Boolean> cir) {
+	private static void hookExtract(World world, Hopper hopper, CallbackInfoReturnable<Boolean> cir) {
 		BlockPos sourcePos = new BlockPos(hopper.getHopperX(), hopper.getHopperY() + 1.0D, hopper.getHopperZ());
 		BlockEntity sourceBe = world.getBlockEntity(sourcePos);
 		Storage<ItemKey> source = ItemStorage.SIDED.find(world, sourcePos, null, sourceBe, Direction.DOWN);
