@@ -72,12 +72,12 @@ public class CursorSlotWrapper extends SnapshotParticipant<ItemStack> implements
 	}
 
 	@Override
-	public ItemKey resource() {
+	public ItemKey getResource() {
 		return ItemKey.of(screenHandler.getCursorStack());
 	}
 
 	@Override
-	public long capacity() {
+	public long getCapacity() {
 		return screenHandler.getCursorStack().getMaxCount();
 	}
 
@@ -87,7 +87,7 @@ public class CursorSlotWrapper extends SnapshotParticipant<ItemStack> implements
 	}
 
 	@Override
-	public long amount() {
+	public long getAmount() {
 		return screenHandler.getCursorStack().getCount();
 	}
 

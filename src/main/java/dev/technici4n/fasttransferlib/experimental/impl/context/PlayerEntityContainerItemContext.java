@@ -31,7 +31,7 @@ public class PlayerEntityContainerItemContext implements ContainerItemContext {
 	}
 
 	private PlayerEntityContainerItemContext(SingleSlotStorage<ItemKey> slot, PlayerInventoryWrapper wrapper) {
-		this.boundKey = slot.resource();
+		this.boundKey = slot.getResource();
 		this.slot = slot;
 		this.wrapper = wrapper;
 	}
@@ -43,7 +43,7 @@ public class PlayerEntityContainerItemContext implements ContainerItemContext {
 
 	@Override
 	public long getCount(Transaction tx) {
-		return slot.resource().equals(boundKey) ? slot.amount() : 0;
+		return slot.getResource().equals(boundKey) ? slot.getAmount() : 0;
 	}
 
 	@Override

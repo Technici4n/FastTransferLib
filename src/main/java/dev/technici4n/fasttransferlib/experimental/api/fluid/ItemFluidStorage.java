@@ -36,7 +36,7 @@ public class ItemFluidStorage {
 	 * @param emptyItem The emptied item.
 	 */
 	public static void registerFullItem(Item fullItem, FluidKey fluid, long amount, Item emptyItem) {
-		registerFullItem(fullItem, fluid, amount, key -> ItemKey.of(emptyItem, key.copyTag()));
+		registerFullItem(fullItem, fluid, amount, key -> ItemKey.of(emptyItem, key.getNbt()));
 	}
 
 	/**
@@ -65,7 +65,7 @@ public class ItemFluidStorage {
 	// TODO: document params and conflicts
 	// TODO: pick parameter order, probably the same for both methods?
 	public static void registerEmptyItem(Item emptyItem, FluidKey fluid, long amount, Item fullItem) {
-		registerEmptyItem(emptyItem, fluid, amount, key -> ItemKey.of(fullItem, key.copyTag()));
+		registerEmptyItem(emptyItem, fluid, amount, key -> ItemKey.of(fullItem, key.getNbt()));
 	}
 
 	/**

@@ -39,13 +39,13 @@ public class ItemKeyImpl implements ItemKey {
 	}
 
 	@Override
-	public Item getResource() {
+	public Item getObject() {
 		return item;
 	}
 
 	@Nullable
 	@Override
-	public NbtCompound getTag() {
+	public NbtCompound getNbt() {
 		return tag;
 	}
 
@@ -111,7 +111,7 @@ public class ItemKeyImpl implements ItemKey {
 
 		ItemKeyImpl itemKey = (ItemKeyImpl) o;
 		// fail fast with hash code
-		return hashCode == itemKey.hashCode && item == itemKey.item && tagMatches(itemKey.tag);
+		return hashCode == itemKey.hashCode && item == itemKey.item && nbtMatches(itemKey.tag);
 	}
 
 	@Override

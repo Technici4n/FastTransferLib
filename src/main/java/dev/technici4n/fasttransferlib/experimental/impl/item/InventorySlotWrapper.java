@@ -75,7 +75,7 @@ class InventorySlotWrapper extends SnapshotParticipant<ItemStack> implements Sin
 	}
 
 	@Override
-	public ItemKey resource() {
+	public ItemKey getResource() {
 		return ItemKey.of(inventory.getStack(slot));
 	}
 
@@ -85,12 +85,12 @@ class InventorySlotWrapper extends SnapshotParticipant<ItemStack> implements Sin
 	}
 
 	@Override
-	public long amount() {
+	public long getAmount() {
 		return inventory.getStack(slot).getCount();
 	}
 
 	@Override
-	public long capacity() {
+	public long getCapacity() {
 		return inventory.getStack(slot).getMaxCount();
 	}
 

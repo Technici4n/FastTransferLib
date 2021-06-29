@@ -29,23 +29,23 @@ public class SimpleFluidContainingItem implements ExtractionOnlyStorage<FluidKey
 	}
 
 	@Override
-	public FluidKey resource() {
+	public FluidKey getResource() {
 		return fluid;
 	}
 
 	@Override
-	public long amount() {
+	public long getAmount() {
 		return amount;
 	}
 
 	@Override
-	public long capacity() {
+	public long getCapacity() {
 		return amount;
 	}
 
 	@Override
 	public boolean isEmpty() {
-		return resource().isEmpty();
+		return getResource().isEmpty();
 	}
 
 	@Override
