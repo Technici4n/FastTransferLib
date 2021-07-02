@@ -38,7 +38,8 @@ Instances are queried and exposed through the `SIDED` and `ITEM` lookups in [`En
 
 To register simple energy-containing items with an energy capacity and maximum insertion/extraction rates,
 [`SimpleItemEnergyIo#getProvider`](src/main/java/dev/technici4n/fasttransferlib/api/energy/base/SimpleItemEnergyIo.java) can be used.
-There is no equivalent for simple blocks at the moment, but that can be added if requested.
+Simple energy-containing block entities can store a [`SimpleEnergyIo`](src/main/java/dev/technici4n/fasttransferlib/api/energy/base/SimpleEnergyIo.java)
+in a field and expose it via the `SIDED` lookup.
 
 [`EnergyMovement`](src/main/java/dev/technici4n/fasttransferlib/api/energy/EnergyMovement.java) provides a helper function to transfer energy between two `EnergyIo`'s.
 [`EnergyPreconditions`](src/main/java/dev/technici4n/fasttransferlib/api/energy/EnergyPreconditions.java) provides a few checks to fail-fast in case of bad API usage.

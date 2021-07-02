@@ -3,6 +3,7 @@ package dev.technici4n.fasttransferlib.api.energy.base;
 import com.google.common.base.Preconditions;
 import dev.technici4n.fasttransferlib.api.Simulation;
 import dev.technici4n.fasttransferlib.api.energy.EnergyIo;
+import dev.technici4n.fasttransferlib.api.energy.EnergyPreconditions;
 
 import net.minecraft.item.ItemStack;
 
@@ -54,6 +55,7 @@ public class SimpleItemEnergyIo implements EnergyIo {
 
 	@Override
 	public double insert(double amount, Simulation simulation) {
+		EnergyPreconditions.notNegative(amount);
 		double inserted = Math.min(Math.min(amount, maxInsertion), capacity - getEnergy());
 		incrementEnergy(inserted, simulation);
 		return simplify(amount - inserted);
@@ -66,6 +68,7 @@ public class SimpleItemEnergyIo implements EnergyIo {
 
 	@Override
 	public double extract(double maxAmount, Simulation simulation) {
+		EnergyPreconditions.notNegative(maxAmount);
 		double extracted = Math.min(Math.min(maxAmount, maxExtraction), getEnergy());
 		incrementEnergy(-extracted, simulation);
 		return simplify(extracted);
