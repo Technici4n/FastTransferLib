@@ -11,7 +11,7 @@ import net.minecraft.util.registry.Registry;
 
 import net.fabricmc.fabric.api.event.registry.RegistryEntryAddedCallback;
 import net.fabricmc.fabric.api.transfer.v1.fluid.FluidConstants;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidKey;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 
 public class FluidApiImpl {
 	public static void init() {
@@ -27,7 +27,7 @@ public class FluidApiImpl {
 			Fluid bucketFluid = ((BucketItemAccessor) bucketItem).ftl_getFluid();
 
 			if (fluid == bucketFluid) {
-				ItemFluidStorage.registerEmptyAndFullItems(Items.BUCKET, FluidKey.of(fluid), FluidConstants.BUCKET, bucketItem);
+				ItemFluidStorage.registerEmptyAndFullItems(Items.BUCKET, FluidVariant.of(fluid), FluidConstants.BUCKET, bucketItem);
 			}
 		}
 	}

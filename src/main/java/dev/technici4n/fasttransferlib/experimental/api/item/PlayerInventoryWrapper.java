@@ -16,5 +16,5 @@ public interface PlayerInventoryWrapper extends InventoryWrapper {
 	 * Add items to the inventory if possible, and drop any leftover items in the
 	 * world.
 	 */
-	void offerOrDrop(ItemKey key, long amount, Transaction transaction);
+	void offerOrDrop(ItemVariant key, long amount, Transaction transaction);
 }

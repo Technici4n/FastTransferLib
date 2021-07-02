@@ -1,7 +1,7 @@
 package dev.technici4n.fasttransferlib.impl.mixin;
 
 import dev.technici4n.fasttransferlib.experimental.api.item.InventoryWrappers;
-import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
+import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemStorage;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,10 +33,10 @@ public class DropperBlockMixin {
 			allow = 1
 	)
 	public void hookDispense(ServerWorld world, BlockPos pos, CallbackInfo ci, BlockPointerImpl blockPointerImpl, DispenserBlockEntity dispenser, int slot, ItemStack stack, Direction direction) {
-		Storage<ItemKey> target = ItemStorage.SIDED.find(world, pos.offset(direction), direction.getOpposite());
+		Storage<ItemVariant> target = ItemStorage.SIDED.find(world, pos.offset(direction), direction.getOpposite());
 
 		if (target != null) {
-			Storage<ItemKey> source = InventoryWrappers.of(dispenser, null).getSlot(slot);
+			Storage<ItemVariant> source = InventoryWrappers.of(dispenser, null).getSlot(slot);
 
 			if (StorageUtil.move(source, target, k -> true, 1, null) == 1) {
 				ci.cancel();

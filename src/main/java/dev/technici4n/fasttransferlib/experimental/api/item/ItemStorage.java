@@ -12,7 +12,7 @@ import net.fabricmc.fabric.api.lookup.v1.block.BlockApiLookup;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 
 public final class ItemStorage {
-	public static final BlockApiLookup<Storage<ItemKey>, Direction> SIDED = BlockApiLookup.get(new Identifier("ftl:sided_item_api"),
+	public static final BlockApiLookup<Storage<ItemVariant>, Direction> SIDED = BlockApiLookup.get(new Identifier("ftl:sided_item_api"),
 			Storage.asClass(), Direction.class);
 
 	private ItemStorage() {

@@ -3,7 +3,7 @@ package dev.technici4n.fasttransferlib.experimental.impl.context;
 import com.google.common.base.Preconditions;
 import dev.technici4n.fasttransferlib.experimental.api.context.ContainerItemContext;
 import dev.technici4n.fasttransferlib.experimental.api.item.InventoryWrappers;
-import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
+import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
 import dev.technici4n.fasttransferlib.experimental.api.item.PlayerInventoryWrapper;
 
 import net.minecraft.entity.player.PlayerEntity;
@@ -15,8 +15,8 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 
 public class PlayerEntityContainerItemContext implements ContainerItemContext {
-	private final ItemKey boundKey;
-	private final SingleSlotStorage<ItemKey> slot;
+	private final ItemVariant boundKey;
+	private final SingleSlotStorage<ItemVariant> slot;
 	private final PlayerInventoryWrapper wrapper;
 
 	public static ContainerItemContext ofHand(PlayerEntity player, Hand hand) {
@@ -30,14 +30,14 @@ public class PlayerEntityContainerItemContext implements ContainerItemContext {
 		return new PlayerEntityContainerItemContext(InventoryWrappers.ofCursor(screenHandler), wrapper);
 	}
 
-	private PlayerEntityContainerItemContext(SingleSlotStorage<ItemKey> slot, PlayerInventoryWrapper wrapper) {
+	private PlayerEntityContainerItemContext(SingleSlotStorage<ItemVariant> slot, PlayerInventoryWrapper wrapper) {
 		this.boundKey = slot.getResource();
 		this.slot = slot;
 		this.wrapper = wrapper;
 	}
 
 	@Override
-	public ItemKey getBoundKey() {
+	public ItemVariant getBoundKey() {
 		return boundKey;
 	}
 
@@ -47,7 +47,7 @@ public class PlayerEntityContainerItemContext implements ContainerItemContext {
 	}
 
 	@Override
-	public boolean transform(long count, ItemKey into, Transaction tx) {
+	public boolean transform(long count, ItemVariant into, Transaction tx) {
 		Preconditions.checkArgument(count <= getCount(tx), "Can't transform items that are not available.");
 
 		if (slot.extract(boundKey, count, tx) != count) {

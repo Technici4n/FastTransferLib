@@ -1,6 +1,6 @@
 package dev.technici4n.fasttransferlib.experimental.api.context;
 
-import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
+import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
 import dev.technici4n.fasttransferlib.experimental.impl.context.PlayerEntityContainerItemContext;
 import dev.technici4n.fasttransferlib.experimental.impl.context.StorageContainerItemContext;
 import org.jetbrains.annotations.Nullable;
@@ -15,17 +15,17 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 
 /**
  * A context for interaction with item-provided apis, bound to a specific
- * ItemKey that must match that provided to {@link ItemApiLookup#get}.
+ * ItemVariant that must match that provided to {@link ItemApiLookup#get}.
  */
 // TODO: rework this stuff, it's not great.
 public interface ContainerItemContext {
 	/**
 	 * Return the item key this context is bound to.
 	 */
-	ItemKey getBoundKey();
+	ItemVariant getBoundKey();
 
 	/**
-	 * Get the current count. If the ItemKey is not present anymore, return 0
+	 * Get the current count. If the ItemVariant is not present anymore, return 0
 	 * instead.
 	 */
 	long getCount(Transaction transaction);
@@ -42,7 +42,7 @@ public interface ContainerItemContext {
 	 */
 	// TODO: consider using an enum instead of a boolean? what about
 	// TransactionResult?
-	boolean transform(long count, ItemKey into, Transaction transaction);
+	boolean transform(long count, ItemVariant into, Transaction transaction);
 
 	/**
 	 * Try to find an API instance for the passed lookup and return it, or {@code null} if there is none.
@@ -62,7 +62,7 @@ public interface ContainerItemContext {
 		return PlayerEntityContainerItemContext.ofCursor(player, screenHandler);
 	}
 
-	static ContainerItemContext ofStorage(ItemKey boundKey, Storage<ItemKey> storage) {
+	static ContainerItemContext ofStorage(ItemVariant boundKey, Storage<ItemVariant> storage) {
 		return new StorageContainerItemContext(boundKey, storage);
 	}
 }

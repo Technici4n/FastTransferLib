@@ -4,23 +4,23 @@ import java.util.Iterator;
 import java.util.function.Function;
 
 import dev.technici4n.fasttransferlib.experimental.api.context.ContainerItemContext;
-import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
+import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
 
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidKey;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ExtractionOnlyStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleViewIterator;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 
-public class SimpleFluidContainingItem implements ExtractionOnlyStorage<FluidKey>, StorageView<FluidKey> {
+public class SimpleFluidContainingItem implements ExtractionOnlyStorage<FluidVariant>, StorageView<FluidVariant> {
 	private final ContainerItemContext ctx;
-	private final ItemKey sourceKey;
-	private final FluidKey fluid;
+	private final ItemVariant sourceKey;
+	private final FluidVariant fluid;
 	private final long amount;
-	private final Function<ItemKey, ItemKey> keyMapping;
+	private final Function<ItemVariant, ItemVariant> keyMapping;
 
-	public SimpleFluidContainingItem(ContainerItemContext ctx, ItemKey sourceKey, FluidKey fluid, long amount, Function<ItemKey, ItemKey> keyMapping) {
+	public SimpleFluidContainingItem(ContainerItemContext ctx, ItemVariant sourceKey, FluidVariant fluid, long amount, Function<ItemVariant, ItemVariant> keyMapping) {
 		this.ctx = ctx;
 		this.sourceKey = sourceKey;
 		this.fluid = fluid;
@@ -29,7 +29,7 @@ public class SimpleFluidContainingItem implements ExtractionOnlyStorage<FluidKey
 	}
 
 	@Override
-	public FluidKey getResource() {
+	public FluidVariant getResource() {
 		return fluid;
 	}
 
@@ -49,7 +49,7 @@ public class SimpleFluidContainingItem implements ExtractionOnlyStorage<FluidKey
 	}
 
 	@Override
-	public long extract(FluidKey resource, long maxAmount, Transaction transaction) {
+	public long extract(FluidVariant resource, long maxAmount, Transaction transaction) {
 		StoragePreconditions.notEmptyNotNegative(resource, maxAmount);
 
 		if (maxAmount >= amount && resource == fluid && ctx.getCount(transaction) > 0) {
@@ -62,7 +62,7 @@ public class SimpleFluidContainingItem implements ExtractionOnlyStorage<FluidKey
 	}
 
 	@Override
-	public Iterator<StorageView<FluidKey>> iterator(Transaction transaction) {
+	public Iterator<StorageView<FluidVariant>> iterator(Transaction transaction) {
 		return SingleViewIterator.create(this, transaction);
 	}
 }

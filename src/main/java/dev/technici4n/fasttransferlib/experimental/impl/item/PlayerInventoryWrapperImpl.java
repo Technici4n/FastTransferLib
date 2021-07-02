@@ -3,7 +3,7 @@ package dev.technici4n.fasttransferlib.experimental.impl.item;
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
+import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemPreconditions;
 import dev.technici4n.fasttransferlib.experimental.api.item.PlayerInventoryWrapper;
 
@@ -15,7 +15,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 
 // A wrapper around a PlayerInventory with the additional functions in PlayerInventoryWrapper.
-class PlayerInventoryWrapperImpl extends CombinedStorage<ItemKey, InventorySlotWrapper> implements PlayerInventoryWrapper {
+class PlayerInventoryWrapperImpl extends CombinedStorage<ItemVariant, InventorySlotWrapper> implements PlayerInventoryWrapper {
 	private final PlayerInventory playerInventory;
 	private final DroppedStacks droppedStacks;
 
@@ -26,7 +26,7 @@ class PlayerInventoryWrapperImpl extends CombinedStorage<ItemKey, InventorySlotW
 	}
 
 	@Override
-	public void offerOrDrop(ItemKey resource, long amount, Transaction tx) {
+	public void offerOrDrop(ItemVariant resource, long amount, Transaction tx) {
 		ItemPreconditions.notEmptyNotNegative(resource, amount);
 
 		for (int iteration = 0; iteration < 2; iteration++) {
@@ -48,15 +48,15 @@ class PlayerInventoryWrapperImpl extends CombinedStorage<ItemKey, InventorySlotW
 	}
 
 	@Override
-	public SingleSlotStorage<ItemKey> getSlot(int slot) {
+	public SingleSlotStorage<ItemVariant> getSlot(int slot) {
 		return parts.get(slot);
 	}
 
 	private class DroppedStacks extends SnapshotParticipant<Integer> {
-		final List<ItemKey> droppedKeys = new ArrayList<>();
+		final List<ItemVariant> droppedKeys = new ArrayList<>();
 		final List<Long> droppedCounts = new ArrayList<>();
 
-		void addDrop(ItemKey key, long count, Transaction transaction) {
+		void addDrop(ItemVariant key, long count, Transaction transaction) {
 			updateSnapshots(transaction);
 			droppedKeys.add(key);
 			droppedCounts.add(count);
@@ -82,7 +82,7 @@ class PlayerInventoryWrapperImpl extends CombinedStorage<ItemKey, InventorySlotW
 		protected void onFinalCommit() {
 			// drop the stacks and mark dirty
 			for (int i = 0; i < droppedKeys.size(); ++i) {
-				ItemKey key = droppedKeys.get(i);
+				ItemVariant key = droppedKeys.get(i);
 
 				while (droppedCounts.get(i) > 0) {
 					int dropped = (int) Math.min(key.getItem().getMaxCount(), droppedCounts.get(i));

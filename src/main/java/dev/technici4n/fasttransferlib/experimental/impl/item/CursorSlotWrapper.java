@@ -3,7 +3,7 @@ package dev.technici4n.fasttransferlib.experimental.impl.item;
 import java.util.Map;
 
 import com.google.common.collect.MapMaker;
-import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
+import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemPreconditions;
 
 import net.minecraft.item.ItemStack;
@@ -13,7 +13,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 
-public class CursorSlotWrapper extends SnapshotParticipant<ItemStack> implements SingleSlotStorage<ItemKey> {
+public class CursorSlotWrapper extends SnapshotParticipant<ItemStack> implements SingleSlotStorage<ItemVariant> {
 	private static final Map<ScreenHandler, CursorSlotWrapper> WRAPPERS = new MapMaker().weakKeys().makeMap();
 
 	public static CursorSlotWrapper get(ScreenHandler screenHandler) {
@@ -32,17 +32,17 @@ public class CursorSlotWrapper extends SnapshotParticipant<ItemStack> implements
 	}
 
 	@Override
-	public long insert(ItemKey itemKey, long maxAmount, Transaction transaction) {
-		ItemPreconditions.notEmptyNotNegative(itemKey, maxAmount);
+	public long insert(ItemVariant ItemVariant, long maxAmount, Transaction transaction) {
+		ItemPreconditions.notEmptyNotNegative(ItemVariant, maxAmount);
 		ItemStack stack = screenHandler.getCursorStack();
-		int inserted = (int) Math.min(maxAmount, Math.min(64, itemKey.getItem().getMaxCount()) - stack.getCount());
+		int inserted = (int) Math.min(maxAmount, Math.min(64, ItemVariant.getItem().getMaxCount()) - stack.getCount());
 
 		if (stack.isEmpty()) {
-			ItemStack keyStack = itemKey.toStack(inserted);
+			ItemStack keyStack = ItemVariant.toStack(inserted);
 			this.updateSnapshots(transaction);
 			screenHandler.setCursorStack(keyStack);
 			return inserted;
-		} else if (itemKey.matches(stack)) {
+		} else if (ItemVariant.matches(stack)) {
 			this.updateSnapshots(transaction);
 			stack.increment(inserted);
 			return inserted;
@@ -57,11 +57,11 @@ public class CursorSlotWrapper extends SnapshotParticipant<ItemStack> implements
 	}
 
 	@Override
-	public long extract(ItemKey itemKey, long maxAmount, Transaction transaction) {
-		ItemPreconditions.notEmptyNotNegative(itemKey, maxAmount);
+	public long extract(ItemVariant ItemVariant, long maxAmount, Transaction transaction) {
+		ItemPreconditions.notEmptyNotNegative(ItemVariant, maxAmount);
 		ItemStack stack = screenHandler.getCursorStack();
 
-		if (itemKey.matches(stack)) {
+		if (ItemVariant.matches(stack)) {
 			int extracted = (int) Math.min(stack.getCount(), maxAmount);
 			this.updateSnapshots(transaction);
 			stack.decrement(extracted);
@@ -72,8 +72,8 @@ public class CursorSlotWrapper extends SnapshotParticipant<ItemStack> implements
 	}
 
 	@Override
-	public ItemKey getResource() {
-		return ItemKey.of(screenHandler.getCursorStack());
+	public ItemVariant getResource() {
+		return ItemVariant.of(screenHandler.getCursorStack());
 	}
 
 	@Override

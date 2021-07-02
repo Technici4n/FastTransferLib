@@ -8,14 +8,14 @@ import java.util.function.Function;
 
 import dev.technici4n.fasttransferlib.experimental.api.context.ContainerItemContext;
 import dev.technici4n.fasttransferlib.experimental.api.fluid.ItemFluidStorage;
-import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
+import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidKey;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
@@ -25,7 +25,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 public class EmptyItemsRegistry {
 	private static final Map<Item, EmptyItemProvider> PROVIDERS = new IdentityHashMap<>();
 
-	public static synchronized void registerEmptyItem(Item emptyItem, FluidKey fluid, long amount, Function<ItemKey, ItemKey> keyMapping) {
+	public static synchronized void registerEmptyItem(Item emptyItem, FluidVariant fluid, long amount, Function<ItemVariant, ItemVariant> keyMapping) {
 		PROVIDERS.computeIfAbsent(emptyItem, item -> {
 			EmptyItemProvider provider = new EmptyItemProvider();
 			ItemFluidStorage.ITEM.registerForItems(provider, emptyItem);
@@ -34,30 +34,30 @@ public class EmptyItemsRegistry {
 		EmptyItemProvider provider = PROVIDERS.get(emptyItem);
 
 		// We use a copy-on-write strategy to register the fluid filling if possible
-		Map<FluidKey, FillInfo> copy = new IdentityHashMap<>(provider.acceptedFluids);
+		Map<FluidVariant, FillInfo> copy = new IdentityHashMap<>(provider.acceptedFluids);
 		copy.putIfAbsent(fluid, new FillInfo(amount, keyMapping));
 		provider.acceptedFluids = copy;
 	}
 
-	private static class EmptyItemProvider implements ItemApiLookup.ItemApiProvider<Storage<FluidKey>, ContainerItemContext> {
-		private volatile Map<FluidKey, FillInfo> acceptedFluids = new IdentityHashMap<>();
+	private static class EmptyItemProvider implements ItemApiLookup.ItemApiProvider<Storage<FluidVariant>, ContainerItemContext> {
+		private volatile Map<FluidVariant, FillInfo> acceptedFluids = new IdentityHashMap<>();
 
 		@Override
-		public @Nullable Storage<FluidKey> find(ItemStack stack, ContainerItemContext context) {
-			return new EmptyItemStorage(ItemKey.of(stack), context);
+		public @Nullable Storage<FluidVariant> find(ItemStack stack, ContainerItemContext context) {
+			return new EmptyItemStorage(ItemVariant.of(stack), context);
 		}
 
-		private class EmptyItemStorage implements InsertionOnlyStorage<FluidKey> {
-			private final ItemKey initialKey;
+		private class EmptyItemStorage implements InsertionOnlyStorage<FluidVariant> {
+			private final ItemVariant initialKey;
 			private final ContainerItemContext ctx;
 
-			private EmptyItemStorage(ItemKey initialKey, ContainerItemContext ctx) {
+			private EmptyItemStorage(ItemVariant initialKey, ContainerItemContext ctx) {
 				this.initialKey = initialKey;
 				this.ctx = ctx;
 			}
 
 			@Override
-			public long insert(FluidKey fluid, long maxAmount, Transaction transaction) {
+			public long insert(FluidVariant fluid, long maxAmount, Transaction transaction) {
 				StoragePreconditions.notEmptyNotNegative(fluid, maxAmount);
 
 				if (ctx.getCount(transaction) == 0) return 0;
@@ -74,7 +74,7 @@ public class EmptyItemsRegistry {
 			}
 
 			@Override
-			public Iterator<StorageView<FluidKey>> iterator(Transaction transaction) {
+			public Iterator<StorageView<FluidVariant>> iterator(Transaction transaction) {
 				return Collections.emptyIterator();
 			}
 		}
@@ -82,9 +82,9 @@ public class EmptyItemsRegistry {
 
 	private static class FillInfo {
 		private final long amount;
-		private final Function<ItemKey, ItemKey> keyMapping;
+		private final Function<ItemVariant, ItemVariant> keyMapping;
 
-		private FillInfo(long amount, Function<ItemKey, ItemKey> keyMapping) {
+		private FillInfo(long amount, Function<ItemVariant, ItemVariant> keyMapping) {
 			this.amount = amount;
 			this.keyMapping = keyMapping;
 		}

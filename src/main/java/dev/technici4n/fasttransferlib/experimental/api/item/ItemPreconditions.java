@@ -9,9 +9,9 @@ import net.minecraft.item.Items;
  * Preconditions for item transfer.
  */
 public final class ItemPreconditions {
-	public static void notEmpty(ItemKey key) {
+	public static void notEmpty(ItemVariant key) {
 		if (key == null || key.isEmpty()) {
-			throw new IllegalArgumentException("ItemKey may not be empty or null.");
+			throw new IllegalArgumentException("ItemVariant may not be empty or null.");
 		}
 	}
 
@@ -21,7 +21,7 @@ public final class ItemPreconditions {
 		}
 	}
 
-	public static void notEmptyNotNegative(ItemKey key, long amount) {
+	public static void notEmptyNotNegative(ItemVariant key, long amount) {
 		ItemPreconditions.notEmpty(key);
 		Preconditions.checkArgument(amount >= 0);
 	}

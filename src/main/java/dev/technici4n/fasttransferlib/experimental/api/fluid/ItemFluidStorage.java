@@ -5,7 +5,7 @@ import java.util.function.Function;
 
 import com.google.common.base.Preconditions;
 import dev.technici4n.fasttransferlib.experimental.api.context.ContainerItemContext;
-import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
+import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemPreconditions;
 import dev.technici4n.fasttransferlib.experimental.impl.fluid.EmptyItemsRegistry;
 import dev.technici4n.fasttransferlib.experimental.impl.fluid.FluidApiImpl;
@@ -15,13 +15,13 @@ import net.minecraft.item.Item;
 import net.minecraft.util.Identifier;
 
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
-import net.fabricmc.fabric.api.transfer.v1.fluid.FluidKey;
+import net.fabricmc.fabric.api.transfer.v1.fluid.FluidVariant;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
 
 // TODO: delegate to static FluidApiImpl functions so that other impl classes can be package private
 public class ItemFluidStorage {
-	public static final ItemApiLookup<Storage<FluidKey>, ContainerItemContext> ITEM = ItemApiLookup.get(new Identifier("ftl:fluid_storage"),
+	public static final ItemApiLookup<Storage<FluidVariant>, ContainerItemContext> ITEM = ItemApiLookup.get(new Identifier("ftl:fluid_storage"),
 			Storage.asClass(), ContainerItemContext.class);
 
 	/**
@@ -35,8 +35,8 @@ public class ItemFluidStorage {
 	 * @param amount    The amount of fluid in the full item. Must be positive.
 	 * @param emptyItem The emptied item.
 	 */
-	public static void registerFullItem(Item fullItem, FluidKey fluid, long amount, Item emptyItem) {
-		registerFullItem(fullItem, fluid, amount, key -> ItemKey.of(emptyItem, key.getNbt()));
+	public static void registerFullItem(Item fullItem, FluidVariant fluid, long amount, Item emptyItem) {
+		registerFullItem(fullItem, fluid, amount, key -> ItemVariant.of(emptyItem, key.getNbt()));
 	}
 
 	/**
@@ -51,12 +51,12 @@ public class ItemFluidStorage {
 	 * @param keyMapping A function mapping the key of the source item to that of
 	 *                   the target item.
 	 */
-	public static void registerFullItem(Item fullItem, FluidKey fluid, long amount, Function<ItemKey, ItemKey> keyMapping) {
+	public static void registerFullItem(Item fullItem, FluidVariant fluid, long amount, Function<ItemVariant, ItemVariant> keyMapping) {
 		ItemPreconditions.notEmpty(fullItem);
 		StoragePreconditions.notEmptyNotNegative(fluid, amount);
 		Preconditions.checkArgument(amount > 0);
 
-		ITEM.registerForItems((stack, ctx) -> new SimpleFluidContainingItem(ctx, ItemKey.of(stack), fluid, amount, keyMapping), fullItem);
+		ITEM.registerForItems((stack, ctx) -> new SimpleFluidContainingItem(ctx, ItemVariant.of(stack), fluid, amount, keyMapping), fullItem);
 	}
 
 	/**
@@ -64,8 +64,8 @@ public class ItemFluidStorage {
 	 */
 	// TODO: document params and conflicts
 	// TODO: pick parameter order, probably the same for both methods?
-	public static void registerEmptyItem(Item emptyItem, FluidKey fluid, long amount, Item fullItem) {
-		registerEmptyItem(emptyItem, fluid, amount, key -> ItemKey.of(fullItem, key.getNbt()));
+	public static void registerEmptyItem(Item emptyItem, FluidVariant fluid, long amount, Item fullItem) {
+		registerEmptyItem(emptyItem, fluid, amount, key -> ItemVariant.of(fullItem, key.getNbt()));
 	}
 
 	/**
@@ -73,7 +73,7 @@ public class ItemFluidStorage {
 	 */
 	// TODO: document params and conflicts
 	// TODO: pick parameter order, probably the same for both methods?
-	public static void registerEmptyItem(Item emptyItem, FluidKey fluid, long amount, Function<ItemKey, ItemKey> keyMapping) {
+	public static void registerEmptyItem(Item emptyItem, FluidVariant fluid, long amount, Function<ItemVariant, ItemVariant> keyMapping) {
 		ItemPreconditions.notEmpty(emptyItem);
 		StoragePreconditions.notEmptyNotNegative(fluid, amount);
 		Objects.requireNonNull(keyMapping);
@@ -83,7 +83,7 @@ public class ItemFluidStorage {
 
 	/**
 	 * Register full and empty variants of a fluid container item. Calls both
-	 * {@link #registerEmptyItem(Item, FluidKey, long, Item) registerEmptyItem} and
+	 * {@link #registerEmptyItem(Item, FluidVariant, long, Item) registerEmptyItem} and
 	 * {@link #registerFullItem}.
 	 *
 	 * @param emptyItem The empty variant of the container.
@@ -91,7 +91,7 @@ public class ItemFluidStorage {
 	 * @param amount    The amount.
 	 * @param fullItem  The full variant of the container.
 	 */
-	public static void registerEmptyAndFullItems(Item emptyItem, FluidKey fluid, long amount, Item fullItem) {
+	public static void registerEmptyAndFullItems(Item emptyItem, FluidVariant fluid, long amount, Item fullItem) {
 		registerEmptyItem(emptyItem, fluid, amount, fullItem);
 		registerFullItem(fullItem, fluid, amount, emptyItem);
 	}

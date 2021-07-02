@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import dev.technici4n.fasttransferlib.experimental.api.item.InventoryWrapper;
-import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
+import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
 import org.jetbrains.annotations.Nullable;
 
 import net.minecraft.entity.player.PlayerInventory;
@@ -19,7 +19,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
 
 public class InventoryWrappersImpl {
-	// List<Storage<ItemKey>> has 7 values.
+	// List<Storage<ItemVariant>> has 7 values.
 	// The 6 first for the various directions, and the last element for a null
 	// direction.
 	private static final WeakHashMap<Inventory, List<InventoryWrapper>> WRAPPERS = new WeakHashMap<>();
@@ -56,13 +56,13 @@ public class InventoryWrappersImpl {
 		return result;
 	}
 
-	private static class InventoryWrapperImpl extends CombinedStorage<ItemKey, SingleSlotStorage<ItemKey>> implements InventoryWrapper {
-		InventoryWrapperImpl(List<SingleSlotStorage<ItemKey>> parts) {
+	private static class InventoryWrapperImpl extends CombinedStorage<ItemVariant, SingleSlotStorage<ItemVariant>> implements InventoryWrapper {
+		InventoryWrapperImpl(List<SingleSlotStorage<ItemVariant>> parts) {
 			super(parts);
 		}
 
 		@Override
-		public SingleSlotStorage<ItemKey> getSlot(int index) {
+		public SingleSlotStorage<ItemVariant> getSlot(int index) {
 			return parts.get(index);
 		}
 	}

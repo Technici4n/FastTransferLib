@@ -1,6 +1,6 @@
 package dev.technici4n.fasttransferlib.experimental.impl.item;
 
-import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
+import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemPreconditions;
 
 import net.minecraft.inventory.Inventory;
@@ -13,7 +13,7 @@ import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 // A wrapper around a single slot of an inventory
 // We must ensure that only one instance of this class exists for every inventory slot,
 // or the transaction logic will not work correct.
-class InventorySlotWrapper extends SnapshotParticipant<ItemStack> implements SingleSlotStorage<ItemKey> {
+class InventorySlotWrapper extends SnapshotParticipant<ItemStack> implements SingleSlotStorage<ItemVariant> {
 	final Inventory inventory;
 	final int slot;
 
@@ -28,7 +28,7 @@ class InventorySlotWrapper extends SnapshotParticipant<ItemStack> implements Sin
 	}
 
 	@Override
-	public long insert(ItemKey key, long maxAmount, Transaction transaction) {
+	public long insert(ItemVariant key, long maxAmount, Transaction transaction) {
 		// TODO: clean this up
 		ItemPreconditions.notEmpty(key);
 		int count = (int) Math.min(maxAmount, inventory.getMaxCountPerStack());
@@ -60,7 +60,7 @@ class InventorySlotWrapper extends SnapshotParticipant<ItemStack> implements Sin
 	}
 
 	@Override
-	public long extract(ItemKey key, long maxAmount, Transaction transaction) {
+	public long extract(ItemVariant key, long maxAmount, Transaction transaction) {
 		ItemPreconditions.notEmpty(key);
 		ItemStack stack = inventory.getStack(slot);
 
@@ -75,8 +75,8 @@ class InventorySlotWrapper extends SnapshotParticipant<ItemStack> implements Sin
 	}
 
 	@Override
-	public ItemKey getResource() {
-		return ItemKey.of(inventory.getStack(slot));
+	public ItemVariant getResource() {
+		return ItemVariant.of(inventory.getStack(slot));
 	}
 
 	@Override

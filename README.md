@@ -51,8 +51,8 @@ The objective is to gather production experience with the Fluid API, and with th
 that will also be PR'ed into Fabric.
 
 ### Item API
-First check out how the Fluid API works. Then you shouldn't be surprised to learn that the Item API revolves around `Storage<ItemKey>`.
-`ItemStorage` is the entrypoint. `InventoryWrappers` provides a way to turn a vanilla `Inventory`, `SidedInventory` or `PlayerInventory` into a `Storage<ItemKey>`.
+First check out how the Fluid API works. Then you shouldn't be surprised to learn that the Item API revolves around `Storage<ItemVariant>`.
+`ItemStorage` is the entrypoint. `InventoryWrappers` provides a way to turn a vanilla `Inventory`, `SidedInventory` or `PlayerInventory` into a `Storage<ItemVariant>`.
 `ItemPreconditions` provides a few helper preconditions.
 
 ### Item Fluid API

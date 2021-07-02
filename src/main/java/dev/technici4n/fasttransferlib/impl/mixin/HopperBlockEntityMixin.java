@@ -1,7 +1,7 @@
 package dev.technici4n.fasttransferlib.impl.mixin;
 
 import dev.technici4n.fasttransferlib.experimental.api.item.InventoryWrappers;
-import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
+import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemStorage;
 import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
@@ -33,7 +33,7 @@ public class HopperBlockEntityMixin {
 		Direction direction = state.get(HopperBlock.FACING);
 		BlockPos targetPos = pos.offset(direction);
 		BlockEntity targetBe = world.getBlockEntity(targetPos);
-		Storage<ItemKey> target = ItemStorage.SIDED.find(world, targetPos, null, targetBe, direction.getOpposite());
+		Storage<ItemVariant> target = ItemStorage.SIDED.find(world, targetPos, null, targetBe, direction.getOpposite());
 
 		if (target != null) {
 			cir.setReturnValue(doTransfer(InventoryWrappers.of(inventory, direction), target, inventory, targetBe));
@@ -48,14 +48,14 @@ public class HopperBlockEntityMixin {
 	private static void hookExtract(World world, Hopper hopper, CallbackInfoReturnable<Boolean> cir) {
 		BlockPos sourcePos = new BlockPos(hopper.getHopperX(), hopper.getHopperY() + 1.0D, hopper.getHopperZ());
 		BlockEntity sourceBe = world.getBlockEntity(sourcePos);
-		Storage<ItemKey> source = ItemStorage.SIDED.find(world, sourcePos, null, sourceBe, Direction.DOWN);
+		Storage<ItemVariant> source = ItemStorage.SIDED.find(world, sourcePos, null, sourceBe, Direction.DOWN);
 
 		if (source != null) {
 			cir.setReturnValue(doTransfer(source, InventoryWrappers.of(hopper, Direction.UP), sourceBe, hopper));
 		}
 	}
 
-	private static boolean doTransfer(Storage<ItemKey> from, Storage<ItemKey> to, @Nullable Object invFrom, @Nullable Object invTo) {
+	private static boolean doTransfer(Storage<ItemVariant> from, Storage<ItemVariant> to, @Nullable Object invFrom, @Nullable Object invTo) {
 		if (invFrom instanceof HopperBlockEntityAccessor hopperFrom && invTo instanceof HopperBlockEntityAccessor hopperTo) {
 			// Hoppers have some special interactions (see HopperBlockEntity#transfer)
 			boolean wasEmpty = hopperTo.isEmpty();

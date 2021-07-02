@@ -2,22 +2,22 @@ package dev.technici4n.fasttransferlib.experimental.impl.context;
 
 import com.google.common.base.Preconditions;
 import dev.technici4n.fasttransferlib.experimental.api.context.ContainerItemContext;
-import dev.technici4n.fasttransferlib.experimental.api.item.ItemKey;
+import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
 
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
 
 public class StorageContainerItemContext implements ContainerItemContext {
-	private final ItemKey boundKey;
-	private final Storage<ItemKey> storage;
+	private final ItemVariant boundKey;
+	private final Storage<ItemVariant> storage;
 
-	public StorageContainerItemContext(ItemKey boundKey, Storage<ItemKey> storage) {
+	public StorageContainerItemContext(ItemVariant boundKey, Storage<ItemVariant> storage) {
 		this.boundKey = boundKey;
 		this.storage = storage;
 	}
 
 	@Override
-	public ItemKey getBoundKey() {
+	public ItemVariant getBoundKey() {
 		return boundKey;
 	}
 
@@ -29,7 +29,7 @@ public class StorageContainerItemContext implements ContainerItemContext {
 	}
 
 	@Override
-	public boolean transform(long count, ItemKey into, Transaction tx) {
+	public boolean transform(long count, ItemVariant into, Transaction tx) {
 		Preconditions.checkArgument(count <= getCount(tx));
 
 		try (Transaction nested = tx.openNested()) {

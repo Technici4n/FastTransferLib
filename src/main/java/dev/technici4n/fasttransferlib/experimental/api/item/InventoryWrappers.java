@@ -64,7 +64,7 @@ public final class InventoryWrappers {
 	/**
 	 * Return a wrapper around the cursor slot of a screen handler.
 	 */
-	public static SingleSlotStorage<ItemKey> ofCursor(ScreenHandler screenHandler) {
+	public static SingleSlotStorage<ItemVariant> ofCursor(ScreenHandler screenHandler) {
 		return CursorSlotWrapper.get(screenHandler);
 	}
 
