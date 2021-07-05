@@ -11,7 +11,7 @@ import net.minecraft.util.Hand;
 
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 /**
  * A context for interaction with item-provided apis, bound to a specific
@@ -28,7 +28,7 @@ public interface ContainerItemContext {
 	 * Get the current count. If the ItemVariant is not present anymore, return 0
 	 * instead.
 	 */
-	long getCount(Transaction transaction);
+	long getCount(TransactionContext transaction);
 
 	/**
 	 * Transform some of the bound items into another item key.
@@ -42,7 +42,7 @@ public interface ContainerItemContext {
 	 */
 	// TODO: consider using an enum instead of a boolean? what about
 	// TransactionResult?
-	boolean transform(long count, ItemVariant into, Transaction transaction);
+	boolean transform(long count, ItemVariant into, TransactionContext transaction);
 
 	/**
 	 * Try to find an API instance for the passed lookup and return it, or {@code null} if there is none.

@@ -6,12 +6,12 @@ import java.util.function.Function;
 import com.google.common.base.Preconditions;
 import dev.technici4n.fasttransferlib.experimental.api.context.ContainerItemContext;
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
-import dev.technici4n.fasttransferlib.experimental.api.item.ItemPreconditions;
 import dev.technici4n.fasttransferlib.experimental.impl.fluid.EmptyItemsRegistry;
 import dev.technici4n.fasttransferlib.experimental.impl.fluid.FluidApiImpl;
 import dev.technici4n.fasttransferlib.experimental.impl.fluid.SimpleFluidContainingItem;
 
 import net.minecraft.item.Item;
+import net.minecraft.item.Items;
 import net.minecraft.util.Identifier;
 
 import net.fabricmc.fabric.api.lookup.v1.item.ItemApiLookup;
@@ -52,8 +52,8 @@ public class ItemFluidStorage {
 	 *                   the target item.
 	 */
 	public static void registerFullItem(Item fullItem, FluidVariant fluid, long amount, Function<ItemVariant, ItemVariant> keyMapping) {
-		ItemPreconditions.notEmpty(fullItem);
-		StoragePreconditions.notEmptyNotNegative(fluid, amount);
+		Preconditions.checkArgument(fullItem != Items.AIR);
+		StoragePreconditions.notBlankNotNegative(fluid, amount);
 		Preconditions.checkArgument(amount > 0);
 
 		ITEM.registerForItems((stack, ctx) -> new SimpleFluidContainingItem(ctx, ItemVariant.of(stack), fluid, amount, keyMapping), fullItem);
@@ -74,8 +74,8 @@ public class ItemFluidStorage {
 	// TODO: document params and conflicts
 	// TODO: pick parameter order, probably the same for both methods?
 	public static void registerEmptyItem(Item emptyItem, FluidVariant fluid, long amount, Function<ItemVariant, ItemVariant> keyMapping) {
-		ItemPreconditions.notEmpty(emptyItem);
-		StoragePreconditions.notEmptyNotNegative(fluid, amount);
+		Preconditions.checkArgument(emptyItem != Items.AIR);
+		StoragePreconditions.notBlankNotNegative(fluid, amount);
 		Objects.requireNonNull(keyMapping);
 
 		EmptyItemsRegistry.registerEmptyItem(emptyItem, fluid, amount, keyMapping);

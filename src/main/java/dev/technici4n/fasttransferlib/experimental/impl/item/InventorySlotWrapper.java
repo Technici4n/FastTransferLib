@@ -1,13 +1,13 @@
 package dev.technici4n.fasttransferlib.experimental.impl.item;
 
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
-import dev.technici4n.fasttransferlib.experimental.api.item.ItemPreconditions;
 
 import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
 
+import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 
 // A wrapper around a single slot of an inventory
@@ -28,9 +28,9 @@ class InventorySlotWrapper extends SnapshotParticipant<ItemStack> implements Sin
 	}
 
 	@Override
-	public long insert(ItemVariant key, long maxAmount, Transaction transaction) {
+	public long insert(ItemVariant key, long maxAmount, TransactionContext transaction) {
 		// TODO: clean this up
-		ItemPreconditions.notEmpty(key);
+		StoragePreconditions.notBlank(key);
 		int count = (int) Math.min(maxAmount, inventory.getMaxCountPerStack());
 		ItemStack stack = inventory.getStack(slot);
 
@@ -60,8 +60,8 @@ class InventorySlotWrapper extends SnapshotParticipant<ItemStack> implements Sin
 	}
 
 	@Override
-	public long extract(ItemVariant key, long maxAmount, Transaction transaction) {
-		ItemPreconditions.notEmpty(key);
+	public long extract(ItemVariant key, long maxAmount, TransactionContext transaction) {
+		StoragePreconditions.notBlank(key);
 		ItemStack stack = inventory.getStack(slot);
 
 		if (key.matches(stack)) {
@@ -80,7 +80,7 @@ class InventorySlotWrapper extends SnapshotParticipant<ItemStack> implements Sin
 	}
 
 	@Override
-	public boolean isEmpty() {
+	public boolean isResourceBlank() {
 		return inventory.getStack(slot).isEmpty();
 	}
 

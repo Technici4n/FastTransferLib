@@ -11,7 +11,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.ExtractionOnlyStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleViewIterator;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 public class SimpleFluidContainingItem implements ExtractionOnlyStorage<FluidVariant>, StorageView<FluidVariant> {
 	private final ContainerItemContext ctx;
@@ -44,13 +44,13 @@ public class SimpleFluidContainingItem implements ExtractionOnlyStorage<FluidVar
 	}
 
 	@Override
-	public boolean isEmpty() {
-		return getResource().isEmpty();
+	public boolean isResourceBlank() {
+		return getResource().isBlank();
 	}
 
 	@Override
-	public long extract(FluidVariant resource, long maxAmount, Transaction transaction) {
-		StoragePreconditions.notEmptyNotNegative(resource, maxAmount);
+	public long extract(FluidVariant resource, long maxAmount, TransactionContext transaction) {
+		StoragePreconditions.notBlankNotNegative(resource, maxAmount);
 
 		if (maxAmount >= amount && resource == fluid && ctx.getCount(transaction) > 0) {
 			if (ctx.transform(1, keyMapping.apply(sourceKey), transaction)) {
@@ -62,7 +62,7 @@ public class SimpleFluidContainingItem implements ExtractionOnlyStorage<FluidVar
 	}
 
 	@Override
-	public Iterator<StorageView<FluidVariant>> iterator(Transaction transaction) {
+	public Iterator<StorageView<FluidVariant>> iterator(TransactionContext transaction) {
 		return SingleViewIterator.create(this, transaction);
 	}
 }

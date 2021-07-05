@@ -6,6 +6,7 @@ import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
 
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 public class StorageContainerItemContext implements ContainerItemContext {
 	private final ItemVariant boundKey;
@@ -22,14 +23,14 @@ public class StorageContainerItemContext implements ContainerItemContext {
 	}
 
 	@Override
-	public long getCount(Transaction tx) {
+	public long getCount(TransactionContext tx) {
 		try (Transaction nested = tx.openNested()) {
 			return storage.extract(boundKey, Long.MAX_VALUE, nested);
 		}
 	}
 
 	@Override
-	public boolean transform(long count, ItemVariant into, Transaction tx) {
+	public boolean transform(long count, ItemVariant into, TransactionContext tx) {
 		Preconditions.checkArgument(count <= getCount(tx));
 
 		try (Transaction nested = tx.openNested()) {

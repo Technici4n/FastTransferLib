@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
-import dev.technici4n.fasttransferlib.experimental.api.item.ItemPreconditions;
 import dev.technici4n.fasttransferlib.experimental.api.item.PlayerInventoryWrapper;
 
 import net.minecraft.entity.player.PlayerInventory;
 
+import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.CombinedStorage;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 
 // A wrapper around a PlayerInventory with the additional functions in PlayerInventoryWrapper.
@@ -26,8 +26,8 @@ class PlayerInventoryWrapperImpl extends CombinedStorage<ItemVariant, InventoryS
 	}
 
 	@Override
-	public void offerOrDrop(ItemVariant resource, long amount, Transaction tx) {
-		ItemPreconditions.notEmptyNotNegative(resource, amount);
+	public void offerOrDrop(ItemVariant resource, long amount, TransactionContext tx) {
+		StoragePreconditions.notBlankNotNegative(resource, amount);
 
 		for (int iteration = 0; iteration < 2; iteration++) {
 			boolean allowEmptySlots = iteration == 1;
@@ -56,7 +56,7 @@ class PlayerInventoryWrapperImpl extends CombinedStorage<ItemVariant, InventoryS
 		final List<ItemVariant> droppedKeys = new ArrayList<>();
 		final List<Long> droppedCounts = new ArrayList<>();
 
-		void addDrop(ItemVariant key, long count, Transaction transaction) {
+		void addDrop(ItemVariant key, long count, TransactionContext transaction) {
 			updateSnapshots(transaction);
 			droppedKeys.add(key);
 			droppedCounts.add(count);

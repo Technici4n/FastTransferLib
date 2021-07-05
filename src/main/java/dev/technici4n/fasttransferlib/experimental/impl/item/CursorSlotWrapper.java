@@ -4,13 +4,13 @@ import java.util.Map;
 
 import com.google.common.collect.MapMaker;
 import dev.technici4n.fasttransferlib.experimental.api.item.ItemVariant;
-import dev.technici4n.fasttransferlib.experimental.api.item.ItemPreconditions;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.screen.ScreenHandler;
 
+import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 import net.fabricmc.fabric.api.transfer.v1.transaction.base.SnapshotParticipant;
 
 public class CursorSlotWrapper extends SnapshotParticipant<ItemStack> implements SingleSlotStorage<ItemVariant> {
@@ -32,8 +32,8 @@ public class CursorSlotWrapper extends SnapshotParticipant<ItemStack> implements
 	}
 
 	@Override
-	public long insert(ItemVariant ItemVariant, long maxAmount, Transaction transaction) {
-		ItemPreconditions.notEmptyNotNegative(ItemVariant, maxAmount);
+	public long insert(ItemVariant ItemVariant, long maxAmount, TransactionContext transaction) {
+		StoragePreconditions.notBlankNotNegative(ItemVariant, maxAmount);
 		ItemStack stack = screenHandler.getCursorStack();
 		int inserted = (int) Math.min(maxAmount, Math.min(64, ItemVariant.getItem().getMaxCount()) - stack.getCount());
 
@@ -57,8 +57,8 @@ public class CursorSlotWrapper extends SnapshotParticipant<ItemStack> implements
 	}
 
 	@Override
-	public long extract(ItemVariant ItemVariant, long maxAmount, Transaction transaction) {
-		ItemPreconditions.notEmptyNotNegative(ItemVariant, maxAmount);
+	public long extract(ItemVariant ItemVariant, long maxAmount, TransactionContext transaction) {
+		StoragePreconditions.notBlankNotNegative(ItemVariant, maxAmount);
 		ItemStack stack = screenHandler.getCursorStack();
 
 		if (ItemVariant.matches(stack)) {
@@ -82,7 +82,7 @@ public class CursorSlotWrapper extends SnapshotParticipant<ItemStack> implements
 	}
 
 	@Override
-	public boolean isEmpty() {
+	public boolean isResourceBlank() {
 		return screenHandler.getCursorStack().isEmpty();
 	}
 

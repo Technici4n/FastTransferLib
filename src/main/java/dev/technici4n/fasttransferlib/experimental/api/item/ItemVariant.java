@@ -22,9 +22,9 @@ import net.fabricmc.fabric.api.transfer.v1.storage.TransferVariant;
 @ApiStatus.NonExtendable
 public interface ItemVariant extends TransferVariant<Item> {
 	/**
-	 * Retrieve an empty ItemVariant.
+	 * Retrieve a blank ItemVariant.
 	 */
-	static ItemVariant empty() {
+	static ItemVariant blank() {
 		return of(Items.AIR);
 	}
 
@@ -78,7 +78,7 @@ public interface ItemVariant extends TransferVariant<Item> {
 	 *              than maximum stack size.
 	 */
 	default ItemStack toStack(int count) {
-		if (isEmpty()) return ItemStack.EMPTY;
+		if (isBlank()) return ItemStack.EMPTY;
 		ItemStack stack = new ItemStack(getItem(), count);
 		stack.setTag(copyNbt());
 		return stack;
@@ -87,7 +87,7 @@ public interface ItemVariant extends TransferVariant<Item> {
 	/**
 	 * Deserialize a key from an NBT compound tag, assuming it was serialized using
 	 * {@link #toNbt}. If an error occurs during deserialization, it will be logged
-	 * with the DEBUG level, and an empty key will be returned.
+	 * with the DEBUG level, and a blank key will be returned.
 	 */
 	static ItemVariant fromNbt(NbtCompound nbt) {
 		return ItemVariantImpl.fromNbt(nbt);

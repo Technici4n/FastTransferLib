@@ -50,7 +50,7 @@ public class ItemVariantImpl implements ItemVariant {
 	}
 
 	@Override
-	public boolean isEmpty() {
+	public boolean isBlank() {
 		return item == Items.AIR;
 	}
 
@@ -73,13 +73,13 @@ public class ItemVariantImpl implements ItemVariant {
 			return of(item, aTag);
 		} catch (RuntimeException runtimeException) {
 			LOGGER.debug("Tried to load an invalid ItemVariant from NBT: {}", tag, runtimeException);
-			return ItemVariant.empty();
+			return ItemVariant.blank();
 		}
 	}
 
 	@Override
 	public void toPacket(PacketByteBuf buf) {
-		if (isEmpty()) {
+		if (isBlank()) {
 			buf.writeBoolean(false);
 		} else {
 			buf.writeBoolean(true);
@@ -90,7 +90,7 @@ public class ItemVariantImpl implements ItemVariant {
 
 	public static ItemVariant fromPacket(PacketByteBuf buf) {
 		if (!buf.readBoolean()) {
-			return ItemVariant.empty();
+			return ItemVariant.blank();
 		} else {
 			Item item = Item.byRawId(buf.readVarInt());
 			NbtCompound tag = buf.readNbt();

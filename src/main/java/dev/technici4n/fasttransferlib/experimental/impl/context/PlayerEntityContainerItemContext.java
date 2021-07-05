@@ -12,7 +12,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.Hand;
 
 import net.fabricmc.fabric.api.transfer.v1.storage.base.SingleSlotStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 public class PlayerEntityContainerItemContext implements ContainerItemContext {
 	private final ItemVariant boundKey;
@@ -42,19 +42,19 @@ public class PlayerEntityContainerItemContext implements ContainerItemContext {
 	}
 
 	@Override
-	public long getCount(Transaction tx) {
+	public long getCount(TransactionContext tx) {
 		return slot.getResource().equals(boundKey) ? slot.getAmount() : 0;
 	}
 
 	@Override
-	public boolean transform(long count, ItemVariant into, Transaction tx) {
+	public boolean transform(long count, ItemVariant into, TransactionContext tx) {
 		Preconditions.checkArgument(count <= getCount(tx), "Can't transform items that are not available.");
 
 		if (slot.extract(boundKey, count, tx) != count) {
 			throw new AssertionError("Implementation error.");
 		}
 
-		if (!into.isEmpty()) {
+		if (!into.isBlank()) {
 			count -= slot.insert(into, count, tx);
 			wrapper.offerOrDrop(into, count, tx);
 		}

@@ -9,7 +9,7 @@ import net.minecraft.util.math.Direction;
 
 import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 // Wraps an InventorySlotWrapper with SidedInventory#canInsert and SidedInventory#canExtract checks for a given direction.
 class SidedInventorySlotWrapper implements Storage<ItemVariant> {
@@ -29,7 +29,7 @@ class SidedInventorySlotWrapper implements Storage<ItemVariant> {
 	}
 
 	@Override
-	public long insert(ItemVariant resource, long maxAmount, Transaction transaction) {
+	public long insert(ItemVariant resource, long maxAmount, TransactionContext transaction) {
 		if (!sidedInventory.canInsert(slotWrapper.slot, resource.toStack(), direction)) {
 			return 0;
 		} else {
@@ -43,7 +43,7 @@ class SidedInventorySlotWrapper implements Storage<ItemVariant> {
 	}
 
 	@Override
-	public long extract(ItemVariant resource, long maxAmount, Transaction transaction) {
+	public long extract(ItemVariant resource, long maxAmount, TransactionContext transaction) {
 		if (!sidedInventory.canExtract(slotWrapper.slot, resource.toStack(), direction)) {
 			return 0;
 		} else {
@@ -52,7 +52,7 @@ class SidedInventorySlotWrapper implements Storage<ItemVariant> {
 	}
 
 	@Override
-	public Iterator<StorageView<ItemVariant>> iterator(Transaction transaction) {
+	public Iterator<StorageView<ItemVariant>> iterator(TransactionContext transaction) {
 		return slotWrapper.iterator(transaction);
 	}
 }

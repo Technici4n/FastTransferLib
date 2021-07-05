@@ -20,7 +20,7 @@ import net.fabricmc.fabric.api.transfer.v1.storage.Storage;
 import net.fabricmc.fabric.api.transfer.v1.storage.StoragePreconditions;
 import net.fabricmc.fabric.api.transfer.v1.storage.StorageView;
 import net.fabricmc.fabric.api.transfer.v1.storage.base.InsertionOnlyStorage;
-import net.fabricmc.fabric.api.transfer.v1.transaction.Transaction;
+import net.fabricmc.fabric.api.transfer.v1.transaction.TransactionContext;
 
 public class EmptyItemsRegistry {
 	private static final Map<Item, EmptyItemProvider> PROVIDERS = new IdentityHashMap<>();
@@ -57,8 +57,8 @@ public class EmptyItemsRegistry {
 			}
 
 			@Override
-			public long insert(FluidVariant fluid, long maxAmount, Transaction transaction) {
-				StoragePreconditions.notEmptyNotNegative(fluid, maxAmount);
+			public long insert(FluidVariant fluid, long maxAmount, TransactionContext transaction) {
+				StoragePreconditions.notBlankNotNegative(fluid, maxAmount);
 
 				if (ctx.getCount(transaction) == 0) return 0;
 				FillInfo fillInfo = acceptedFluids.get(fluid);
@@ -74,19 +74,12 @@ public class EmptyItemsRegistry {
 			}
 
 			@Override
-			public Iterator<StorageView<FluidVariant>> iterator(Transaction transaction) {
+			public Iterator<StorageView<FluidVariant>> iterator(TransactionContext transaction) {
 				return Collections.emptyIterator();
 			}
 		}
 	}
 
-	private static class FillInfo {
-		private final long amount;
-		private final Function<ItemVariant, ItemVariant> keyMapping;
-
-		private FillInfo(long amount, Function<ItemVariant, ItemVariant> keyMapping) {
-			this.amount = amount;
-			this.keyMapping = keyMapping;
-		}
+	private record FillInfo(long amount, Function<ItemVariant, ItemVariant> keyMapping) {
 	}
 }
