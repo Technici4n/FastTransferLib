@@ -13,16 +13,6 @@ archivesBaseName = project.archives_base_name
 version = project.mod_version
 group = project.maven_group
 
-repositories {
-    maven {
-        name = "Technici4n"
-        url = "https://raw.githubusercontent.com/Technici4n/Technici4n-maven/master/"
-        content {
-            includeGroup "net.fabricmc.fabric-api"
-        }
-    }
-}
-
 sourceSets {
     testmod {
         compileClasspath += main.compileClasspath
@@ -36,7 +26,6 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    modApi include("net.fabricmc.fabric-api:fabric-transfer-api-v1:${project.transfer_api_version}")
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
 
     modImplementation "teamreborn:energy:${project.tr_energy_version}"

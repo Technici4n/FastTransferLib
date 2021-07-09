@@ -4,13 +4,9 @@
   "package": "dev.technici4n.fasttransferlib.impl.mixin",
   "compatibilityLevel": "JAVA_16",
   "mixins": [
-    "BucketItemAccessor",
     "EnergyAccess",
     "EnergyHandlerAccess",
-    "EnergyHandlerMixin",
-    "HopperBlockEntityAccessor",
-    "HopperBlockEntityMixin",
-    "ItemMixin"
+    "EnergyHandlerMixin"
    ],
   "injectors": {
     "defaultRequire": 1
