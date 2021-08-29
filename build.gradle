@@ -26,10 +26,9 @@ dependencies {
     mappings "net.fabricmc:yarn:${project.yarn_mappings}:v2"
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
 
-    modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
+    modApi "net.fabricmc.fabric-api:fabric-api-lookup-api-v1:${project.api_lookup_version}"
 
-    modImplementation "teamreborn:energy:${project.tr_energy_version}"
-    include "teamreborn:energy:${project.tr_energy_version}"
+    modImplementation include("teamreborn:energy:${project.tr_energy_version}")
 
     afterEvaluate {
         testmodImplementation sourceSets.main.output

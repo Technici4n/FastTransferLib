@@ -3,7 +3,7 @@
   "id": "fasttransferlib",
   "version": "${version}",
   "name": "Fast Transfer Lib",
-  "description": "A fast item, fluid and energy api for the Fabric ecosystem.",
+  "description": "A fast energy api for the Fabric ecosystem.",
   "authors": [
     "Technici4n",
     "ThatTrollzer"
@@ -18,7 +18,8 @@
     "fasttransferlib.mixins.json"
   ],
   "depends": {
-    "fabricloader": ">=0.7.4",
-    "fabric": ">=0.36"
+    "java": ">=16",
+    "minecraft": ">=1.17",
+    "fabric-api-lookup-api-v1": ">=1.2"
   }
 }
