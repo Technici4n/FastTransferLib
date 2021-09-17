@@ -1,3 +1,7 @@
+# DEPRECATED, USE THE NEW TECHREBORN ENERGY INSTEAD
+[TechReborn Energy](https://github.com/TechReborn/Energy) was reworked recently and now offers an interface similar to FTL's, but a little closer to the Fabric Transfer API and embracing its transaction system.
+As such, FTL is deprecated in favor of TR Energy.
+
 # Fast Transfer Lib
 A clean, simple and fast energy api for the Fabric ecosystem, with **bidirectional** compatibility with Tech Reborn Energy,
 based on the [Fabric API Lookup module](https://github.com/FabricMC/fabric/tree/1.16/fabric-api-lookup-api-v1).
